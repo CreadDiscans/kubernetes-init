@@ -1,0 +1,3 @@
+module "ingress" {
+  source = "./ingress"
+}

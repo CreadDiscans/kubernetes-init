@@ -1,10 +1,3 @@
-# 환경
-
-Ubuntu 22.04
-kubernetes 1.27
-weavenet 2.8.1 [https://github.com/weaveworks/weave]
-ingress-nginx 1.8.1 [https://github.com/kubernetes/ingress-nginx]
-
 # kubernetes install 방법
 
 마스터 노드에서
