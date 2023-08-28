@@ -4,11 +4,11 @@ locals {
 
 resource "null_resource" "ingress_nginx" {
   provisioner "local-exec" {
-    command = "kubectl apply -f ${path.module}/ingress-nginx-v1.8.1.yaml"
+    command = "kubectl apply -f ${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "kubectl delete -f ${path.module}/ingress-nginx-v1.8.1.yaml"
+    command = "kubectl delete -f ${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
   }
 }
 
@@ -42,26 +42,25 @@ resource "null_resource" "arp_protocol_window" {
 
 resource "null_resource" "metallb" {
   provisioner "local-exec" {
-    command = "kubectl apply -f ${path.module}/metallb-v0.13.10.yaml"
+    command = "kubectl apply -f ${path.module}/yaml/metallb-v0.13.10.yaml"
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "kubectl delete -f ${path.module}/metallb-v0.13.10.yaml"
+    command = "kubectl delete -f ${path.module}/yaml/metallb-v0.13.10.yaml"
   }
   depends_on = [null_resource.arp_protocol_window, null_resource.arp_protocol_linux]
 }
 
-resource "null_resource" "metallb_config" {
-  provisioner "local-exec" {
-    command = "kubectl apply -f ${path.module}/metallb-config.yaml"
-  }
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl delete -f ${path.module}/metallb-config.yaml"
-  }
+resource "kubectl_manifest" "metallb_config-ipaddress" {
+  yaml_body = templatefile("${path.module}/yaml/metallb-config-ipaddress.yaml", {
+    external_ips = var.external_ips
+  })
   depends_on = [null_resource.metallb]
 }
-
+resource "kubectl_manifest" "metallb_config-advertisement" {
+  yaml_body  = templatefile("${path.module}/yaml/metallb-config-advertisement.yaml", {})
+  depends_on = [null_resource.metallb]
+}
 
 resource "null_resource" "set_loadbalancer_linux" {
   count = local.is_linux ? 1 : 0
@@ -73,7 +72,7 @@ resource "null_resource" "set_loadbalancer_linux" {
     when    = destroy
     command = "kubectl -n ingress-nginx patch service ingress-nginx-controller -p '{\"spec\":{\"type\":\"NodePort\"}}'"
   }
-  depends_on = [null_resource.metallb_config]
+  depends_on = [kubectl_manifest.metallb_config-ipaddress]
 }
 
 resource "null_resource" "set_loadbalancer_window" {
@@ -88,5 +87,5 @@ resource "null_resource" "set_loadbalancer_window" {
     command     = "kubectl -n ingress-nginx patch service ingress-nginx-controller -p '{\\\"spec\\\":{\\\"type\\\":\\\"NodePort\\\"}}'"
     interpreter = ["PowerShell", "-Command"]
   }
-  depends_on = [null_resource.metallb_config]
+  depends_on = [kubectl_manifest.metallb_config-ipaddress]
 }
