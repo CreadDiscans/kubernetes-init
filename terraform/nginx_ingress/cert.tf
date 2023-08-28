@@ -8,15 +8,20 @@ resource "null_resource" "cert-manager" {
   }
 }
 
+resource "time_sleep" "wait-cert-manager" {
+  create_duration = "120s"
+  depends_on      = [null_resource.cert-manager]
+}
+
 resource "kubectl_manifest" "cert-cluster-issuer-stage" {
   yaml_body = templatefile("${path.module}/yaml/cluster-issuer-stage.yaml", {
     email = var.email
   })
-  depends_on = [null_resource.cert-manager]
+  depends_on = [time_sleep.wait-cert-manager]
 }
 resource "kubectl_manifest" "cert-cluster-issuer-prod" {
   yaml_body = templatefile("${path.module}/yaml/cluster-issuer-prod.yaml", {
     email = var.email
   })
-  depends_on = [null_resource.cert-manager]
+  depends_on = [time_sleep.wait-cert-manager]
 }

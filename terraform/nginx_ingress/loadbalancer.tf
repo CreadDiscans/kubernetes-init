@@ -51,15 +51,20 @@ resource "null_resource" "metallb" {
   depends_on = [null_resource.arp_protocol_window, null_resource.arp_protocol_linux]
 }
 
+resource "time_sleep" "wait-metallb" {
+  create_duration = "10s"
+  depends_on      = [null_resource.metallb]
+}
+
 resource "kubectl_manifest" "metallb_config-ipaddress" {
   yaml_body = templatefile("${path.module}/yaml/metallb-config-ipaddress.yaml", {
     external_ips = var.external_ips
   })
-  depends_on = [null_resource.metallb]
+  depends_on = [time_sleep.wait-metallb]
 }
 resource "kubectl_manifest" "metallb_config-advertisement" {
   yaml_body  = templatefile("${path.module}/yaml/metallb-config-advertisement.yaml", {})
-  depends_on = [null_resource.metallb]
+  depends_on = [time_sleep.wait-metallb]
 }
 
 resource "null_resource" "set_loadbalancer_linux" {
