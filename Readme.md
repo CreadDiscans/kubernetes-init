@@ -2,11 +2,12 @@
 
 Ubuntu          22.04
 kubernetes      1.27
-weavenet        2.8.1   [https://github.com/weaveworks/weave]
-ingress-nginx   1.8.1   [https://github.com/kubernetes/ingress-nginx]
-metallb         0.13.10 [https://github.com/metallb/metallb]
-cert-manager    1.12.3  [https://github.com/cert-manager/cert-manager]
-
+weavenet        2.8.1       [https://github.com/weaveworks/weave]
+ingress-nginx   1.8.1       [https://github.com/kubernetes/ingress-nginx]
+metallb         0.13.10     [https://github.com/metallb/metallb]
+cert-manager    1.12.3      [https://github.com/cert-manager/cert-manager]
+gitlab-ce       16.3.0-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
+       
 # 설정
 
 ingress/yaml/metallb-config.yaml ->  addresses 값 네트워크 환경에 맞게 조절
