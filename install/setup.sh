@@ -26,6 +26,9 @@ sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.1.1.tgz
 sudo systemctl restart containerd
 rm cni-plugins-linux-amd64-v1.1.1.tgz
 
+# nfs
+sudo apt install nfs-common
+
 # kubernetes 설치
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
