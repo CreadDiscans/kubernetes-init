@@ -9,7 +9,7 @@ resource "null_resource" "cert-manager" {
 }
 
 resource "time_sleep" "wait-cert-manager" {
-  create_duration = "120s"
+  create_duration = "180s"
   depends_on      = [null_resource.cert-manager]
 }
 
