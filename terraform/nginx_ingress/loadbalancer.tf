@@ -52,17 +52,17 @@ resource "null_resource" "metallb" {
 }
 
 resource "time_sleep" "wait-metallb" {
-  create_duration = "10s"
+  create_duration = "60s"
   depends_on      = [null_resource.metallb]
 }
 
-resource "kubectl_manifest" "metallb_config-ipaddress" {
+resource "kubectl_manifest" "metallb_config_ipaddress" {
   yaml_body = templatefile("${path.module}/yaml/metallb-config-ipaddress.yaml", {
     external_ips = var.external_ips
   })
   depends_on = [time_sleep.wait-metallb]
 }
-resource "kubectl_manifest" "metallb_config-advertisement" {
+resource "kubectl_manifest" "metallb_config_advertisement" {
   yaml_body  = templatefile("${path.module}/yaml/metallb-config-advertisement.yaml", {})
   depends_on = [time_sleep.wait-metallb]
 }
@@ -77,7 +77,7 @@ resource "null_resource" "set_loadbalancer_linux" {
     when    = destroy
     command = "kubectl -n ingress-nginx patch service ingress-nginx-controller -p '{\"spec\":{\"type\":\"NodePort\"}}'"
   }
-  depends_on = [kubectl_manifest.metallb_config-ipaddress]
+  depends_on = [kubectl_manifest.metallb_config_ipaddress]
 }
 
 resource "null_resource" "set_loadbalancer_window" {
@@ -92,5 +92,5 @@ resource "null_resource" "set_loadbalancer_window" {
     command     = "kubectl -n ingress-nginx patch service ingress-nginx-controller -p '{\\\"spec\\\":{\\\"type\\\":\\\"NodePort\\\"}}'"
     interpreter = ["PowerShell", "-Command"]
   }
-  depends_on = [kubectl_manifest.metallb_config-ipaddress]
+  depends_on = [kubectl_manifest.metallb_config_ipaddress]
 }

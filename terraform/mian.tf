@@ -14,5 +14,7 @@ module "gitlab_devops" {
   source        = "./gitlab_devops"
   domain        = var.domain
   root_password = var.gitlab_root_password
+  nfs_ip        = var.nfs_ip
+  nfs_path      = var.nfs_path
   depends_on    = [module.nginx_ingress]
 }

@@ -4,10 +4,52 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+resource "kubernetes_persistent_volume" "gitlab_pv" {
+  metadata {
+    name = "gitlab-pv"
+    labels = {
+      name = "gitlab-pv"
+    }
+  }
+  spec {
+    capacity = {
+      storage = "2Gi"
+    }
+    persistent_volume_reclaim_policy = "Retain"
+    access_modes                     = ["ReadWriteMany"]
+    persistent_volume_source {
+      nfs {
+        server = var.nfs_ip
+        path   = var.nfs_path
+      }
+    }
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "gitlab_pvc" {
+  metadata {
+    name      = "gitlab-pvc"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  spec {
+    access_modes = ["ReadWriteMany"]
+    resources {
+      requests = {
+        storage = "2Gi"
+      }
+    }
+    selector {
+      match_labels = {
+        name = kubernetes_persistent_volume.gitlab_pv.metadata.0.name
+      }
+    }
+  }
+}
+
 resource "kubernetes_deployment" "gitlab_deploy" {
   metadata {
     name      = "gitlab-deploy"
-    namespace = kubernetes_namespace.ns.metadata[0].name
+    namespace = kubernetes_namespace.ns.metadata.0.name
     labels = {
       app = "gitlab"
     }
@@ -41,6 +83,22 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             name  = "GITLAB_SKIP_UNMIGRATED_DATA_CHECK"
             value = true
           }
+          volume_mount {
+            mount_path = "/etc/gitlab"
+            name       = "gitlab-volume"
+            sub_path   = "gitlab/config"
+          }
+          volume_mount {
+            mount_path = "/var/opt/gitlab"
+            name       = "gitlab-volume"
+            sub_path   = "gitlab/data"
+          }
+        }
+        volume {
+          name = "gitlab-volume"
+          persistent_volume_claim {
+            claim_name = kubernetes_persistent_volume_claim.gitlab_pvc.metadata.0.name
+          }
         }
       }
     }
@@ -48,7 +106,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
 }
 
 resource "time_sleep" "wait_deploy" {
-  create_duration = "60s"
+  create_duration = "300s"
   depends_on      = [kubernetes_deployment.gitlab_deploy]
 }
 
