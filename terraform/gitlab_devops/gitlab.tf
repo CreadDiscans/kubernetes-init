@@ -141,11 +141,11 @@ resource "kubernetes_ingress_v1" "gitlab_ingress" {
   }
   spec {
     tls {
-      hosts       = ["gitlab.${var.domain}"]
+      hosts       = ["${local.prefix}.${var.domain}"]
       secret_name = "gitlab-cert"
     }
     rule {
-      host = "gitlab.${var.domain}"
+      host = "${local.prefix}.${var.domain}"
       http {
         path {
           path = "/"

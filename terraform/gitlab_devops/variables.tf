@@ -1,3 +1,6 @@
+locals {
+  prefix = "gitlab"
+}
 
 variable "domain" {
   type = string
