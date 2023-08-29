@@ -1,27 +1,18 @@
-resource "null_resource" "cert-manager" {
-  provisioner "local-exec" {
-    command = "kubectl apply -f ${path.module}/yaml/cert-manager-v1.12.3.yaml"
-  }
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl delete -f ${path.module}/yaml/cert-manager-v1.12.3.yaml"
-  }
+module "cert_manager" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/cert-manager-v1.12.3.yaml"
 }
 
-resource "time_sleep" "wait-cert-manager" {
+resource "time_sleep" "wait_cert_manager" {
   create_duration = "200s"
-  depends_on      = [null_resource.cert-manager]
+  depends_on      = [module.cert_manager]
 }
 
-resource "kubectl_manifest" "cert-cluster-issuer-stage" {
-  yaml_body = templatefile("${path.module}/yaml/cluster-issuer-stage.yaml", {
+module "cert_cluster_issuer" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/cluster-issuer.yaml"
+  args = {
     email = var.email
-  })
-  depends_on = [time_sleep.wait-cert-manager]
-}
-resource "kubectl_manifest" "cert-cluster-issuer-prod" {
-  yaml_body = templatefile("${path.module}/yaml/cluster-issuer-prod.yaml", {
-    email = var.email
-  })
-  depends_on = [time_sleep.wait-cert-manager]
+  }
+  depends_on = [time_sleep.wait_cert_manager]
 }
