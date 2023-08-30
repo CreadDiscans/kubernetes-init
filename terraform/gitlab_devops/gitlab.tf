@@ -106,7 +106,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
 }
 
 resource "time_sleep" "wait_deploy" {
-  create_duration = "300s"
+  create_duration = "180s"
   depends_on      = [kubernetes_deployment.gitlab_deploy]
 }
 
@@ -135,7 +135,7 @@ resource "kubernetes_ingress_v1" "gitlab_ingress" {
       "ingress.kubernetes.io/ssl-redirect" = "true"
       "kubernetes.io/ingress.class"        = "nginx"
       "kubernetes.io/tls-acme"             = "true"
-      "cert-manager.io/cluster-issuer"     = "letsencrypt-prod"
+      "cert-manager.io/cluster-issuer"     = local.clusterissuer
     }
     namespace = kubernetes_namespace.ns.metadata.0.name
   }

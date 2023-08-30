@@ -27,3 +27,8 @@ variable "gitlab_root_password" {
   type    = string
   default = "defaultpassword"
 }
+
+variable "mode" {
+  type    = string
+  default = "staging"
+}

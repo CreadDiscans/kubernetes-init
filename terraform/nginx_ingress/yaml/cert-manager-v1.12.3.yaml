@@ -5383,6 +5383,11 @@ spec:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '9402'
     spec:
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 8.8.8.8
+      dnsPolicy: None
       serviceAccountName: cert-manager
       securityContext:
         runAsNonRoot: true

@@ -1,5 +1,6 @@
 locals {
-  prefix = "gitlab"
+  prefix        = "gitlab"
+  clusterissuer = var.mode == "prod" ? "letsencrypt-prod" : "letsencrypt-staging"
 }
 
 variable "domain" {
@@ -15,5 +16,9 @@ variable "nfs_ip" {
 }
 
 variable "nfs_path" {
+  type = string
+}
+
+variable "mode" {
   type = string
 }
