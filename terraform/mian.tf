@@ -10,10 +10,18 @@ module "nfs_provisioner" {
   nfs_path = var.nfs_path
 }
 
+module "keycloak_sso" {
+  source   = "./keycloak"
+  domain   = var.domain
+  mode     = var.mode
+  username = var.username
+  password = var.password
+}
+
 module "gitlab_devops" {
   source        = "./gitlab_devops"
   domain        = var.domain
-  root_password = var.gitlab_root_password
+  root_password = var.password
   nfs_ip        = var.nfs_ip
   nfs_path      = var.nfs_path
   mode          = var.mode

@@ -8,6 +8,7 @@ metallb                             0.13.10     [https://github.com/metallb/meta
 cert-manager                        1.12.3      [https://github.com/cert-manager/cert-manager]
 nfs-subdir-external-provisioner     4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
 gitlab-ce                           16.3.0-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
+keycloak                            22.0.1      [https://www.keycloak.org/]
 
 # 설정
 

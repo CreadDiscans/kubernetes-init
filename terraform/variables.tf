@@ -23,7 +23,12 @@ variable "nfs_path" {
   default = "/nfs"
 }
 
-variable "gitlab_root_password" {
+variable "username" {
+  type    = string
+  default = "admin"
+}
+
+variable "password" {
   type    = string
   default = "defaultpassword"
 }
