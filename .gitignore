@@ -4,3 +4,5 @@ terraform.tfstate
 terraform.tfstate.backup
 dev.tfvars
 *_applied.yaml
+venv
+tmp
