@@ -77,7 +77,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           }
           env {
             name  = "GITLAB_ROOT_PASSWORD"
-            value = var.root_password
+            value = var.password
           }
           env {
             name  = "GITLAB_SKIP_UNMIGRATED_DATA_CHECK"

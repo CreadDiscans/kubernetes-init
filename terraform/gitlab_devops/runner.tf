@@ -94,7 +94,7 @@ resource "kubernetes_deployment" "runner" {
           }
           env {
             name  = "PASSWORD"
-            value = var.root_password
+            value = var.password
           }
           env {
             name  = "SOURCE"
