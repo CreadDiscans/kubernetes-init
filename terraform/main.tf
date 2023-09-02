@@ -1,12 +1,15 @@
-module "prometheus_monitoring" {
-  source = "./prometheus-monitoring"
+module "nginx_ingress" {
+  source       = "./nginx_ingress"
+  external_ips = var.external_ips
+  email        = var.email
 }
 
-# module "nginx_ingress" {
-#   source       = "./nginx_ingress"
-#   external_ips = var.external_ips
-#   email        = var.email
-# }
+module "prometheus_monitoring" {
+  source     = "./prometheus-monitoring"
+  domain     = var.domain
+  mode       = var.mode
+  depends_on = [module.nginx_ingress]
+}
 
 # module "nfs_provisioner" {
 #   source   = "./nfs_provisioner"

@@ -39860,37 +39860,6 @@ spec:
           secretName: grafana-config
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  labels:
-    app.kubernetes.io/component: grafana
-    app.kubernetes.io/name: grafana
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 9.5.3
-  name: grafana
-  namespace: monitoring
-spec:
-  egress:
-  - {}
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-    ports:
-    - port: 3000
-      protocol: TCP
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
-  policyTypes:
-  - Egress
-  - Ingress
-
----
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -39924,27 +39893,6 @@ spec:
     - expr: |
         sum by (namespace, job, handler, status_code) (rate(grafana_http_request_duration_seconds_count[5m]))
       record: namespace_job_handler_statuscode:grafana_http_request_duration_seconds_count:rate5m
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: grafana
-    app.kubernetes.io/name: grafana
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 9.5.3
-  name: grafana
-  namespace: monitoring
-spec:
-  ports:
-  - name: http
-    port: 3000
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: grafana
-    app.kubernetes.io/name: grafana
-    app.kubernetes.io/part-of: kube-prometheus
 
 ---
 apiVersion: v1
