@@ -1,7 +1,7 @@
 #!/bin/sh
 if [ $# -ne 1 ]; then
-        echo "Uset: $0 DEVICE_NAME # check ifconfig"
-        exit -1
+	echo "Usage: $0 DEVICE_NAME # check ifconfig"
+	exit -1
 fi
 
 sudo ethtool -s $1 wol g

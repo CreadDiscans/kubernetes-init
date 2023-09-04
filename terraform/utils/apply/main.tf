@@ -30,7 +30,7 @@ resource "null_resource" "apply" {
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "kubectl delete -f ${self.triggers.yaml}"
+    command = "kubectl delete --ignore-not-found=true -f ${self.triggers.yaml}"
   }
 
   depends_on = [local_file.ready]
