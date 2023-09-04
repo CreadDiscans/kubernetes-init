@@ -13,7 +13,7 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
-sudo apt install containerd.io
+sudo apt install -y containerd.io
 sudo systemctl start containerd
 sudo systemctl enable containerd
 sudo mv /etc/containerd/config.toml /etc/containerd/config.toml.orig
@@ -27,7 +27,10 @@ sudo systemctl restart containerd
 rm cni-plugins-linux-amd64-v1.1.1.tgz
 
 # nfs
-sudo apt install nfs-common
+sudo apt install -y nfs-common
+
+# wake on lan
+sudo apt install -y net-tools ethtool wakeonlan
 
 # kubernetes 설치
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
