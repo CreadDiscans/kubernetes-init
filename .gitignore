@@ -10,3 +10,4 @@ tmp
 db.sqlite3
 __pycache__
 venv
+dump.rdb

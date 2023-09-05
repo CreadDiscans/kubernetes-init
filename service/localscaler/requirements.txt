@@ -1,2 +1,4 @@
 django
 tzdata
+celery[redis]
+django-celery-beat
