@@ -1,9 +1,75 @@
 <html>
-
-    <head>
-        <title>Cluster Resource Dahsboard</title>
-    </head>
-    <body>
-        
-    </body>
+  <head>
+    <title>Cluster Dahsboard</title>
+    <link href="/static/dashboard/bootstrap.min.css" rel="stylesheet" />
+    <script src="/static/dashboard/bootstrap.bundle.min.js"></script>
+    <script src="/static/dashboard/angular.min.js"></script>
+  </head>
+  <body ng-app="myApp">
+    <header class="p-3 text-bg-dark">
+      <div class="container">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
+        >
+          <ul
+            class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
+          >
+            <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <div class="container mt-5" ng-controller="nodeCtrl">
+      <div class="row">
+        <div class="col-12">
+          <table class="table">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Mac Address</th>
+                <th>IP</th>
+                <th>Status</th>
+                <th>Info</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="node in nodes">
+                <td>[[$index]]</td>
+                <td>[[node.name]]</td>
+                <td>[[node.mac]]</td>
+                <td>[[node.ip]]</td>
+                <td>[[node.status]]</td>
+                <td>[[node.info]]</td>
+                <td>[[node.updated]]</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var app = angular.module("myApp", []);
+        app.config(function ($interpolateProvider) {
+          $interpolateProvider.startSymbol("[[");
+          $interpolateProvider.endSymbol("]]");
+        });
+        app.controller("nodeCtrl", function ($scope) {
+          const load = () => {
+            fetch("/api/node/")
+              .then((res) => res.json())
+              .then((nodes) => {
+                $scope.nodes = nodes;
+              });
+          };
+          load();
+          setInterval(() => {
+            load();
+          }, 10 * 1000);
+        });
+      })();
+    </script>
+  </body>
 </html>
