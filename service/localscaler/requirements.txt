@@ -2,3 +2,5 @@ django
 tzdata
 celery[redis]
 django-celery-beat
+requests
+getmac
