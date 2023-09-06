@@ -42929,6 +42929,16 @@ spec:
     ports:
     - port: 9090
       protocol: TCP
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: localscaler
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: autoscaler
+    ports:
+    - port: 9090
+      protocol: TCP
   podSelector:
     matchLabels:
       app.kubernetes.io/component: prometheus

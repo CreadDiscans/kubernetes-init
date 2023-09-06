@@ -11,6 +11,11 @@ module "prometheus_monitoring" {
   depends_on = [module.nginx_ingress]
 }
 
+module "autoscaler" {
+  source     = "./autoscaler"
+  depends_on = [module.prometheus_monitoring]
+}
+
 # module "nfs_provisioner" {
 #   source   = "./nfs_provisioner"
 #   nfs_ip   = var.nfs_ip
