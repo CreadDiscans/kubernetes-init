@@ -18,4 +18,4 @@ echo "WantedBy=basic.target"                    >> wol.service
 
 sudo mv wol.service /etc/systemd/system/wol.service
 sudo systemctl enable /etc/systemd/system/wol.service
-sudo systemctl start wol.servic
+sudo systemctl start wol.service

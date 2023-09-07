@@ -14,6 +14,8 @@ module "prometheus_monitoring" {
 module "autoscaler" {
   source     = "./autoscaler"
   depends_on = [module.prometheus_monitoring]
+  domain     = var.domain
+  mode       = var.mode
 }
 
 # module "nfs_provisioner" {
