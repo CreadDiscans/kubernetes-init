@@ -14,7 +14,9 @@
           <ul
             class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
           >
-            <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
+            <li>
+              <a href="#" class="nav-link px-2 text-secondary">LocalScaler</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -42,7 +44,7 @@
                 <td>[[node.ip]]</td>
                 <td>[[node.status]]</td>
                 <td>[[node.info]]</td>
-                <td>[[node.updated]]</td>
+                <td>[[parseTime(node.updated)]]</td>
               </tr>
             </tbody>
           </table>
@@ -57,11 +59,15 @@
           $interpolateProvider.endSymbol("]]");
         });
         app.controller("nodeCtrl", function ($scope) {
+          $scope.parseTime = (val) => {
+            return new Date(val).toLocaleString();
+          };
           const load = () => {
             fetch("/api/node/")
               .then((res) => res.json())
               .then((nodes) => {
                 $scope.nodes = nodes;
+                $scope.$apply();
               });
           };
           load();

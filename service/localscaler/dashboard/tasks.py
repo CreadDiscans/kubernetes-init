@@ -51,7 +51,7 @@ def every_10_sec():
                     name=node_name,
                     mac=get_mac_address(ip),
                     ip=ip,
-                    status='add',
+                    status='up',
                     info=json.dumps({
                         'cpu':nodes[node_name]['cpu_max'],
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)

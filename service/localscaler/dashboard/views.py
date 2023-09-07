@@ -8,7 +8,7 @@ def home(request):
 
 def node(request):
     if request.method == 'GET':
-        nodes = Node.objects.all()
+        nodes = Node.objects.all().order_by('-id')
         output = []
         for node in nodes:
             output.append({
