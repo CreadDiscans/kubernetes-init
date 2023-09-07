@@ -20,3 +20,9 @@ def node(request):
                 'updated':node.updated
             })
         return JsonResponse(output, safe=False)
+    
+def powerOffReq(request):
+    return JsonResponse({}, safe=False)
+
+def powerOnReq(request):
+    return JsonResponse({}, safe=False)

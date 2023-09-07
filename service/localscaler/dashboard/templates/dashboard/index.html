@@ -34,6 +34,7 @@
                 <th>Status</th>
                 <th>Info</th>
                 <th>Updated</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -45,6 +46,22 @@
                 <td>[[node.status]]</td>
                 <td>[[node.info]]</td>
                 <td>[[parseTime(node.updated)]]</td>
+                <td>
+                  <button
+                    class="btn btn-primary"
+                    ng-if="node.status == 'down'"
+                    ng-click="powerOn(node)"
+                  >
+                    Power On
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    ng-if="node.status == 'up'"
+                    ng-click="powerOff(node)"
+                  >
+                    Power Off
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -61,6 +78,16 @@
         app.controller("nodeCtrl", function ($scope) {
           $scope.parseTime = (val) => {
             return new Date(val).toLocaleString();
+          };
+          $scope.powerOff = (node) => {
+            fetch("/api/power/off").then(() => {
+              load();
+            });
+          };
+          $scope.powerOn = (node) => {
+            fetch("/api/power/on").then(() => {
+              load();
+            });
           };
           const load = () => {
             fetch("/api/node/")
