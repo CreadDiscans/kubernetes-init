@@ -80,12 +80,28 @@
             return new Date(val).toLocaleString();
           };
           $scope.powerOff = (node) => {
-            fetch("/api/power/off").then(() => {
+            fetch("/api/power/off",{
+              method:'POST',
+              headers:{
+                'Content-Type':'application/json'
+              },
+              body:JSON.stringify({
+                node:node.name
+              })
+            }).then(() => {
               load();
             });
           };
           $scope.powerOn = (node) => {
-            fetch("/api/power/on").then(() => {
+            fetch("/api/power/on",{
+              method:'POST',
+              headers:{
+                'Content-Type':'application/json'
+              },
+              body:JSON.stringify({
+                node:node.name
+              })
+            }).then(() => {
               load();
             });
           };

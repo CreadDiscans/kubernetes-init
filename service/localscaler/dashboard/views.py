@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Node
+import os
+from django.conf import settings
 # Create your views here.
 
 def home(request):
@@ -22,7 +24,20 @@ def node(request):
         return JsonResponse(output, safe=False)
     
 def powerOffReq(request):
-    return JsonResponse({}, safe=False)
+    if request.method == 'POST':
+        node = request.data['node']
+        model = Node.objects.get(name=node)
+        os.system(f'kubectl cordon {node}')
+        os.system(f'kubectl drain --ignore-daemonsets {node}')
+        model.status = 'drain'
+        model.save()
+        return JsonResponse({}, safe=False)
 
 def powerOnReq(request):
-    return JsonResponse({}, safe=False)
+    if request.method == 'POST':
+        node = request.data['node']
+        model = Node.objects.get(name=node)
+        os.system(f'bash {os.path.join(settings.BASE_DIR, "wol.sh")} {model.mac} {model.ip}')
+        model.status = 'boot'
+        model.save()
+        return JsonResponse({}, safe=False)
