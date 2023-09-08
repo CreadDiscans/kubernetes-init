@@ -68,6 +68,7 @@
         </div>
       </div>
     </div>
+    {% csrf_token %}
     <script>
       (function () {
         var app = angular.module("myApp", []);
@@ -80,27 +81,29 @@
             return new Date(val).toLocaleString();
           };
           $scope.powerOff = (node) => {
-            fetch("/api/power/off",{
-              method:'POST',
-              headers:{
-                'Content-Type':'application/json'
+            fetch("/api/power/off", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
               },
-              body:JSON.stringify({
-                node:node.name
-              })
+              body: JSON.stringify({
+                node: node.name,
+              }),
             }).then(() => {
               load();
             });
           };
           $scope.powerOn = (node) => {
-            fetch("/api/power/on",{
-              method:'POST',
-              headers:{
-                'Content-Type':'application/json'
+            fetch("/api/power/on", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
               },
-              body:JSON.stringify({
-                node:node.name
-              })
+              body: JSON.stringify({
+                node: node.name,
+              }),
             }).then(() => {
               load();
             });
