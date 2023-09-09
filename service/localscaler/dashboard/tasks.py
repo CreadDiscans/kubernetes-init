@@ -37,7 +37,7 @@ def every_10_sec():
                 prome_sql=f'kube_pod_info{"{"}node="{node.name}",created_by_kind!="DaemonSet"{"}"}'
                 response = requests.get(url, params={'query': prome_sql})
                 if len(response.json()['data']['result']) == 0:
-                    os.system(f'ssh root@{node.ip} shutdown now')
+                    os.system(f'/usr/bin/ssh root@{node.ip} shutdown now')
                     os.system(f'/usr/local/bin/kubectl delete nodes {node.name}')
                     node.status = 'down'
                     node.save()
