@@ -28,9 +28,10 @@ resource "kubernetes_deployment" "localscaler" {
       }
       spec {
         host_network = true
+        node_name    = "master"
         container {
           name  = "localscaler"
-          image = "creaddiscans/localscaler:0.18"
+          image = "creaddiscans/localscaler:0.21"
           env {
             name  = "PROMETHEUS"
             value = data.kubernetes_service.prometheus.spec.0.cluster_ip
