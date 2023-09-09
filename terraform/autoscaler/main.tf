@@ -30,7 +30,7 @@ resource "kubernetes_deployment" "localscaler" {
         host_network = true
         container {
           name  = "localscaler"
-          image = "creaddiscans/localscaler:0.11"
+          image = "creaddiscans/localscaler:0.18"
           env {
             name  = "PROMETHEUS"
             value = data.kubernetes_service.prometheus.spec.0.cluster_ip
@@ -40,11 +40,22 @@ resource "kubernetes_deployment" "localscaler" {
             mount_path = "/etc/kubeconfig"
             read_only  = true
           }
+          volume_mount {
+            name       = "node-ssh"
+            mount_path = "/etc/node_ssh"
+            read_only  = true
+          }
         }
         volume {
           name = "kubeconfig"
           secret {
             secret_name = "kubeconfig"
+          }
+        }
+        volume {
+          name = "node-ssh"
+          secret {
+            secret_name = "node-ssh"
           }
         }
       }
