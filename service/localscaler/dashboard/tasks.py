@@ -42,14 +42,23 @@ def every_10_sec():
                     node.status = 'down'
                     node.save()
                     continue
-            find = False
-            for item in raw:
-                node_name = item['metric']['node'].strip()
-                if node.name == node_name:
-                   find = True
-                   break
-            if not find:
-                node.status = 'down' 
+                else:
+                    os.system(f'/usr/local/bin/kubectl drain --ignore-daemonsets --delete-emptydir-data {node.name}')
+            elif node.status == 'boot':
+                prome_sql=f'kube_pod_info{"{"}node="{node.name}"{"}"}'
+                response = requests.get(url, params={'query': prome_sql})
+                if len(response.json()['data']['result']) == 0:
+                    node.status = 'up'
+                    node.save()
+                    continue
+            # find = False
+            # for item in raw:
+            #     node_name = item['metric']['node'].strip()
+            #     if node.name == node_name:
+            #        find = True
+            #        break
+            # if not find:
+            #     node.status = 'down' 
 
         for item in raw:
             node_name = item['metric']['node'].strip()
@@ -66,10 +75,6 @@ def every_10_sec():
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
                         }, indent=2)
                 ).save()
-            elif node_model[0].status == 'boot':
-                model = node_model[0]
-                model.status = 'up'
-                model.save()
         return 'success'
     except Exception as ex:
         return str(ex)
