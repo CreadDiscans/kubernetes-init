@@ -47,7 +47,7 @@ def every_10_sec():
             elif node.status == 'boot':
                 prome_sql=f'kube_pod_info{"{"}node="{node.name}"{"}"}'
                 response = requests.get(url, params={'query': prome_sql})
-                if len(response.json()['data']['result']) == 0:
+                if len(response.json()['data']['result']) != 0:
                     node.status = 'up'
                     node.save()
                     continue
