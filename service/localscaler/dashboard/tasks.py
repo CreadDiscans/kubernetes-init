@@ -19,7 +19,7 @@ def every_10_sec():
         merge(nodes, 'node_memory_MemTotal_bytes', 'mem_max', int)
         merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
         merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
-        need_more_node = all([n['cpu_max']*0.9 < n['cpu_req'] or n['mem_max']*0.9 < n['mem_req'] for _, n in nodes.items()])
+        # need_more_node = all([n['cpu_max']*0.9 < n['cpu_req'] or n['mem_max']*0.9 < n['mem_req'] for _, n in nodes.items()])
         # if need_more_node:
         #     if Node.objects.filter(status='booting').count() > 0:
         #         print('booting')
@@ -37,7 +37,11 @@ def every_10_sec():
                 prome_sql=f'kube_pod_info{"{"}node="{node.name}",created_by_kind!="DaemonSet"{"}"}'
                 response = requests.get(url, params={'query': prome_sql})
                 if len(response.json()['data']['result']) == 0:
-                    print('shutdown node')
+                    os.system(f'ssh root@{node.ip} shutdown now')
+                    os.system(f'/usr/local/bin/kubectl delete nodes {node.name}')
+                    node.status = 'down'
+                    node.save()
+                    continue
             find = False
             for item in raw:
                 node_name = item['metric']['node'].strip()

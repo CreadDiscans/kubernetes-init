@@ -3,12 +3,12 @@ FROM ubuntu:22.04
 RUN apt-get update
 RUN apt-get -y install apt-utils
 RUN apt-get -y install nginx uwsgi python3 python3-dev python3-pip pkg-config supervisor redis net-tools curl
-RUN apt-get -y install uwsgi-plugin-python3
-RUN apt-get -y install libmysqlclient-dev
+RUN apt-get -y install uwsgi-plugin-python3 libmysqlclient-dev netcat openssh-client wget
 
-RUN curl -LO https://dl.k8s.io/release/v1.27.5/bin/linux/amd64/kubectl
+RUN wget https://dl.k8s.io/release/v1.27.5/bin/linux/amd64/kubectl
 RUN install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 RUN mkdir /root/.kube
+RUN mkdir /root/.ssh
 
 RUN mkdir /app
 WORKDIR /app
@@ -24,4 +24,4 @@ RUN cp /app/config/celery.conf /etc/supervisor/conf.d/celery.conf
 RUN rm /etc/nginx/sites-enabled/default
 
 EXPOSE 80
-CMD cp /etc/kubeconfig/config /root/.kube/config; echo $PROMETHEUS > /app/.env; service supervisor start; service uwsgi start; service nginx start; redis-server
+CMD bash /app/run.sh
