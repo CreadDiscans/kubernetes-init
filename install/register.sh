@@ -22,8 +22,8 @@ spec:
     command: ['sh', '-c']
     args:
     - |
-      USERNAME=\$(cat /etc/username/username);
-      PUBKEY=\$(cat /etc/rsa/id_rsa.pub);
+      USERNAME=\$(cat /etc/ssh/username);
+      PUBKEY=\$(cat /etc/ssh/id_rsa.pub);
       mkdir -p /host/home/\$USERNAME/.ssh;
       echo \$PUBKEY >> /host/home/\$USERNAME/.ssh/authorized_keys;
     tty: true
@@ -34,20 +34,15 @@ spec:
     volumeMounts:
     - name: host
       mountPath: /host
-    - name: node-public
-      mountPath: /etc/rsa
-    - name: node-username
-      mountPath: /etc/username
+    - name: node-ssh
+      mountPath: /etc/ssh
   volumes:
   - name: host
     hostPath:
       path: /
-  - name: node-public
+  - name: node-ssh
     secret:
-        secretName: node-public
-  - name: node-username
-    secret:
-        secretName: node-username
+        secretName: node-ssh
   hostNetwork: true
   hostIPC: true
   hostPID: true
