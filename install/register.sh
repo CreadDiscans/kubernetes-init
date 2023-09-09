@@ -22,10 +22,9 @@ spec:
     command: ['sh', '-c']
     args:
     - |
-      USERNAME=\$(cat /etc/ssh/username);
       PUBKEY=\$(cat /etc/ssh/id_rsa.pub);
-      mkdir -p /host/home/\$USERNAME/.ssh;
-      echo \$PUBKEY >> /host/home/\$USERNAME/.ssh/authorized_keys;
+      mkdir -p /host/root/.ssh;
+      echo \$PUBKEY >> /host/root/.ssh/authorized_keys;
     tty: true
     stdin: true
     stdinOnce: true
