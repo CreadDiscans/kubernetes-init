@@ -66,9 +66,10 @@ def every_10_sec():
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
                         }, indent=2)
                 ).save()
-            # else:
-            #     node_model[0].status = 'running'
-            #     node_model[0].save()
+            elif node_model[0].status == 'boot':
+                model = node_model[0]
+                model.status = 'up'
+                model.save()
         return 'success'
     except Exception as ex:
         return str(ex)
