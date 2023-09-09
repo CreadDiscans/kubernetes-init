@@ -9,7 +9,7 @@ import os
 
 with open('.env', 'r') as f:
     target = f.read().strip()
-url = f'http://{target}:9090/api/v1/query?query='
+url = f'http://{target}:9090/api/v1/query'
 
 @shared_task
 def every_10_sec():
@@ -20,19 +20,24 @@ def every_10_sec():
         merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
         merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
         need_more_node = all([n['cpu_max']*0.9 < n['cpu_req'] or n['mem_max']*0.9 < n['mem_req'] for _, n in nodes.items()])
-        if need_more_node:
-            if Node.objects.filter(status='booting').count() > 0:
-                print('booting')
-            elif Node.objects.filter(status='down').count() > 0:
-                node = Node.objects.filter(status='down')[0]
-                print('boot', node.name, node.ip, node.mac)
-            else:
-                print('no more node')
+        # if need_more_node:
+        #     if Node.objects.filter(status='booting').count() > 0:
+        #         print('booting')
+        #     elif Node.objects.filter(status='down').count() > 0:
+        #         node = Node.objects.filter(status='down')[0]
+        #         print('boot', node.name, node.ip, node.mac)
+        #     else:
+        #         print('no more node')
 
         # TODO cpu / memory 기준으로 요청 < 현재 -1 일대  node 끄기
 
         node_models = Node.objects.all()
         for node in node_models:
+            if node.status == 'drain':
+                prome_sql=f'kube_pod_info{"{"}node="{node.name}",created_by_kind!="DaemonSet"{"}"}'
+                response = requests.get(url, params={'query': prome_sql})
+                if len(response.json()['data']['result']) == 0:
+                    print('shutdown node')
             find = False
             for item in raw:
                 node_name = item['metric']['node'].strip()
@@ -57,15 +62,15 @@ def every_10_sec():
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
                         }, indent=2)
                 ).save()
-            else:
-                node_model[0].status = 'running'
-                node_model[0].save()
+            # else:
+            #     node_model[0].status = 'running'
+            #     node_model[0].save()
         return 'success'
     except Exception as ex:
         return str(ex)
     
 def merge(source, query, key, type):
-    data = requests.get(f'{url}{query}').json()['data']['result']
+    data = requests.get(f'{url}?query={query}').json()['data']['result']
     for item in data:
         if 'node' in item['metric']:
             node_name = item['metric']['node'].strip()
