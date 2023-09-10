@@ -39,7 +39,13 @@ def powerOnReq(request):
         data = json.loads(request.body)
         node = data['node']
         model = Node.objects.get(name=node)
-        os.system(f'/usr/bin/bash {os.path.join(settings.BASE_DIR, "wol.sh")} {model.mac} {model.ip}')
         model.status = 'boot'
         model.save()
         return JsonResponse({}, safe=False)
+
+def magic_packet(request, node):
+    if request.method == 'GET':
+        model = Node.objects.get(name=node)
+        os.system(f'/usr/bin/bash {os.path.join(settings.BASE_DIR, "wol.sh")} {model.mac} {model.ip}')
+        return JsonResponse({}, safe=False)
+        

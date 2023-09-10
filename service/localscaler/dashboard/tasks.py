@@ -6,6 +6,7 @@ import re
 import json
 import getmac
 import os
+from django.conf import settings
 
 with open('.env', 'r') as f:
     target = f.read().strip()
@@ -19,19 +20,17 @@ def every_10_sec():
         merge(nodes, 'node_memory_MemTotal_bytes', 'mem_max', int)
         merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
         merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
-        # need_more_node = all([n['cpu_max']*0.9 < n['cpu_req'] or n['mem_max']*0.9 < n['mem_req'] for _, n in nodes.items()])
-        # if need_more_node:
-        #     if Node.objects.filter(status='booting').count() > 0:
-        #         print('booting')
-        #     elif Node.objects.filter(status='down').count() > 0:
-        #         node = Node.objects.filter(status='down')[0]
-        #         print('boot', node.name, node.ip, node.mac)
-        #     else:
-        #         print('no more node')
-
+        workers = dict(filter(lambda d:
+                              d[0] != 'master' and 
+                              all([key in d[1] for key in ['cpu_max', 'cpu_req', 'mem_max', 'mem_req']]), 
+                              nodes.items()))
+        need_more_node = all([n['cpu_max']*0.8 < n['cpu_req'] or n['mem_max']*0.8 < n['mem_req'] for _, n in workers.items()])
         # TODO cpu / memory 기준으로 요청 < 현재 -1 일대  node 끄기
 
         node_models = Node.objects.all()
+        booting = False
+        down_nodes = []
+        up_nodes = []
         for node in node_models:
             if node.status == 'drain':
                 prome_sql=f'kube_pod_info{"{"}node="{node.name}",created_by_kind!="DaemonSet"{"}"}'
@@ -41,24 +40,25 @@ def every_10_sec():
                     os.system(f'/usr/local/bin/kubectl delete nodes {node.name}')
                     node.status = 'down'
                     node.save()
-                    continue
                 else:
                     os.system(f'/usr/local/bin/kubectl drain --ignore-daemonsets --delete-emptydir-data {node.name}')
             elif node.status == 'boot':
-                prome_sql=f'kube_pod_info{"{"}node="{node.name}"{"}"}'
-                response = requests.get(url, params={'query': prome_sql})
-                if len(response.json()['data']['result']) != 0:
+                booting = True
+                pid = Popen(["/usr/local/bin/kubectl", "get", "node"], stdout=PIPE)
+                s = pid.communicate()[0].decode('utf-8')
+                if node.name in s:
                     node.status = 'up'
                     node.save()
-                    continue
-            # find = False
-            # for item in raw:
-            #     node_name = item['metric']['node'].strip()
-            #     if node.name == node_name:
-            #        find = True
-            #        break
-            # if not find:
-            #     node.status = 'down' 
+                else:
+                    requests.get(f'http://localhost/api/magic/{node.name}')
+            elif node.status == 'down':
+                down_nodes.append(node)
+            elif node.status == 'up':
+                up_nodes.append(node)
+        if need_more_node and len(down_nodes) > 0 and not booting:
+            model = down_nodes[0]
+            model.status = 'boot'
+            model.save()
 
         for item in raw:
             node_name = item['metric']['node'].strip()
@@ -75,10 +75,17 @@ def every_10_sec():
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
                         }, indent=2)
                 ).save()
-        return 'success'
+
+        return json.dumps([[
+            n['cpu_max'],
+            round(n['cpu_req'], 2),
+            round(n['mem_max']/1024/1024/1024, 2),
+            round(n['mem_req']/1024/1024/1024, 2)
+        ] for _, n in workers.items()])
+        # return 'success'
     except Exception as ex:
         return str(ex)
-    
+
 def merge(source, query, key, type):
     data = requests.get(f'{url}?query={query}').json()['data']['result']
     for item in data:
