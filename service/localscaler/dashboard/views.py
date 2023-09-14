@@ -46,6 +46,7 @@ def powerOnReq(request):
 def magic_packet(request, node):
     if request.method == 'GET':
         model = Node.objects.get(name=node)
-        os.system(f'/usr/bin/bash {os.path.join(settings.BASE_DIR, "wol.sh")} {model.mac} {model.ip}')
+        broadcast = '.'.join(model.ip.split('.')[:3] + ['255'])
+        os.system(f'/usr/bin/wakeonlan -i {broadcast} {model.mac}')
         return JsonResponse({}, safe=False)
         

@@ -18,9 +18,9 @@ app.conf.update(
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'every-10-seconds': {
-        'task':'dashboard.tasks.every_10_sec',
-        'schedule':10
+    'every-minute': {
+        'task':'dashboard.tasks.every_minute',
+        'schedule':60
     }
 }
 
