@@ -20,19 +20,7 @@ def every_minute():
         raw = merge(nodes, 'machine_cpu_cores','cpu_max', int)
         merge(nodes, 'node_memory_MemTotal_bytes', 'mem_max', int)
 
-        # merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
-        # merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
-        # workers = dict(filter(lambda d:
-        #                       d[0] != 'master' and 
-        #                       all([key in d[1] for key in ['cpu_max', 'cpu_req', 'mem_max', 'mem_req']]), 
-        #                       nodes.items()))
-        # need_more_node = all([n['cpu_max']*0.8 < n['cpu_req'] or n['mem_max']*0.8 < n['mem_req'] for _, n in workers.items()])
-        # TODO cpu / memory 기준으로 요청 < 현재 -1 일대  node 끄기
-
         node_models = Node.objects.all()
-        # booting = False
-        # down_nodes = []
-        # up_nodes = []
         node_action = False
         for node in node_models:
             if node.status == 'drain':
@@ -55,14 +43,6 @@ def every_minute():
                     node.save()
                 else:
                     requests.get(f'http://localhost/api/magic/{node.name}')
-            # elif node.status == 'down':
-            #     down_nodes.append(node)
-            # elif node.status == 'up':
-            #     up_nodes.append(node)
-        # if need_more_node and len(down_nodes) > 0 and not booting:
-        #     model = down_nodes[0]
-        #     model.status = 'boot'
-        #     model.save()
 
         for item in raw:
             node_name = item['metric']['node'].strip()
@@ -79,6 +59,7 @@ def every_minute():
                         'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
                         }, indent=2)
                 ).save()
+                node_action = True
 
         if not node_action:
             action, node = autoscale(node_models)
@@ -86,25 +67,20 @@ def every_minute():
                 nodes = Node.objects.filter(status='down')
                 if nodes.count() > 0:
                     node = nodes[0]
-                    node.status == 'boot'
+                    node.status = 'boot'
                     node.save()
                     return 'boot'
                 else:
                     return 'boot but not enough node'
             elif action == 'drain':
                 node = Node.objects.get(name=node)
-                node.status == 'drain'
+                node.status = 'drain'
                 node.save()
                 os.system(f'/usr/local/bin/kubectl cordon {node.name}')
                 return 'drain'
-
-        # return json.dumps([[
-        #     n['cpu_max'],
-        #     round(n['cpu_req'], 2),
-        #     round(n['mem_max']/1024/1024/1024, 2),
-        #     round(n['mem_req']/1024/1024/1024, 2)
-        # ] for _, n in workers.items()])
-        return 'keep'
+            else:
+                return 'keep'
+        return 'action'
     except Exception as ex:
         return str(ex)
 
