@@ -7,6 +7,7 @@ import json
 import getmac
 import os
 from django.conf import settings
+import copy
 
 with open('.env', 'r') as f:
     target = f.read().strip()
@@ -18,24 +19,26 @@ def every_minute():
         nodes = {}
         raw = merge(nodes, 'machine_cpu_cores','cpu_max', int)
         merge(nodes, 'node_memory_MemTotal_bytes', 'mem_max', int)
-        merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
-        merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
-        workers = dict(filter(lambda d:
-                              d[0] != 'master' and 
-                              all([key in d[1] for key in ['cpu_max', 'cpu_req', 'mem_max', 'mem_req']]), 
-                              nodes.items()))
-        need_more_node = all([n['cpu_max']*0.8 < n['cpu_req'] or n['mem_max']*0.8 < n['mem_req'] for _, n in workers.items()])
+
+        # merge(nodes, 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests', 'cpu_req', float)
+        # merge(nodes, 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests', 'mem_req', int)
+        # workers = dict(filter(lambda d:
+        #                       d[0] != 'master' and 
+        #                       all([key in d[1] for key in ['cpu_max', 'cpu_req', 'mem_max', 'mem_req']]), 
+        #                       nodes.items()))
+        # need_more_node = all([n['cpu_max']*0.8 < n['cpu_req'] or n['mem_max']*0.8 < n['mem_req'] for _, n in workers.items()])
         # TODO cpu / memory 기준으로 요청 < 현재 -1 일대  node 끄기
 
         node_models = Node.objects.all()
-        booting = False
-        down_nodes = []
-        up_nodes = []
+        # booting = False
+        # down_nodes = []
+        # up_nodes = []
+        node_action = False
         for node in node_models:
             if node.status == 'drain':
+                node_action = True
                 prome_sql=f'kube_pod_info{"{"}node="{node.name}",created_by_kind!="DaemonSet"{"}"}'
-                response = requests.get(url, params={'query': prome_sql})
-                if len(response.json()['data']['result']) == 0:
+                if len(load(prome_sql)) == 0:
                     os.system(f'/usr/bin/ssh -o StrictHostKeychecking=no root@{node.ip} shutdown now')
                     os.system(f'/usr/local/bin/kubectl delete nodes {node.name}')
                     node.status = 'down'
@@ -43,7 +46,8 @@ def every_minute():
                 else:
                     os.system(f'/usr/local/bin/kubectl drain --ignore-daemonsets --delete-emptydir-data {node.name}')
             elif node.status == 'boot':
-                booting = True
+                # booting = True
+                node_action = True
                 pid = Popen(["/usr/local/bin/kubectl", "get", "node"], stdout=PIPE)
                 s = pid.communicate()[0].decode('utf-8')
                 if node.name in s:
@@ -51,14 +55,14 @@ def every_minute():
                     node.save()
                 else:
                     requests.get(f'http://localhost/api/magic/{node.name}')
-            elif node.status == 'down':
-                down_nodes.append(node)
-            elif node.status == 'up':
-                up_nodes.append(node)
-        if need_more_node and len(down_nodes) > 0 and not booting:
-            model = down_nodes[0]
-            model.status = 'boot'
-            model.save()
+            # elif node.status == 'down':
+            #     down_nodes.append(node)
+            # elif node.status == 'up':
+            #     up_nodes.append(node)
+        # if need_more_node and len(down_nodes) > 0 and not booting:
+        #     model = down_nodes[0]
+        #     model.status = 'boot'
+        #     model.save()
 
         for item in raw:
             node_name = item['metric']['node'].strip()
@@ -76,13 +80,31 @@ def every_minute():
                         }, indent=2)
                 ).save()
 
-        return json.dumps([[
-            n['cpu_max'],
-            round(n['cpu_req'], 2),
-            round(n['mem_max']/1024/1024/1024, 2),
-            round(n['mem_req']/1024/1024/1024, 2)
-        ] for _, n in workers.items()])
-        # return 'success'
+        if not node_action:
+            action, node = autoscale(node_models)
+            if action == 'boot':
+                nodes = Node.objects.filter(status='down')
+                if nodes.count() > 0:
+                    node = nodes[0]
+                    node.status == 'boot'
+                    node.save()
+                    return 'boot'
+                else:
+                    return 'boot but not enough node'
+            elif action == 'drain':
+                node = Node.objects.get(name=node)
+                node.status == 'drain'
+                node.save()
+                os.system(f'/usr/local/bin/kubectl cordon {node.name}')
+                return 'drain'
+
+        # return json.dumps([[
+        #     n['cpu_max'],
+        #     round(n['cpu_req'], 2),
+        #     round(n['mem_max']/1024/1024/1024, 2),
+        #     round(n['mem_req']/1024/1024/1024, 2)
+        # ] for _, n in workers.items()])
+        return 'keep'
     except Exception as ex:
         return str(ex)
 
@@ -113,3 +135,83 @@ def get_mac_address(ip):
         s = pid.communicate()[0].decode('utf-8')
         mac = re.search(r"(([a-f\d]{1,2}\:){5}[a-f\d]{1,2})", s).groups()[0]
         return mac
+    
+def autoscale(models):
+    ignore_list = []
+    prome_sql=f'kube_pod_info{"{"}created_by_kind="DaemonSet"{"}"}'
+    for item in load(prome_sql):
+        ignore_list.append(f"{item['metric']['node']}-{item['metric']['pod']}")
+    workers = {}
+    for model in models:
+        if model.status == 'up':
+            info = json.loads(model.info)
+            workers[model.name] = {
+                'cpu':info['cpu'],
+                'memory':info['memory']*1024**3,
+                'daemonset':{'cpu':0, 'memory':0}, 
+                'stack':[]
+            }
+    
+    prome_sql=f'kube_pod_container_resource_requests{"{"}node!="master"{"}"}'
+    pods = {}
+    for item in load(prome_sql):
+        key = f"{item['metric']['node']}-{item['metric']['pod']}"
+        value = float(item['value'][1])
+        node = item['metric']['node']
+        type = item['metric']['resource']
+        if key in ignore_list:
+            if type == 'cpu':
+                workers[node]['daemonset']['cpu'] += value
+            elif type == 'memory':
+                workers[node]['daemonset']['memory'] += value
+        else:
+            if not key in pods:
+                pods[key] = {'cpu':0, 'memory':0}
+            if type == 'cpu':
+                pods[key]['cpu'] += value
+            elif type == 'memory':
+                pods[key]['memory'] += value
+    
+    pods_list = []
+    for key, item in pods.items():
+        pods_list.append(item)
+    result = {'opt_node':0, 'need_more_node':False}
+    dps(pods_list, workers, result)
+    if result['need_more_node']:
+        return 'boot', None
+    else:
+        for node, info in result['workers'].items():
+            if len(info['stack']) == 0:
+                return 'drain', node
+        return None, None
+
+def dps(pods, workers, result, i=0):
+    if len(pods) == i:
+        use_node = 0
+        for node, info in workers.items():
+            if len(info['stack']) > 0:
+                use_node += 1
+        if result['opt_node'] == 0:
+            result['opt_node'] = use_node
+            result['workers'] = copy.deepcopy(workers)
+        else:
+            if result['opt_node'] > use_node:
+                result['opt_node'] = use_node
+                result['workers'] = copy.deepcopy(workers)
+        return
+    item = pods[i]
+    need_more_node = True
+    for node, info in workers.items():
+        cpu = sum(list(map(lambda d:d['cpu'], info['stack']))) + info['daemonset']['cpu']
+        mem = sum(list(map(lambda d:d['memory'], info['stack']))) + info['daemonset']['memory']
+        if cpu + item['cpu'] < info['cpu'] and mem + item['memory'] < info['memory']:
+            need_more_node = False
+            info['stack'].append(item)
+            dps(pods, workers, result, i+1)
+            info['stack'].pop()
+    if result['need_more_node'] == False:
+        result['need_more_node'] = need_more_node
+
+def load(prome_sql):
+    response = requests.get(url, params={'query': prome_sql})
+    return response.json()['data']['result']
