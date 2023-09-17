@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-test # 이름 변경 후 사용할것.
+  namespace: cnpg-system
+spec:
+  cluster:
+    name: cluster-cnpg

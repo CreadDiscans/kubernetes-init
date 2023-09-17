@@ -17,13 +17,12 @@ spec:
     limits:
       memory: "1024Mi"
       cpu: 1
-  # Require 1Gi of space
   storage:
     size: 1Gi
   
   backup:
     barmanObjectStore:
-      destinationPath: s3://cnpg/
+      destinationPath: s3://cnpg/${current} # 값 변경 후 사용할 것
       endpointURL: http://minio-gateway-service.minio-storage:9000
       s3Credentials:
         accessKeyId:
@@ -32,3 +31,12 @@ spec:
         secretAccessKey:
           name: minio-creds
           key: MINIO_SECRET_KEY
+      wal:
+        compression: gzip
+    retentionPolicy: "30d"
+
+  # bootstrap:
+  #   recovery:
+  #     backup:
+  #       name: backup-test # 이름 변경 후 사용할 것
+      

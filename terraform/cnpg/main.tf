@@ -22,8 +22,19 @@ resource "time_sleep" "wait" {
   depends_on      = [module.operator]
 }
 
+resource "time_static" "current" {}
+
 module "cluster" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/cnpg-cluster.yaml"
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/cnpg-cluster.yaml"
+  args = {
+    current = time_static.current.rfc3339
+  }
   depends_on = [time_sleep.wait]
+}
+
+module "backup_daily" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/backup-scheduled.yaml"
+  depends_on = [module.cluster]
 }
