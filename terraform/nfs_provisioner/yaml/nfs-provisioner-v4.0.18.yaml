@@ -7,8 +7,21 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: nfs-client
+  annotations:
+    "storageclass.kubernetes.io/is-default-class": "true"
+allowVolumeExpansion: true
 parameters:
   archiveOnDelete: "false"
+provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-volume
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+parameters:
+  archiveOnDelete: "true"
 provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
 ---
 apiVersion: v1
