@@ -9,7 +9,8 @@ cert-manager                        1.12.3      [https://github.com/cert-manager
 nfs-subdir-external-provisioner     4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
 gitlab-ce                           16.3.0-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 keycloak                            22.0.1      [https://www.keycloak.org/]
-kube-prometheus-stack               main        [https://github.com/prometheus-operator/kube-prometheus]
+kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
+cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
 
 # 설정
 

@@ -5,8 +5,8 @@ resource "kubernetes_namespace" "ns" {
 }
 
 module "volume" {
-  source = "../utils/volume"
-  name = "minio"
+  source    = "../utils/volume"
+  name      = "minio"
   namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
@@ -83,13 +83,30 @@ resource "kubernetes_deployment" "minio_deploy" {
 }
 
 module "service" {
-  source ="../utils/service"
-  mode = var.mode
-  domain = var.domain
-  prefix = "minio"
+  source    = "../utils/service"
+  mode      = var.mode
+  domain    = var.domain
+  prefix    = "minio"
   namespace = kubernetes_namespace.ns.metadata.0.name
-  port = 9001
+  port      = 9001
   selector = {
     app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
+  }
+}
+
+resource "kubernetes_service" "gateway" {
+  metadata {
+    name = "minio-gateway-service"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  spec {
+    port {
+      port = 9000
+      target_port = 9000
+      protocol = "TCP"
+    }
+    selector = {
+      app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
+    }
   }
 }
