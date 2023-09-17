@@ -18,10 +18,24 @@ module "autoscaler" {
   mode       = var.mode
 }
 
-# module "nfs_provisioner" {
-#   source   = "./nfs_provisioner"
-#   nfs_ip   = var.nfs_ip
-#   nfs_path = var.nfs_path
+module "nfs_provisioner" {
+  source   = "./nfs_provisioner"
+  nfs_ip   = var.nfs_ip
+  nfs_path = var.nfs_path
+}
+
+module "minio_storage" {
+  source     = "./minio_storage"
+  domain     = var.domain
+  mode       = var.mode
+  username   = var.username
+  password   = var.password
+  depends_on = [module.nfs_provisioner]
+}
+
+# module "cnpg" {
+#   source     = "./cnpg"
+#   depends_on = [module.nfs_provisioner]
 # }
 
 # module "keycloak_sso" {
@@ -32,15 +46,6 @@ module "autoscaler" {
 #   password = var.password
 # }
 
-# module "minio_storage" {
-#   source   = "./minio_storage"
-#   domain   = var.domain
-#   mode     = var.mode
-#   username = var.username
-#   password = var.password
-#   nfs_ip   = var.nfs_ip
-#   nfs_path = var.nfs_path
-# }
 
 # module "gitlab_devops" {
 #   source     = "./gitlab_devops"

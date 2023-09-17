@@ -4,46 +4,10 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-resource "kubernetes_persistent_volume" "minio_pv" {
-  metadata {
-    name = "minio-pv"
-    labels = {
-      name = "minio-pv"
-    }
-  }
-  spec {
-    capacity = {
-      storage = "1Gi"
-    }
-    access_modes                     = ["ReadWriteMany"]
-    persistent_volume_reclaim_policy = "Retain"
-    persistent_volume_source {
-      nfs {
-        server = var.nfs_ip
-        path   = var.nfs_path
-      }
-    }
-  }
-}
-
-resource "kubernetes_persistent_volume_claim" "minio_pvc" {
-  metadata {
-    name      = "minio-pvc"
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  spec {
-    access_modes = ["ReadWriteMany"]
-    resources {
-      requests = {
-        storage = "1Gi"
-      }
-    }
-    selector {
-      match_labels = {
-        name = kubernetes_persistent_volume.minio_pv.metadata.0.name
-      }
-    }
-  }
+module "volume" {
+  source = "../utils/volume"
+  name = "minio"
+  namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
 resource "kubernetes_deployment" "minio_deploy" {
@@ -110,7 +74,7 @@ resource "kubernetes_deployment" "minio_deploy" {
         volume {
           name = "minio-volume"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.minio_pvc.metadata.0.name
+            claim_name = module.volume.pvc_name
           }
         }
       }
@@ -118,54 +82,14 @@ resource "kubernetes_deployment" "minio_deploy" {
   }
 }
 
-resource "kubernetes_service" "minio_service" {
-  metadata {
-    name      = "minio-service"
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
-    }
-    port {
-      port        = 80
-      target_port = 9001
-    }
-    type = "NodePort"
-  }
-}
-
-resource "kubernetes_ingress_v1" "minio_ingress" {
-  metadata {
-    name = "minio-ingress"
-    annotations = {
-      "ingress.kubernetes.io/ssl-redirect" = "true"
-      "kubernetes.io/ingress.class"        = "nginx"
-      "kubernetes.io/tls-acme"             = "true"
-      "cert-manager.io/cluster-issuer"     = local.clusterissuer
-    }
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  spec {
-    tls {
-      hosts       = ["${local.prefix}.${var.domain}"]
-      secret_name = "minio-cert"
-    }
-    rule {
-      host = "${local.prefix}.${var.domain}"
-      http {
-        path {
-          path = "/"
-          backend {
-            service {
-              name = kubernetes_service.minio_service.metadata.0.name
-              port {
-                number = 80
-              }
-            }
-          }
-        }
-      }
-    }
+module "service" {
+  source ="../utils/service"
+  mode = var.mode
+  domain = var.domain
+  prefix = "minio"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+  port = 9001
+  selector = {
+    app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
   }
 }
