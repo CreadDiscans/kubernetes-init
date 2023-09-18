@@ -154,8 +154,9 @@ def autoscale(models):
     pods_list = []
     for key, item in pods.items():
         pods_list.append(item)
+    pods_list.append({'cpu':1, 'memory': 512*1024**2}) # 유휴 자원
     result = {'opt_node':0, 'need_more_node':False}
-    dps(pods_list, workers, result)
+    dfs(pods_list, workers, result)
     if result['need_more_node']:
         return 'boot', None
     else:
@@ -164,7 +165,7 @@ def autoscale(models):
                 return 'drain', node
         return None, None
 
-def dps(pods, workers, result, i=0):
+def dfs(pods, workers, result, i=0):
     if len(pods) == i:
         use_node = 0
         for node, info in workers.items():
@@ -186,7 +187,7 @@ def dps(pods, workers, result, i=0):
         if cpu + item['cpu'] < info['cpu'] and mem + item['memory'] < info['memory']:
             need_more_node = False
             info['stack'].append(item)
-            dps(pods, workers, result, i+1)
+            dfs(pods, workers, result, i+1)
             info['stack'].pop()
     if result['need_more_node'] == False:
         result['need_more_node'] = need_more_node
