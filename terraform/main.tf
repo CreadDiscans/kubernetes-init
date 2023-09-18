@@ -40,13 +40,18 @@ module "cnpg" {
   depends_on = [module.minio_storage]
 }
 
-# module "keycloak_sso" {
-#   source   = "./keycloak"
-#   domain   = var.domain
-#   mode     = var.mode
-#   username = var.username
-#   password = var.password
-# }
+module "istio" {
+  source = "./istio"
+}
+
+module "keycloak" {
+  source     = "./keycloak"
+  domain     = var.domain
+  mode       = var.mode
+  username   = var.username
+  password   = var.password
+  depends_on = [module.istio]
+}
 
 
 # module "gitlab_devops" {

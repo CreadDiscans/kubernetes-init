@@ -25,3 +25,8 @@ variable "port" {
 variable "selector" {
   type = any
 }
+
+variable "gateway" {
+  type    = bool
+  default = false
+}

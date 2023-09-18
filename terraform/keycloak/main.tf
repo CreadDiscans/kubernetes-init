@@ -1,6 +1,6 @@
 resource "kubernetes_namespace" "ns" {
   metadata {
-    name = "keycloak-sso"
+    name = "keycloak"
   }
 }
 
@@ -58,54 +58,15 @@ resource "kubernetes_deployment" "keycloak_deploy" {
   }
 }
 
-resource "kubernetes_service" "keycloak_service" {
-  metadata {
-    name      = "keycloak-service"
-    namespace = kubernetes_namespace.ns.metadata.0.name
+module "service" {
+  source    = "../utils/service"
+  mode      = var.mode
+  domain    = var.domain
+  prefix    = "keycloak"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+  port      = 8080
+  selector = {
+    app = "keycloak"
   }
-  spec {
-    selector = {
-      app = kubernetes_deployment.keycloak_deploy.metadata.0.labels.app
-    }
-    port {
-      port        = 80
-      target_port = 8080
-    }
-    type = "NodePort"
-  }
-}
-
-resource "kubernetes_ingress_v1" "keycloak_ingress" {
-  metadata {
-    name = "keycloak-ingress"
-    annotations = {
-      "ingress.kubernetes.io/ssl-redirect" = "true"
-      "kubernetes.io/ingress.class"        = "nginx"
-      "kubernetes.io/tls-acme"             = "true"
-      "cert-manager.io/cluster-issuer"     = local.clusterissuer
-    }
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  spec {
-    tls {
-      hosts       = ["${local.prefix}.${var.domain}"]
-      secret_name = "keycloak-cert"
-    }
-    rule {
-      host = "${local.prefix}.${var.domain}"
-      http {
-        path {
-          path = "/"
-          backend {
-            service {
-              name = kubernetes_service.keycloak_service.metadata.0.name
-              port {
-                number = 80
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  gateway = true
 }

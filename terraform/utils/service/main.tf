@@ -22,7 +22,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       "kubernetes.io/tls-acme"             = "true"
       "cert-manager.io/cluster-issuer"     = local.clusterissuer
     }
-    namespace = var.namespace
+    namespace = var.gateway ? "istio-system" : var.namespace
   }
   spec {
     tls {
@@ -31,12 +31,13 @@ resource "kubernetes_ingress_v1" "ingress" {
     }
     rule {
       host = "${var.prefix}.${var.domain}"
+
       http {
         path {
           path = "/"
           backend {
             service {
-              name = kubernetes_service.service.metadata.0.name
+              name = var.gateway ? "istio-ingress" : kubernetes_service.service.metadata.0.name
               port {
                 number = 80
               }
@@ -45,5 +46,66 @@ resource "kubernetes_ingress_v1" "ingress" {
         }
       }
     }
+  }
+}
+
+resource "time_sleep" "wait" {
+  create_duration = "10s"
+  depends_on      = [kubernetes_ingress_v1.ingress]
+}
+
+data "template_file" "gateway" {
+  template = file("${path.module}/yaml/gateway.yaml")
+  vars = {
+    name      = var.prefix
+    namespace = var.namespace
+    hostname  = "${var.prefix}.${var.domain}"
+  }
+  depends_on = [time_sleep.wait]
+}
+
+resource "null_resource" "gateway" {
+  count = var.gateway ? 1 : 0
+
+  triggers = {
+    template = data.template_file.gateway.rendered
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "kubectl create -f -<<EOF\n${self.triggers.template}\nEOF"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "kubectl delete -f -<<EOF\n${self.triggers.template}\nEOF"
+  }
+}
+
+data "template_file" "vertual_service" {
+  template = file("${path.module}/yaml/virtual-service.yaml")
+  vars = {
+    name      = var.prefix
+    namespace = var.namespace
+    hostname  = "${var.prefix}.${var.domain}"
+  }
+  depends_on = [time_sleep.wait]
+}
+
+resource "null_resource" "vertual_service" {
+  count = var.gateway ? 1 : 0
+
+  triggers = {
+    template = data.template_file.vertual_service.rendered
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "kubectl create -f -<<EOF\n${self.triggers.template}\nEOF"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "kubectl delete -f -<<EOF\n${self.triggers.template}\nEOF"
   }
 }
