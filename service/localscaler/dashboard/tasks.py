@@ -131,9 +131,12 @@ def autoscale(models):
     prome_sql=f'kube_pod_container_resource_requests{"{"}node!="master"{"}"}'
     pods = {}
     for item in load(prome_sql):
-        key = f"{item['metric']['node']}-{item['metric']['pod']}"
+        if not 'node' in item['metric']:
+            node = 'None'
+        else:
+            node = item['metric']['node']
+        key = f"{node}-{item['metric']['pod']}"
         value = float(item['value'][1])
-        node = item['metric']['node']
         type = item['metric']['resource']
         if key in ignore_list:
             if type == 'cpu':
