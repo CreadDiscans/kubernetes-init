@@ -3,26 +3,19 @@ resource "kubernetes_namespace" "ns" {
     name = "istio-system"
   }
 }
-
-module "crds" {
+module "crds_operator" {
   source = "../utils/apply"
-  yaml   = "${path.module}/yaml/crd-all.gen.yaml"
+  yaml   = "${path.module}/yaml/crd-operator.yaml"
 }
 
-module "istio_base" {
+module "istio_operator" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/istio-base.yaml"
-  depends_on = [kubernetes_namespace.ns, module.crds]
+  yaml       = "${path.module}/yaml/istio-operator.yaml"
+  depends_on = [module.crds_operator]
 }
 
-module "istiod" {
+module "default_operator" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/istiod.yaml"
-  depends_on = [module.istio_base]
-}
-
-module "istio-gateway" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/istio-gateway.yaml"
-  depends_on = [module.istiod]
+  yaml       = "${path.module}/yaml/default-operator.yaml"
+  depends_on = [module.istio_operator]
 }

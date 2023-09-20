@@ -11,6 +11,8 @@ gitlab-ce                           16.3.0-ce.0 [https://gitlab.com/rluna-gitlab
 keycloak                            22.0.1      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
+istio                               1.19.0      [https://github.com/istio/istio]
+authservice                         0.5.3       [https://github.com/istio-ecosystem/authservice]
 
 # 설정
 
