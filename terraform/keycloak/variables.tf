@@ -18,3 +18,7 @@ variable "password" {
 variable "mode" {
   type = string
 }
+
+output "url" {
+  value = "https://${local.prefix}.${var.domain}"
+}

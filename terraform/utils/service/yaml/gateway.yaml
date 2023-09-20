@@ -5,7 +5,7 @@ metadata:
   namespace: ${namespace}
 spec:
   selector:
-    istio: ingress # use istio default controller
+    istio: ingressgateway
   servers:
   - port:
       number: 80

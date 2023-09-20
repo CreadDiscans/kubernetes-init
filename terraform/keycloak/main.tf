@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
         container {
           name  = "keycloak"
           image = "quay.io/keycloak/keycloak:22.0.1"
-          args  = ["start-dev"]
+          args  = ["start", "--hostname=keycloak.${var.domain}"]
           env {
             name  = "KEYCLOAK_ADMIN"
             value = var.username
@@ -68,5 +68,4 @@ module "service" {
   selector = {
     app = "keycloak"
   }
-  gateway = true
 }

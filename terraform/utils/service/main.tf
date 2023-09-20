@@ -37,7 +37,7 @@ resource "kubernetes_ingress_v1" "ingress" {
           path = "/"
           backend {
             service {
-              name = var.gateway ? "istio-ingress" : kubernetes_service.service.metadata.0.name
+              name = var.gateway ? "istio-ingressgateway" : kubernetes_service.service.metadata.0.name
               port {
                 number = 80
               }
@@ -50,6 +50,7 @@ resource "kubernetes_ingress_v1" "ingress" {
 }
 
 resource "time_sleep" "wait" {
+  count           = var.gateway ? 1 : 0
   create_duration = "10s"
   depends_on      = [kubernetes_ingress_v1.ingress]
 }

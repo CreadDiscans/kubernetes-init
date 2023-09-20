@@ -14,14 +14,30 @@ module "istio" {
   source = "./istio"
 }
 
-# module "keycloak" {
-#   source     = "./keycloak"
-#   domain     = var.domain
-#   mode       = var.mode
-#   username   = var.username
-#   password   = var.password
-#   depends_on = [module.istio]
-# }
+module "keycloak" {
+  source     = "./keycloak"
+  domain     = var.domain
+  mode       = var.mode
+  username   = var.username
+  password   = var.password
+  depends_on = [module.nginx]
+}
+
+module "minio" {
+  source     = "./minio"
+  domain     = var.domain
+  mode       = var.mode
+  username   = var.username
+  password   = var.password
+  depends_on = [module.nfs, module.keycloak]
+}
+
+module "keycloak_sso" {
+  source   = "./keycloak-sso"
+  username = var.username
+  password = var.password
+  url      = module.keycloak.url
+}
 
 # module "prometheus_monitoring" {
 #   source     = "./prometheus-monitoring"
@@ -35,15 +51,6 @@ module "istio" {
 #   depends_on = [module.prometheus_monitoring]
 #   domain     = var.domain
 #   mode       = var.mode
-# }
-
-# module "minio_storage" {
-#   source     = "./minio_storage"
-#   domain     = var.domain
-#   mode       = var.mode
-#   username   = var.username
-#   password   = var.password
-#   depends_on = [module.nfs_provisioner]
 # }
 
 # module "cnpg" {
