@@ -2,7 +2,7 @@ resource "kubernetes_namespace" "ns" {
   metadata {
     name = "minio-storage"
     labels = {
-      "istio-injection"="enabled"
+      "istio-injection" = "enabled"
     }
   }
 }
@@ -42,7 +42,8 @@ resource "kubernetes_deployment" "minio_deploy" {
           security_context {
             run_as_user = 0
           }
-          args = ["server", "--console-address", ":9001", "/storage"]
+          command = ["/bin/sh", "-c"]
+          args    = ["sleep 5 && minio server --console-address :9001 /storage --address :9000"]
           env {
             name  = "MINIO_ROOT_USER"
             value = var.username
@@ -60,28 +61,44 @@ resource "kubernetes_deployment" "minio_deploy" {
             value = "ko_KR.utf8"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_CONFIG_URL_KEYCLOAK_PRIMARY"
+            name  = "MINIO_IDENTITY_OPENID_CONFIG_URL"
             value = "http://keycloak-service.keycloak/realms/master/.well-known/openid-configuration"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_CLIENT_ID_KEYCLOAK_PRIMARY"
-            value = "minio"
+            name  = "MINIO_IDENTITY_OPENID_CLIENT_ID"
+            value = local.client_id
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_CLIENT_SECRET_KEYCLOAK_PRIMARY"
-            value = "CCpWXImGAgOPLKj4ENAUlFbKeXZFzFwq"
+            name  = "MINIO_IDENTITY_OPENID_CLIENT_SECRET"
+            value = local.client_secret
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_DISPLAY_NAME_KEYCLOAK_PRIMARY"
+            name  = "MINIO_IDENTITY_OPENID_DISPLAY_NAME"
             value = "keycloak"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_SCOPES_KEYCLOAK_PRIMARY"
-            value = "openid,email,preferred_username"
+            name  = "MINIO_IDENTITY_OPENID_SCOPES"
+            value = "openid,email"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC_KEYCLOAK_PRIMARY"
+            name  = "MINIO_IDENTITY_OPENID_CLAIM_NAME"
+            value = "policy"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC"
             value = "on"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_VENDOR"
+            value = "keycloak"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_ADMIN_URL"
+            value = "http://keycloak-service.keycloak/admin"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_REALM"
+            value = "master"
           }
           port {
             container_port = 9000
@@ -124,14 +141,14 @@ module "service" {
 
 resource "kubernetes_service" "gateway" {
   metadata {
-    name = "minio-gateway-service"
+    name      = "minio-gateway-service"
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   spec {
     port {
-      port = 9000
+      port        = 9000
       target_port = 9000
-      protocol = "TCP"
+      protocol    = "TCP"
     }
     selector = {
       app = kubernetes_deployment.minio_deploy.metadata.0.labels.app

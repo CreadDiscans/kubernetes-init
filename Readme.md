@@ -8,11 +8,12 @@ metallb                             0.13.10     [https://github.com/metallb/meta
 cert-manager                        1.12.3      [https://github.com/cert-manager/cert-manager]
 nfs-subdir-external-provisioner     4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
 gitlab-ce                           16.3.0-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
-keycloak                            22.0.1      [https://www.keycloak.org/]
+keycloak                            22.0.3      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
 istio                               1.19.0      [https://github.com/istio/istio]
 authservice                         0.5.3       [https://github.com/istio-ecosystem/authservice]
+minio                               latest      [https://github.com/minio/minio]
 
 # 설정
 

@@ -37,6 +37,7 @@ module "keycloak_sso" {
   username = var.username
   password = var.password
   url      = module.keycloak.url
+  clients  = [module.minio.client]
 }
 
 # module "prometheus_monitoring" {

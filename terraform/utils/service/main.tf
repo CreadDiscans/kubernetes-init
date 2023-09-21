@@ -17,10 +17,11 @@ resource "kubernetes_ingress_v1" "ingress" {
   metadata {
     name = "${var.prefix}-ingress"
     annotations = {
-      "ingress.kubernetes.io/ssl-redirect" = "true"
-      "kubernetes.io/ingress.class"        = "nginx"
-      "kubernetes.io/tls-acme"             = "true"
-      "cert-manager.io/cluster-issuer"     = local.clusterissuer
+      "ingress.kubernetes.io/ssl-redirect"            = "true"
+      "kubernetes.io/ingress.class"                   = "nginx"
+      "kubernetes.io/tls-acme"                        = "true"
+      "cert-manager.io/cluster-issuer"                = local.clusterissuer
+      "nginx.ingress.kubernetes.io/proxy-buffer-size" = "128k"
     }
     namespace = var.gateway ? "istio-system" : var.namespace
   }
