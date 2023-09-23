@@ -11,6 +11,7 @@ resource "keycloak_openid_client" "openid_client" {
   valid_redirect_uris             = each.value.valid_redirect_uris
   valid_post_logout_redirect_uris = each.value.valid_post_logout_redirect_uris
   base_url                        = each.value.base_url
+  root_url                        = each.value.base_url
   access_token_lifespan           = 86400
 }
 
@@ -23,7 +24,8 @@ resource "keycloak_user_groups" "user_groups" {
   realm_id = local.realm
   user_id  = data.keycloak_user.root.id
   group_ids = [
-    keycloak_group.minio_group.id
+    keycloak_group.minio_group.id,
+    keycloak_group.grafana_group.id
   ]
 }
 

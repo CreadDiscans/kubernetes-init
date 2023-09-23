@@ -8,17 +8,28 @@ resource "time_sleep" "wait" {
   depends_on      = [module.setup]
 }
 
+module "grafana_config" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/grafana-config.yaml"
+  args = {
+    client_id     = local.client_id
+    client_secret = local.client_secret
+    domain        = var.domain
+  }
+  depends_on = [module.setup]
+}
+
 module "manifests" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/manifests.yaml"
-  depends_on = [time_sleep.wait]
+  depends_on = [time_sleep.wait, module.grafana_config]
 }
 
 module "grafana" {
   source    = "../utils/service"
   mode      = var.mode
   domain    = var.domain
-  prefix    = "grafana"
+  prefix    = local.prefix
   namespace = "monitoring"
   port      = 3000
   selector = {

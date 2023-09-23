@@ -45,7 +45,10 @@ module "sso" {
   password = var.password
   domain   = var.domain
   url      = module.keycloak.url
-  clients  = [module.minio.client]
+  clients  = [
+    module.minio.client,
+    module.prometheus.client
+  ]
 }
 
 
