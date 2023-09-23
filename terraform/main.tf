@@ -32,6 +32,13 @@ module "minio" {
   depends_on = [module.nfs, module.keycloak]
 }
 
+module "prometheus" {
+  source     = "./prometheus"
+  domain     = var.domain
+  mode       = var.mode
+  depends_on = [module.keycloak]
+}
+
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -41,12 +48,6 @@ module "sso" {
   clients  = [module.minio.client]
 }
 
-# module "prometheus_monitoring" {
-#   source     = "./prometheus-monitoring"
-#   domain     = var.domain
-#   mode       = var.mode
-#   depends_on = [module.nginx_ingress]
-# }
 
 # module "autoscaler" {
 #   source     = "./autoscaler"
