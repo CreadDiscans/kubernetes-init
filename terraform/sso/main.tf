@@ -27,11 +27,21 @@ resource "keycloak_user_groups" "user_groups" {
   ]
 }
 
-# module "authservice" {
-#   source = "../utils/apply"
-#   yaml   = "${path.module}/yaml/authservice.yaml"
-#   args = {
-#     client_id     = local.client_id
-#     client_secret = local.client_secret
+# resource "kubernetes_config_map" "authservice_config" {
+#   metadata {
+#     name      = "authservice"
+#     namespace = "istio-system"
 #   }
+#   data = {
+#     "config.json" = templatefile("${path.module}/yaml/config.json", {
+#       clients = var.clients
+#       domain  = var.domain
+#     })
+#   }
+# }
+
+# module "authservice" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/authservice.yaml"
+#   depends_on = [kubernetes_config_map.authservice_config]
 # }

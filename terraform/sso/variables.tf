@@ -10,6 +10,10 @@ variable "password" {
   type = string
 }
 
+variable "domain" {
+  type = string
+}
+
 variable "url" {
   type = string
 }

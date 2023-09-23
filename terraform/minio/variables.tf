@@ -24,7 +24,10 @@ output "client" {
   value = {
     client_id                       = local.client_id
     client_secret                   = local.client_secret
-    valid_redirect_uris             = ["http://${local.prefix}.${var.domain}/oauth_callback"]
+    valid_redirect_uris             = [
+      "http://${local.prefix}.${var.domain}/oauth_callback",
+      "https://${local.prefix}.${var.domain}",
+    ]
     valid_post_logout_redirect_uris = []
     base_url                        = ""
   }

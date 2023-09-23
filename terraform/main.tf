@@ -32,10 +32,11 @@ module "minio" {
   depends_on = [module.nfs, module.keycloak]
 }
 
-module "keycloak_sso" {
-  source   = "./keycloak-sso"
+module "sso" {
+  source   = "./sso"
   username = var.username
   password = var.password
+  domain   = var.domain
   url      = module.keycloak.url
   clients  = [module.minio.client]
 }
