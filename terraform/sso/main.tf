@@ -29,21 +29,7 @@ resource "keycloak_user_groups" "user_groups" {
   ]
 }
 
-# resource "kubernetes_config_map" "authservice_config" {
-#   metadata {
-#     name      = "authservice"
-#     namespace = "istio-system"
-#   }
-#   data = {
-#     "config.json" = templatefile("${path.module}/yaml/config.json", {
-#       clients = var.clients
-#       domain  = var.domain
-#     })
-#   }
-# }
-
-# module "authservice" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/authservice.yaml"
-#   depends_on = [kubernetes_config_map.authservice_config]
-# }
+module "oauth2_proxy" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/oauth2-proxy.yaml"
+}

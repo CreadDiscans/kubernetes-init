@@ -39,6 +39,13 @@ module "prometheus" {
   depends_on = [module.keycloak]
 }
 
+module "autoscaler" {
+  source     = "./autoscaler"
+  domain     = var.domain
+  mode       = var.mode
+  depends_on = [module.prometheus]
+}
+
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -47,17 +54,10 @@ module "sso" {
   url      = module.keycloak.url
   clients  = [
     module.minio.client,
-    module.prometheus.client
+    module.prometheus.client,
+    module.autoscaler.client
   ]
 }
-
-
-# module "autoscaler" {
-#   source     = "./autoscaler"
-#   depends_on = [module.prometheus_monitoring]
-#   domain     = var.domain
-#   mode       = var.mode
-# }
 
 # module "cnpg" {
 #   source     = "./cnpg"

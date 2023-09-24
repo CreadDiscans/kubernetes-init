@@ -12,8 +12,8 @@ keycloak                            22.0.3      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
 istio                               1.19.0      [https://github.com/istio/istio]
-authservice                         0.5.3       [https://github.com/istio-ecosystem/authservice]
 minio                               latest      [https://github.com/minio/minio]
+oauth2-proxy                        7.4.0       [https://github.com/oauth2-proxy/oauth2-proxy]
 
 # 설정
 
