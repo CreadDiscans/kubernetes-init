@@ -18,7 +18,7 @@ COPY . /app
 
 RUN mkdir /app/log
 RUN pip install -r requirements.txt
-RUN python3 manage.py migrate
+# RUN python3 manage.py migrate
 RUN python3 manage.py collectstatic --no-input
 RUN cp /app/config/uwsgi.ini /etc/uwsgi/apps-enabled/uwsgi.ini
 RUN cp /app/config/nginx.conf /etc/nginx/sites-enabled/nginx.conf
@@ -26,4 +26,4 @@ RUN cp /app/config/celery.conf /etc/supervisor/conf.d/celery.conf
 RUN rm /etc/nginx/sites-enabled/default
 
 EXPOSE 80
-CMD bash /app/run.sh
+CMD bash /app/run_foreground.sh

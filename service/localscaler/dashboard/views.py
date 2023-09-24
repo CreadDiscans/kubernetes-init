@@ -31,7 +31,6 @@ def powerOffReq(request):
         model = Node.objects.get(name=node)
         model.status = 'drain'
         model.save()
-        os.system(f'/usr/local/bin/kubectl cordon {node}')
         return JsonResponse({}, safe=False)
 
 def powerOnReq(request):

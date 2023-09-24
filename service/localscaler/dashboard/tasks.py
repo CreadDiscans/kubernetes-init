@@ -32,6 +32,7 @@ def every_minute():
                     node.status = 'down'
                     node.save()
                 else:
+                    os.system(f'/usr/local/bin/kubectl cordon {node}') 
                     os.system(f'/usr/local/bin/kubectl drain --ignore-daemonsets --delete-emptydir-data {node.name}')
             elif node.status == 'boot':
                 # booting = True
