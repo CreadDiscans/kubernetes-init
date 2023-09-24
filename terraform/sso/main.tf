@@ -25,7 +25,8 @@ resource "keycloak_user_groups" "user_groups" {
   user_id  = data.keycloak_user.root.id
   group_ids = [
     keycloak_group.minio_group.id,
-    keycloak_group.grafana_group.id
+    keycloak_group.grafana_group.id,
+    keycloak_group.argocd_group.id
   ]
 }
 

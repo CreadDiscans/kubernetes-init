@@ -44,16 +44,24 @@ module "autoscaler" {
   depends_on = [module.prometheus]
 }
 
+module "argocd" {
+  source     = "./argocd"
+  mode       = var.mode
+  domain     = var.domain
+  depends_on = [module.keycloak]
+}
+
 module "sso" {
   source   = "./sso"
   username = var.username
   password = var.password
   domain   = var.domain
   url      = module.keycloak.url
-  clients  = [
+  clients = [
     module.minio.client,
     module.prometheus.client,
-    module.autoscaler.client
+    module.autoscaler.client,
+    module.argocd.client
   ]
 }
 
