@@ -13,6 +13,12 @@ module "volume" {
   namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "kubernetes_deployment" "minio_deploy" {
   metadata {
     name      = "minio-deploy"
@@ -45,12 +51,8 @@ resource "kubernetes_deployment" "minio_deploy" {
           command = ["/bin/sh", "-c"]
           args    = ["sleep 5 && minio server --console-address :9001 /storage --address :9000"]
           env {
-            name  = "MINIO_ROOT_USER"
-            value = var.username
-          }
-          env {
             name  = "MINIO_ROOT_PASSWORD"
-            value = var.password
+            value = random_password.password.result
           }
           env {
             name  = "TZ"

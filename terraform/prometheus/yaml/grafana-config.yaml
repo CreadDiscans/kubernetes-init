@@ -17,6 +17,7 @@ stringData:
     root_url = https://grafana.${domain}
     [auth]
     signout_redirect_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/logout
+    disable_login_form = true
     [auth.generic_oauth]
     enabled = true
     name = Keycloak-OAuth

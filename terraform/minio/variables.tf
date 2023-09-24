@@ -4,14 +4,6 @@ locals {
   client_secret = "minio-secret"
 }
 
-variable "username" {
-  type = string
-}
-
-variable "password" {
-  type = string
-}
-
 variable "mode" {
   type = string
 }

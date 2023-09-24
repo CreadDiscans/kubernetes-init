@@ -27,8 +27,6 @@ module "minio" {
   source     = "./minio"
   domain     = var.domain
   mode       = var.mode
-  username   = var.username
-  password   = var.password
   depends_on = [module.nfs, module.keycloak]
 }
 
