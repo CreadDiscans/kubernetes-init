@@ -51,6 +51,10 @@ resource "kubernetes_deployment" "minio_deploy" {
           command = ["/bin/sh", "-c"]
           args    = ["sleep 5 && minio server --console-address :9001 /storage --address :9000"]
           env {
+            name = "MINIO_ROOT_USER"
+            value = "minioadmin"
+          }
+          env {
             name  = "MINIO_ROOT_PASSWORD"
             value = random_password.password.result
           }

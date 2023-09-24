@@ -1,8 +1,10 @@
 locals {
   prefix        = "localscaler"
   client_id     = "localscaler"
-  client_secret = "localscaler-secret"
+  client_secret = random_uuid.client_secret.result
 }
+
+resource "random_uuid" "client_secret" {}
 
 variable "mode" {
   type = string

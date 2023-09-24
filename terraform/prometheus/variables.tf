@@ -1,8 +1,10 @@
 locals {
   prefix = "grafana"
   client_id = "grafana"
-  client_secret = "grafana-secret"
+  client_secret = random_uuid.client_secret.result
 }
+
+resource "random_uuid" "client_secret" {}
 
 variable "domain" {
   type = string

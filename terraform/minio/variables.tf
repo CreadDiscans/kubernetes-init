@@ -1,8 +1,10 @@
 locals {
   prefix        = "minio"
   client_id     = "minio"
-  client_secret = "minio-secret"
+  client_secret = random_uuid.client_secret.result
 }
+
+resource "random_uuid" "client_secret" {}
 
 variable "mode" {
   type = string

@@ -20,8 +20,8 @@ spec:
         - --skip-provider-button=true
         - --ssl-insecure-skip-verify
         - --provider=keycloak-oidc
-        - --upstream=http://localscaler-service.autoscaler
-        - --oidc-issuer-url=https://keycloak.geocluster.r-e.kr/realms/master # keycloak 주소
+        - --upstream=${upstream}
+        - --oidc-issuer-url=${issuer}
         - --http-address=0.0.0.0:4180
         - --cookie-secure=false
         - --insecure-oidc-allow-unverified-email=true
@@ -30,9 +30,9 @@ spec:
         - name: "OAUTH2_PROXY_PROVIDER"
           value: "keycloak-oidc"
         - name: OAUTH2_PROXY_CLIENT_ID
-          value: localscaler
+          value: ${client_id}
         - name: OAUTH2_PROXY_CLIENT_SECRET
-          value: localscaler-secret
+          value: ${client_secret}
         - name: OAUTH2_PROXY_COOKIE_SECRET
           value: FApM8bW-JK_a0y0DLm45miuvohvAFl6X8b7NZt9AQz8=
         - name: "OAUTH2_PROXY_EMAIL_DOMAINS"
