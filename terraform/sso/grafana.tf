@@ -20,9 +20,8 @@ resource "keycloak_openid_client_default_scopes" "grafana_scopes" {
   client_id = each.value.id
   default_scopes = [
     "email",
-    "offline_access",
     "profile",
-    keycloak_openid_group_membership_protocol_mapper.grafana_auth_mapper.name
+    keycloak_openid_client_scope.grafana_auth.name
   ]
 }
 
