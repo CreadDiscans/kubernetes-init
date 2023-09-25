@@ -2,7 +2,7 @@
 locals {
   is_linux     = length(regexall("/home/", lower(abspath(path.root)))) > 0
   no_args      = length(keys(var.args)) == 0
-  applied_yaml = local.no_args ? var.yaml : replace(var.yaml, ".yaml", "_applied.yaml")
+  applied_yaml = local.no_args ? var.yaml : var.unique == null ? replace(var.yaml, ".yaml", "_applied.yaml") : replace(var.yaml, ".yaml", "_${var.unique}_applied.yaml")
 }
 
 variable "yaml" {
@@ -12,6 +12,11 @@ variable "yaml" {
 variable "args" {
   type    = map(any)
   default = {}
+}
+
+variable "unique" {
+  type    = string
+  default = null
 }
 
 resource "local_file" "ready" {

@@ -78,7 +78,6 @@ spec:
   rules:
   - to:
     - operation:      
-        # paths: ["/"]
         notPaths: ["/oauth2/*"]
   selector:
     matchLabels:
