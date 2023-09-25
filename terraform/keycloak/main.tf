@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
         container {
           name  = "keycloak"
           image = "quay.io/keycloak/keycloak:22.0.3"
-          args  = ["start", "--hostname=keycloak.${var.domain}"]
+          args  = ["start", "--hostname=keycloak.${var.domain}", "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"]
           env {
             name  = "KEYCLOAK_ADMIN"
             value = var.username
