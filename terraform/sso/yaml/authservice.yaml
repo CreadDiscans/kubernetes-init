@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authservice
+  namespace: istio-system
+  labels:
+    app: authservice
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: authservice
+  template:
+    metadata:
+      labels:
+        app: authservice
+    spec:
+      volumes:
+        - name: authservice-config 
+          configMap:
+            name: authservice
+      containers:
+      - name: authservice 
+        image: ghcr.io/istio-ecosystem/authservice/authservice:0.5.3
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 10003
+        volumeMounts:
+          - name: authservice-config 
+            mountPath: /etc/authservice
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 10004
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authservice
+  namespace: istio-system
+  labels:
+    app: authservice
+spec:
+  ports:
+  - port: 10003
+    name: grpc
+  selector:
+    app: authservice
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ext-authz
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  action: CUSTOM
+  provider:
+    name: authservice-grpc
+  rules:
+  - to:
+    - operation:
+        notPaths: ["/public"]
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: authz-svc
+  namespace: istio-system
+spec:
+  hosts:
+  - authservice.istio-system.svc.cluster.local # not used
+  ports:
+  - number: 10003
+    name: grpc-ext
+    protocol: grpc
+  resolution: STATIC
+  endpoints:
+  - address: 127.0.0.1

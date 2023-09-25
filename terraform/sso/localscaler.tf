@@ -1,12 +1,18 @@
-module "oauth2_proxy" {
+module "config" {
   for_each = { for n in var.clients : n.client_id => n if n.client_id == "localscaler" }
   source   = "../utils/apply"
-  yaml     = "${path.module}/yaml/oauth2-proxy.yaml"
+  yaml     = "${path.module}/yaml/config.yaml"
   args = {
-    upstream      = "http://localscaler-service.autoscaler"
-    issuer        = "https://keycloak.${var.domain}/realms/master"
+    prefix        = each.value.client_id
     client_id     = each.value.client_id
     client_secret = each.value.client_secret
+    domain        = var.domain
+    redirect_uri  = each.value.valid_redirect_uris.0
   }
-  unique = each.key
+}
+
+module "authservice" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/authservice.yaml"
+  depends_on = [module.config]
 }

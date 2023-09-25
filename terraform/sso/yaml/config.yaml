@@ -1,0 +1,53 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: authservice
+  namespace: istio-system
+data:
+  # We listen on 0.0.0.0 since Istio 1.10, it changes the sidecar configuration only support
+  # application listen on pod IP. See https://istio.io/latest/blog/2021/upcoming-networking-changes/
+  # for more details.
+  config.json: |
+    {
+      "listen_address": "0.0.0.0",
+      "listen_port": "10003",
+      "log_level": "trace",
+      "threads": 8,
+      "allow_unmatched_requests": "false",
+      "chains": [
+        {
+          "name": "idp_filter_chain",
+          "match": {
+            "header": ":authority",
+            "prefix": "${prefix}",
+          },
+          "filters": [
+          {
+            "oidc":
+              {
+                "authorization_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/auth",
+                "token_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/token",
+                "callback_uri": "${redirect_uri}",
+                "jwks_fetcher": {
+                  "jwks_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/certs",
+                  "periodic_fetch_interval_sec": 10,
+                  "skip_verify_peer_cert": true
+                },
+                "client_id": "${client_id}",
+                "client_secret": "${client_secret}",
+                "scopes": ["openid"],
+                "id_token": {
+                  "preamble": "Bearer",
+                  "header": "Authorization"
+                },
+                "logout": {
+                  "path": "/authservice_logout",
+                  "redirect_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/logout"
+                },
+                "skip_verify_peer_cert": true
+              }
+            }
+          ]
+        }
+      ]
+    }
