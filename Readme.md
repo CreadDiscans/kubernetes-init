@@ -14,7 +14,7 @@ cnpg                                1.20.2      [https://github.com/cloudnative-
 istio                               1.19.0      [https://github.com/istio/istio]
 minio                               latest      [https://github.com/minio/minio]
 argocd                              2.8.4       [https://github.com/argoproj/argo-cd]
-authservice                         0.5.3       [https://github.com/istio-ecosystem/authservice]
+authservice                         0.10        [https://github.com/CreadDiscans/authservice]
 
 # 설정
 

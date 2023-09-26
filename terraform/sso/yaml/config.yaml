@@ -35,8 +35,13 @@ data:
                 },
                 "client_id": "${client_id}",
                 "client_secret": "${client_secret}",
+                "cookie_name_prefix":"${client_id}",
                 "scopes": ["openid"],
                 "id_token": {
+                  "preamble": "Bearer",
+                  "header": "Authorization"
+                },
+                "access_token": {
                   "preamble": "Bearer",
                   "header": "Authorization"
                 },
@@ -44,7 +49,9 @@ data:
                   "path": "/authservice_logout",
                   "redirect_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/logout"
                 },
-                "skip_verify_peer_cert": true
+                "skip_verify_peer_cert": true,
+                "group":"/localscaler",
+                "error_uri":"https://keycloak.${domain}/403"
               }
             }
           ]

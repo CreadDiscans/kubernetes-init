@@ -21,7 +21,7 @@ spec:
             name: authservice
       containers:
       - name: authservice 
-        image: ghcr.io/istio-ecosystem/authservice/authservice:0.5.3
+        image: creaddiscans/authservice:0.10
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 10003

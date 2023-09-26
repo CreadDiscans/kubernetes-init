@@ -58,8 +58,7 @@ resource "keycloak_openid_client_default_scopes" "default_scopes" {
   default_scopes = [
     "email",
     "profile",
-    "${each.key}-auth",
-    "audience"
+    "${each.key}-auth"
   ]
   depends_on = [keycloak_openid_group_membership_protocol_mapper.auth_mapper]
 }
