@@ -3,7 +3,7 @@ module "config" {
   source   = "../utils/apply"
   yaml     = "${path.module}/yaml/config.yaml"
   args = {
-    clients       = var.clients
+    clients       = toset([for each in var.clients : each if each.client_id == "localscaler"])
     domain        = var.domain
   }
 }
