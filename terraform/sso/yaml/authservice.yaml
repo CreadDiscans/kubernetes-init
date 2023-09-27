@@ -62,7 +62,13 @@ spec:
   rules:
   - to:
     - operation:
-        notPaths: ["/public"]
+        notPaths: [
+          "/static/*",
+          "/styles/*", 
+          "/images/*", 
+          "/api/*", 
+          "/oauth_callback"
+        ]
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry

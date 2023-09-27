@@ -14,12 +14,11 @@ data:
       "log_level": "trace",
       "threads": 8,
       "allow_unmatched_requests": "false",
-      "chains": [
-        {
+      "chains": [%{ for client in clients ~}{
           "name": "idp_filter_chain",
           "match": {
             "header": ":authority",
-            "prefix": "${prefix}",
+            "prefix": "${client.client_id}",
           },
           "filters": [
           {
@@ -27,16 +26,16 @@ data:
               {
                 "authorization_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/auth",
                 "token_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/token",
-                "callback_uri": "${redirect_uri}",
+                "callback_uri": "${client.valid_redirect_uris.0}",
                 "jwks_fetcher": {
                   "jwks_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/certs",
                   "periodic_fetch_interval_sec": 10,
                   "skip_verify_peer_cert": true
                 },
-                "client_id": "${client_id}",
-                "client_secret": "${client_secret}",
-                "cookie_name_prefix":"${client_id}",
-                "scopes": ["openid"],
+                "client_id": "${client.client_id}",
+                "client_secret": "${client.client_secret}",
+                "cookie_name_prefix":"${client.client_id}",
+                "scopes": [],
                 "id_token": {
                   "preamble": "Bearer",
                   "header": "Authorization"
@@ -50,11 +49,11 @@ data:
                   "redirect_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/logout"
                 },
                 "skip_verify_peer_cert": true,
-                "group":"/localscaler",
+                "group":"/${client.client_id}",
                 "error_uri":"https://keycloak.${domain}/403"
               }
             }
           ]
-        }
+        },%{endfor ~}
       ]
     }

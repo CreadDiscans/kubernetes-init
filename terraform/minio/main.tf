@@ -142,6 +142,7 @@ module "service" {
   selector = {
     app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
   }
+  gateway = true
 }
 
 resource "kubernetes_service" "gateway" {

@@ -10,7 +10,7 @@ variable "yaml" {
 }
 
 variable "args" {
-  type    = map(any)
+  type    = any
   default = {}
 }
 
