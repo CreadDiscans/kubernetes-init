@@ -65,12 +65,10 @@ module "sso" {
   ]
 }
 
-# module "cnpg" {
-#   source     = "./cnpg"
-#   username   = var.username
-#   password   = var.password
-#   depends_on = [module.minio_storage]
-# }
+module "cnpg" {
+  source     = "./cnpg"
+  depends_on = [module.minio]
+}
 
 
 

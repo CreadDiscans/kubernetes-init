@@ -16,6 +16,17 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+resource "kubernetes_secret" "root_creds" {
+  metadata {
+    name      = "minio-creds"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    username = "minioadmin"
+    password = random_password.password.result
+  }
+}
+
 resource "kubernetes_deployment" "minio_deploy" {
   metadata {
     name      = "minio-deploy"
@@ -48,12 +59,12 @@ resource "kubernetes_deployment" "minio_deploy" {
           command = ["/bin/sh", "-c"]
           args    = ["sleep 5 && minio server --console-address :9001 /storage --address :9000"]
           env {
-            name = "MINIO_ROOT_USER"
-            value = "minioadmin"
+            name  = "MINIO_ROOT_USER"
+            value = kubernetes_secret.root_creds.data.username
           }
           env {
             name  = "MINIO_ROOT_PASSWORD"
-            value = random_password.password.result
+            value = kubernetes_secret.root_creds.data.password
           }
           env {
             name  = "TZ"

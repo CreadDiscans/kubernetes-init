@@ -4,15 +4,22 @@ module "operator" {
   yaml   = "${path.module}/yaml/cnpg-1.20.2.yaml"
 }
 
-resource "kubernetes_secret" "minio-creds" {
+data "kubernetes_secret" "creds" {
+  metadata {
+    name      = "minio-creds"
+    namespace = "minio-storage"
+  }
+}
+
+resource "kubernetes_secret" "minio_creds" {
   metadata {
     name      = "minio-creds"
     namespace = "cnpg-system"
   }
 
   data = {
-    MINIO_ACCESS_KEY = var.username
-    MINIO_SECRET_KEY = var.password
+    MINIO_ACCESS_KEY = data.kubernetes_secret.creds.data.username
+    MINIO_SECRET_KEY = data.kubernetes_secret.creds.data.password
   }
   depends_on = [module.operator]
 }
