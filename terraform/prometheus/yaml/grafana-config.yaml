@@ -32,5 +32,8 @@ stringData:
     token_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/token
     api_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/userinfo
     role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
-    tls_skip_verify_insecure = true
+    tls_skip_verify_insecure = false
+    tls_client_cert = /etc/keycloak/ssl/tls.crt
+    tls_client_key = /etc/keycloak/ssl/tls.key
+    tls_client_ca = /etc/keycloak/ssl/tls.crt
 type: Opaque

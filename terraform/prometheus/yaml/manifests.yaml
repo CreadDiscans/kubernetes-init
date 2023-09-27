@@ -39741,6 +39741,9 @@ spec:
         - mountPath: /etc/grafana
           name: grafana-config
           readOnly: false
+        - mountPath: /etc/keycloak/ssl
+          name: keycloak-cert
+          readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -39841,6 +39844,9 @@ spec:
       - name: grafana-config
         secret:
           secretName: grafana-config
+      - name: keycloak-cert
+        secret:
+          secretName: keycloak-cert
 
 ---
 apiVersion: monitoring.coreos.com/v1
