@@ -12,4 +12,4 @@ bash fixed_ip.sh IP GATEWAY_IP
 reboot
 bash wol.sh DEVICE_NAME # ifconfig로 확인
 bash worker.sh MASTER_IP TOKEN DISCOVERY_TOKEN_CA_CERT_HASH
-kubectl register.sh NODE # kubectl 가능한 환경에서
+bash register.sh NODE # kubectl 가능한 환경에서
