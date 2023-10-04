@@ -38,34 +38,33 @@ def get_token():
     print('login')
     driver.get(f'{host}/admin/runners')
     time.sleep(2)
-    find = False
-    for tr in driver.find_elements(By.TAG_NAME, 'tr'):
-        tds = tr.find_elements(By.TAG_NAME, 'td')
-        if len(tds) == 5:
-            a = tds[2].find_element(By.TAG_NAME, 'a')
-            url = a.get_attribute('href')
-            path = '/admin/'+url.split('/admin/')[1]+'/register'
-            register_url = host+path
-            find = True
-            print('find legacy runner')
+    # find = False
+    # for tr in driver.find_elements(By.TAG_NAME, 'tr'):
+    #     tds = tr.find_elements(By.TAG_NAME, 'td')
+    #     if len(tds) == 5:
+    #         a = tds[2].find_element(By.TAG_NAME, 'a')
+    #         url = a.get_attribute('href')
+    #         path = '/admin/'+url.split('/admin/')[1]+'/register'
+    #         register_url = host+path
+    #         find = True
+    #         print('find legacy runner', register_url)
+    #         break
+    # if not find:
+    driver.get(f'{host}/admin/runners/new')
+    while True:
+        try:
+            checkbox = driver.find_element(By.ID,'37')
             break
-    if not find:
-        print('legacy runner not exists')
-        driver.get(f'{host}/admin/runners/new')
-        while True:
-            try:
-                checkbox = driver.find_element(By.ID,'37')
-                break
-            except KeyboardInterrupt:
-                return
-            except:
-                pass
-        driver.execute_script("arguments[0].click();", checkbox)
-        driver.find_element(By.CLASS_NAME, 'js-no-auto-disable').click()
-        time.sleep(1)
-        path = '/admin/'+driver.current_url.split('/admin/')[1]
-        register_url = host + path
-        print('created new runner')
+        except KeyboardInterrupt:
+            return
+        except:
+            pass
+    driver.execute_script("arguments[0].click();", checkbox)
+    driver.find_element(By.CLASS_NAME, 'js-no-auto-disable').click()
+    time.sleep(1)
+    path = '/admin/'+driver.current_url.split('/admin/')[1]
+    register_url = host + path
+    print('created new runner')
     
     driver.get(register_url)
     while True:

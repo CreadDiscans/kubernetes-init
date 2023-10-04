@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "runner" {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
         init_container {
           name  = "gitlab-runner-token-getter"
-          image = "creaddiscans/gitlab-runner-token-getter:0.6"
+          image = "creaddiscans/gitlab-runner-token-getter:0.7"
           env {
             name  = "HOST"
             value = "https://${local.prefix}.${var.domain}"
