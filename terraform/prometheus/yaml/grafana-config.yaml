@@ -14,7 +14,7 @@ stringData:
     [date_formats]
     default_timezone = UTC
     [server]
-    root_url = https://grafana.${domain}
+    root_url = https://${prefix}.${domain}
     [auth]
     signout_redirect_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/logout
     disable_login_form = true

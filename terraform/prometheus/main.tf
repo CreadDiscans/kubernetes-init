@@ -20,7 +20,7 @@ resource "kubernetes_secret" "cert" {
     name      = "keycloak-cert"
     namespace = "monitoring"
   }
-  data = data.kubernetes_secret.cert.data
+  data       = data.kubernetes_secret.cert.data
   depends_on = [module.setup]
 }
 
@@ -31,6 +31,7 @@ module "grafana_config" {
     client_id     = local.client_id
     client_secret = local.client_secret
     domain        = var.domain
+    prefix        = local.prefix
   }
   depends_on = [module.setup]
 }
