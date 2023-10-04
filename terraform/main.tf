@@ -51,6 +51,14 @@ module "argocd" {
   depends_on = [module.keycloak]
 }
 
+module "gitlab" {
+  source     = "./gitlab"
+  domain     = var.domain
+  password   = var.password
+  mode       = "staging"
+  depends_on = [module.nginx]
+}
+
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -72,13 +80,3 @@ module "cnpg" {
 
 
 
-
-# module "gitlab_devops" {
-#   source     = "./gitlab_devops"
-#   domain     = var.domain
-#   password   = var.password
-#   nfs_ip     = var.nfs_ip
-#   nfs_path   = var.nfs_path
-#   mode       = var.mode
-#   depends_on = [module.nginx_ingress]
-# }

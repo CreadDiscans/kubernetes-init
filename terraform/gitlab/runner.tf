@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "runner" {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
         init_container {
           name  = "gitlab-runner-token-getter"
-          image = "creaddiscans/gitlab-runner-token-getter:0.3"
+          image = "creaddiscans/gitlab-runner-token-getter:0.6"
           env {
             name  = "HOST"
             value = "https://${local.prefix}.${var.domain}"
@@ -145,11 +145,12 @@ resource "kubernetes_deployment" "runner" {
         volume {
           name = "gitlab-cert"
           secret {
-            secret_name = "gitlab-cert"
+            secret_name = "${local.prefix}-cert"
           }
         }
         restart_policy = "Always"
       }
     }
   }
+  depends_on = [time_sleep.wait_deploy]
 }

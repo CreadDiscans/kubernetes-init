@@ -1,5 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 
@@ -12,13 +14,16 @@ destination = os.environ['DESTINATION']
 def get_token():
     
     options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    options.add_argument('window-size=1920,1000')
-    options.add_argument('ignore-certificate-errors')
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.20 Safari/537.36")
-
-    driver = webdriver.Chrome(options)
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--window-size=1920,1000')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.20 Safari/537.36")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.get(host)
+    print('open gitlab', host)
     while True:
         try:
             driver.find_element(By.ID, 'user_login')
@@ -30,7 +35,7 @@ def get_token():
     driver.find_element(By.ID, 'user_login').send_keys(username)
     driver.find_element(By.ID, 'user_password').send_keys(password)
     driver.find_element(By.CLASS_NAME, 'js-sign-in-button').click()
-
+    print('login')
     driver.get(f'{host}/admin/runners')
     time.sleep(2)
     find = False
@@ -42,12 +47,14 @@ def get_token():
             path = '/admin/'+url.split('/admin/')[1]+'/register'
             register_url = host+path
             find = True
+            print('find legacy runner')
             break
     if not find:
+        print('legacy runner not exists')
         driver.get(f'{host}/admin/runners/new')
         while True:
             try:
-                checkbox = driver.find_element(By.ID,'40')
+                checkbox = driver.find_element(By.ID,'37')
                 break
             except KeyboardInterrupt:
                 return
@@ -58,12 +65,14 @@ def get_token():
         time.sleep(1)
         path = '/admin/'+driver.current_url.split('/admin/')[1]
         register_url = host + path
+        print('created new runner')
     
     driver.get(register_url)
     while True:
         section = driver.find_elements(By.TAG_NAME, 'section')
         if len(section) == 3:
             break
+    print('find section')
     section = section[0]
     while True:
         try:
@@ -73,6 +82,7 @@ def get_token():
             return
         except:
             pass
+    print('find command')
     token = command.split('--token')[1].strip()
     driver.close()
     return token

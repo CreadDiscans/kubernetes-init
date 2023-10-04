@@ -7,7 +7,7 @@ ingress-nginx                       1.8.1       [https://github.com/kubernetes/i
 metallb                             0.13.10     [https://github.com/metallb/metallb]
 cert-manager                        1.12.3      [https://github.com/cert-manager/cert-manager]
 nfs-subdir-external-provisioner     4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
-gitlab-ce                           16.3.0-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
+gitlab-ce                           16.4.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 keycloak                            22.0.3      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
