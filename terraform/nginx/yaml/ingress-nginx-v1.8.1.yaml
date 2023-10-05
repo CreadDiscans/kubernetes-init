@@ -331,6 +331,8 @@ metadata:
     app.kubernetes.io/version: 1.8.1
   name: ingress-nginx-controller
   namespace: ingress-nginx
+data:
+  proxy-body-size: '100g'
 ---
 apiVersion: v1
 kind: Service
