@@ -55,7 +55,7 @@ module "gitlab" {
   source     = "./gitlab"
   domain     = var.domain
   password   = var.password
-  mode       = "staging"
+  mode       = var.mode
   depends_on = [module.nginx]
 }
 

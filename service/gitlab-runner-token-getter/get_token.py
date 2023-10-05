@@ -87,9 +87,12 @@ def get_token():
     return token
 
 if __name__ == '__main__':
-    token = get_token()
-    with open(source, 'r') as f:
-        body = f.read()
-    body = body.replace('$TOKEN', token)
-    with open(destination, 'w') as f:
-        f.write(body)
+    if os.path.exists(destination):
+        print('destination exists so skip')
+    else: 
+        token = get_token()
+        with open(source, 'r') as f:
+            body = f.read()
+        body = body.replace('$TOKEN', token)
+        with open(destination, 'w') as f:
+            f.write(body)

@@ -47,6 +47,14 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             name  = "GITLAB_SKIP_UNMIGRATED_DATA_CHECK"
             value = true
           }
+          env {
+            name  = "GITLAB_OMNIBUS_CONFIG"
+            value = <<-EOF
+            external_url 'https://${local.prefix}.${var.domain}'
+            nginx['listen_port'] = 80
+            nginx['listen_https'] = false
+            EOF
+          }
           volume_mount {
             mount_path = "/etc/gitlab"
             name       = "gitlab-volume"

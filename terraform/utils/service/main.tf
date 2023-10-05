@@ -6,7 +6,13 @@ resource "kubernetes_service" "service" {
   spec {
     selector = var.selector
     port {
+      name        = "http"
       port        = 80
+      target_port = var.port
+    }
+    port {
+      name        = "https"
+      port        = 443
       target_port = var.port
     }
     type = "NodePort"

@@ -17,7 +17,7 @@ resource "kubernetes_role" "runner_role" {
   }
   rule {
     api_groups = [""]
-    resources  = ["pods", "services", "secrets", "pods/exec", "serviceaccounts"]
+    resources  = ["pods", "services", "secrets", "pods/exec", "serviceaccounts", "pods/attach"]
     verbs      = ["get", "list", "watch", "create", "update", "patch", "delete"]
   }
 }
@@ -55,9 +55,28 @@ resource "kubernetes_config_map" "runner_config" {
         executor = "kubernetes"
         [runners.kubernetes]
             namespace = "${kubernetes_namespace.ns.metadata.0.name}"
-            image = "ubuntu:22.04"
+            image = "docker:latest"
             privileged = true
+            [[runners.kubernetes.volumes.host_path]]
+              name = "docker"
+              mount_path = "/var/run/docker.sock"
+              host_path = "/var/run/docker.sock"
         EOF
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "pvc" {
+  metadata {
+    name      = "runner-pvc"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  spec {
+    access_modes = ["ReadWriteMany"]
+    resources {
+      requests = {
+        storage = "1Gi"
+      }
+    }
   }
 }
 
@@ -83,7 +102,7 @@ resource "kubernetes_deployment" "runner" {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
         init_container {
           name  = "gitlab-runner-token-getter"
-          image = "creaddiscans/gitlab-runner-token-getter:0.7"
+          image = "creaddiscans/gitlab-runner-token-getter:0.8"
           env {
             name  = "HOST"
             value = "https://${local.prefix}.${var.domain}"
@@ -140,7 +159,9 @@ resource "kubernetes_deployment" "runner" {
         }
         volume {
           name = "config-with-token"
-          empty_dir {}
+          persistent_volume_claim {
+           claim_name = kubernetes_persistent_volume_claim.pvc.metadata.0.name 
+          }
         }
         volume {
           name = "gitlab-cert"
