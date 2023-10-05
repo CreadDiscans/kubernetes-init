@@ -51,8 +51,13 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             name  = "GITLAB_OMNIBUS_CONFIG"
             value = <<-EOF
             external_url 'https://${local.prefix}.${var.domain}'
+            registry_external_url 'https://${local.prefix_registry}.${var.domain}'
             nginx['listen_port'] = 80
             nginx['listen_https'] = false
+            registry['enable'] = true
+            registry_nginx['listen_port'] = '5005'
+            registry_nginx['listen_https'] = false
+            registry_nginx['ssl_verify_client'] = "off"
             EOF
           }
           volume_mount {
@@ -64,6 +69,11 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             mount_path = "/var/opt/gitlab"
             name       = "gitlab-volume"
             sub_path   = "gitlab/data"
+          }
+          volume_mount {
+            mount_path = "/var/opt/gitlab_empty"
+            name       = "gitlab-volume"
+            sub_path   = "gitlab/data_new"
           }
         }
         volume {
@@ -89,6 +99,19 @@ module "service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
+  selector = {
+    app = "gitlab"
+  }
+  depends_on = [time_sleep.wait_deploy]
+}
+
+module "service_registry" {
+  source    = "../utils/service"
+  mode      = var.mode
+  domain    = var.domain
+  prefix    = local.prefix_registry
+  namespace = kubernetes_namespace.ns.metadata.0.name
+  port      = 5005
   selector = {
     app = "gitlab"
   }
