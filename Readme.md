@@ -33,3 +33,7 @@ https://developer.hashicorp.com/terraform/downloads
 # k9s 설치
 
 https://github.com/derailed/k9s/releases
+
+# Post Install
+
+[airflow/Readme.md]
