@@ -78,5 +78,7 @@ module "sso" {
   ]
 }
 
-
+module "spark" {
+  source = "./spark"
+}
 
