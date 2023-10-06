@@ -4,6 +4,15 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+module "config" {
+  count  = var.git_repo == "" ? 0 : 1
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/config.yaml"
+  args = {
+    git_repo = var.git_repo
+  }
+}
+
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"

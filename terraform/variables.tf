@@ -37,3 +37,8 @@ variable "mode" {
   type    = string
   default = "staging"
 }
+
+variable "airflow_repo" {
+  type    = string
+  default = ""
+}
