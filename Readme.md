@@ -15,6 +15,8 @@ istio                               1.19.0      [https://github.com/istio/istio]
 minio                               latest      [https://github.com/minio/minio]
 argocd                              2.8.4       [https://github.com/argoproj/argo-cd]
 authservice                         0.10        [https://github.com/CreadDiscans/authservice]
+spark                               1.1.27      [https://github.com/GoogleCloudPlatform/spark-on-k8s-operator]
+airflow                             2.7.1       [https://github.com/apache/airflow/]
 
 # 설정
 
