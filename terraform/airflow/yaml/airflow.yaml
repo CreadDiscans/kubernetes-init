@@ -14,7 +14,6 @@ metadata:
     release: airflow
     chart: "airflow-1.11.0"
     heritage: Helm
-  namespace: airflow
 ---
 # Source: airflow/templates/jobs/migrate-database-job-serviceaccount.yaml
 #############################################
@@ -31,7 +30,6 @@ metadata:
     release: airflow
     chart: "airflow-1.11.0"
     heritage: Helm
-  namespace: airflow
 ---
 # Source: airflow/templates/scheduler/scheduler-serviceaccount.yaml
 ################################
@@ -152,27 +150,7 @@ type: Opaque
 data:
   connection: "cG9zdGdyZXNxbDovL3Bvc3RncmVzOnBvc3RncmVzQGFpcmZsb3ctcG9zdGdyZXNxbC5haXJmbG93OjU0MzIvcG9zdGdyZXM/c3NsbW9kZT1kaXNhYmxl"
 ---
-# Source: airflow/templates/secrets/webserver-secret-key-secret.yaml
-############################################
-## Airflow Webserver Flask Secret Key Secret
-############################################
 
-apiVersion: v1
-kind: Secret
-metadata:
-  name: airflow-webserver-secret-key
-  labels:
-    tier: airflow
-    component: webserver
-    release: airflow
-    chart: airflow
-    heritage: Helm
-  namespace: airflow
-type: Opaque
-data:
-  webserver-secret-key: "UVdkMVJWaGlXR2RHYUROTFIzQXpUbTVXYWs5M1VYTTFNMnRPWm10WWRGaz0="
-
----
 # Source: airflow/templates/configmaps/statsd-configmap.yaml
 ################################
 ## Airflow StatsD ConfigMap
@@ -655,8 +633,8 @@ spec:
       annotations:
         checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/webserver-secret-key: 5d0e9831e274e4cfe88bedc13e080ef90aefb33b7373e17de8e59b02b8c51b81
-        checksum/airflow-config: 693d96b323df67b8e97c6f27550fa9ff02c5e5c67cf909a47a2729a499256bf2
+        checksum/webserver-secret-key: 97ccb485bcb4d6b5d625617645f8cda75f82731afbd1fa58b643a3bd927c7026
+        checksum/airflow-config: c4c2207f4b165d4cdee0f79e4228e6886dea7000288ecd0a07233f6a446437ce
         checksum/webserver-config: 2f3fdfd294a37094d2abee43b2b09888a5c195ee03414996bf99a4681658af94
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
@@ -738,7 +716,7 @@ spec:
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: airflow-webserver-secret-key
+                  name: webserver-secret
                   key: webserver-secret-key
       containers:
         - name: webserver
@@ -829,7 +807,7 @@ spec:
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: airflow-webserver-secret-key
+                  name: webserver-secret
                   key: webserver-secret-key          
       volumes:
         - name: config
@@ -1196,6 +1174,11 @@ spec:
 ## Airflow Result Backend Secret
 #################################
 ---
+# Source: airflow/templates/secrets/webserver-secret-key-secret.yaml
+############################################
+## Airflow Webserver Flask Secret Key Secret
+############################################
+---
 # Source: airflow/templates/statsd/statsd-networkpolicy.yaml
 ################################
 ## Airflow StatsD NetworkPolicy
@@ -1266,7 +1249,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "YzI5aVJGZEtWVE00VW5GeVEwb3dVRVpoY0hoT2MzSnhTSHBqTm0xb05XRT0="
+  fernet-key: "T1RKRU5VcGFSSGxtZFU1NlNHOUdkVXRzTTFKMlYwMVRVVVZtV1dkUWFtND0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
@@ -1297,7 +1280,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  password: "T3ZxcFFNM2hDMQ=="
+  password: "MEJ3cnJ3TnBOVw=="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 ##################################
@@ -1320,7 +1303,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  connection: "cmVkaXM6Ly86T3ZxcFFNM2hDMUBhaXJmbG93LXJlZGlzOjYzNzkvMA=="
+  connection: "cmVkaXM6Ly86MEJ3cnJ3TnBOV0BhaXJmbG93LXJlZGlzOjYzNzkvMA=="
 ---
 # Source: airflow/templates/jobs/create-user-job.yaml
 ################################
@@ -1423,7 +1406,7 @@ spec:
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: airflow-webserver-secret-key
+                  name: webserver-secret
                   key: webserver-secret-key          
           resources:
             {}
@@ -1531,7 +1514,7 @@ spec:
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: airflow-webserver-secret-key
+                  name: webserver-secret
                   key: webserver-secret-key
           resources:
             {}

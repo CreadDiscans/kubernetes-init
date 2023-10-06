@@ -4,6 +4,20 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+resource "random_password" "password" {
+  length = 16
+}
+
+resource "kubernetes_secret" "webserver_secret" {
+  metadata {
+    name      = "webserver-secret"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    webserver-secret-key = random_password.password.result
+  }
+}
+
 module "config" {
   count  = var.git_repo == "" ? 0 : 1
   source = "../utils/apply"
