@@ -82,3 +82,8 @@ module "spark" {
   source = "./spark"
 }
 
+module "airflow" {
+  source = "./airflow"
+  mode   = var.mode
+  domain = var.domain
+}
