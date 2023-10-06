@@ -31,6 +31,22 @@ resource "time_sleep" "wait" {
 
 resource "time_static" "current" {}
 
+resource "random_password" "keycloak_password" {
+  length = 16
+}
+
+resource "kubernetes_secret" "secret" {
+  metadata {
+    name      = "keycloak-db-secret"
+    namespace = "cnpg-system"
+  }
+  data = {
+    username = "keycloak"
+    password = random_password.keycloak_password.result
+  }
+  type = "kubernetes.io/basic-auth"
+}
+
 module "cluster" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/cnpg-cluster.yaml"

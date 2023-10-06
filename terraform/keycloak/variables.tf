@@ -19,6 +19,10 @@ variable "mode" {
   type = string
 }
 
+variable "db_password" {
+  type = string
+}
+
 output "url" {
   value = "https://${local.prefix}.${var.domain}"
 }

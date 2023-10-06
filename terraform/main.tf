@@ -14,13 +14,18 @@ module "istio" {
   source = "./istio"
 }
 
+module "cnpg" {
+  source = "./cnpg"
+}
+
 module "keycloak" {
-  source     = "./keycloak"
-  domain     = var.domain
-  mode       = var.mode
-  username   = var.username
-  password   = var.password
-  depends_on = [module.nginx]
+  source      = "./keycloak"
+  domain      = var.domain
+  mode        = var.mode
+  username    = var.username
+  password    = var.password
+  db_password = module.cnpg.keycloak_db_password
+  depends_on  = [module.nginx, module.cnpg]
 }
 
 module "minio" {
@@ -71,11 +76,6 @@ module "sso" {
     module.autoscaler.client,
     module.argocd.client
   ]
-}
-
-module "cnpg" {
-  source     = "./cnpg"
-  depends_on = [module.minio]
 }
 
 
