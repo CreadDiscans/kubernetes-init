@@ -58,6 +58,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             registry_nginx['listen_port'] = '5005'
             registry_nginx['listen_https'] = false
             registry_nginx['ssl_verify_client'] = "off"
+            prometheus_monitoring['enable'] = false
             EOF
           }
           volume_mount {
@@ -69,11 +70,6 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             mount_path = "/var/opt/gitlab"
             name       = "gitlab-volume"
             sub_path   = "gitlab/data"
-          }
-          volume_mount {
-            mount_path = "/var/opt/gitlab_empty"
-            name       = "gitlab-volume"
-            sub_path   = "gitlab/data_new"
           }
         }
         volume {

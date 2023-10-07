@@ -1,6 +1,6 @@
 locals {
   prefix          = "gitlab"
-  prefix_registry = "reg"
+  prefix_registry = "registry"
 }
 
 variable "domain" {
