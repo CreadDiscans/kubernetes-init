@@ -135,8 +135,7 @@ resource "kubernetes_deployment" "runner" {
           }
         }
         container {
-          args              = ["run"]
-          image             = "gitlab/gitlab-runner:v16.3.0"
+          image             = "gitlab/gitlab-runner:v16.4.1"
           image_pull_policy = "Always"
           name              = "gitlab-runner"
           volume_mount {
