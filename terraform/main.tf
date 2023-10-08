@@ -24,7 +24,6 @@ module "keycloak" {
   mode        = var.mode
   username    = var.username
   password    = var.password
-  db_password = module.cnpg.keycloak_db_password
   depends_on  = [module.nginx, module.cnpg]
 }
 

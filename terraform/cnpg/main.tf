@@ -31,20 +31,14 @@ resource "time_sleep" "wait" {
 
 resource "time_static" "current" {}
 
-resource "random_password" "keycloak_password" {
-  length = 16
+module "keycloak" {
+  source = "./service"
+  name   = "keycloak"
 }
 
-resource "kubernetes_secret" "secret" {
-  metadata {
-    name      = "keycloak-db-secret"
-    namespace = "cnpg-system"
-  }
-  data = {
-    username = "keycloak"
-    password = random_password.keycloak_password.result
-  }
-  type = "kubernetes.io/basic-auth"
+module "airflow" {
+  source = "./service"
+  name   = "airflow"
 }
 
 module "cluster" {
@@ -52,6 +46,10 @@ module "cluster" {
   yaml   = "${path.module}/yaml/cnpg-cluster.yaml"
   args = {
     current = time_static.current.rfc3339
+    services = [
+      module.keycloak.info,
+      module.airflow.info
+    ]
   }
   depends_on = [time_sleep.wait]
 }

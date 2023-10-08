@@ -4,6 +4,13 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+data "kubernetes_secret" "db_secret" {
+  metadata {
+    name      = "keycloak-db-secret"
+    namespace = "cnpg-system"
+  }
+}
+
 resource "kubernetes_deployment" "keycloak_deploy" {
   metadata {
     name      = "keycloak-deploy"
@@ -35,8 +42,8 @@ resource "kubernetes_deployment" "keycloak_deploy" {
             "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true",
             "--db postgres",
             "--db-url-host cluster-cnpg-rw.cnpg-system",
-            "--db-username keycloak",
-            "--db-password ${var.db_password}"
+            "--db-username ${data.kubernetes_secret.db_secret.data.username}",
+            "--db-password ${data.kubernetes_secret.db_secret.data.password}"
           ]
           env {
             name  = "KEYCLOAK_ADMIN"

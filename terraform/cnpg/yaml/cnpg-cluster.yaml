@@ -36,10 +36,14 @@ spec:
 
   bootstrap:
     initdb:
-      database: keycloak
-      owner: keycloak
-      secret:
-        name: keycloak-db-secret
+      database: app
+      owner: app
+      postInitSQL:
+        %{ for item in services ~}- CREATE DATABASE ${item.db_name};
+        - CREATE USER ${item.username} WITH ENCRYPTED PASSWORD '${item.password}';
+        - GRANT ALL PRIVILEGES ON DATABASE ${item.db_name} TO ${item.username};
+        - ALTER DATABASE ${item.db_name} OWNER TO ${item.username};
+        %{ endfor ~}
 
     # recovery:
     #   backup:
