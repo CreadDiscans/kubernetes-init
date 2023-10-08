@@ -57,7 +57,9 @@ resource "kubernetes_deployment" "minio_deploy" {
             run_as_user = 0
           }
           command = ["/bin/sh", "-c"]
-          args    = ["sleep 5 && minio server --console-address :9001 /storage --address :9000"]
+          args    = [
+            "sleep 5 && mc mb /storage/cnpg && mc mb /storage/airflow && minio server --console-address :9001 /storage --address :9000"
+          ]
           env {
             name  = "MINIO_ROOT_USER"
             value = kubernetes_secret.root_creds.data.username

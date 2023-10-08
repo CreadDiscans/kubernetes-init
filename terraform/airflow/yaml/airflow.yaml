@@ -1163,10 +1163,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+          command: ["bash", "-c"]
           args:
-            - bash
-            - -c
-            - exec airflow webserver
+            - airflow connections add s3_conn --conn-json '${connection}' & airflow webserver
           resources:
             {}
           volumeMounts:

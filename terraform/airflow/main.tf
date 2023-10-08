@@ -35,11 +35,19 @@ resource "kubernetes_secret" "cnpg_db" {
   }
 }
 
+data "kubernetes_secret" "minio" {
+  metadata {
+    name      = "minio-creds"
+    namespace = "minio-storage"
+  }
+}
+
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
   args = {
-    git_repo = var.git_repo
+    git_repo   = var.git_repo
+    connection = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${data.kubernetes_secret.minio.data.username}\",\"aws_secret_access_key\":\"${data.kubernetes_secret.minio.data.password}\"}}"
   }
 }
 
