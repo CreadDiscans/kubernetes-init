@@ -268,6 +268,9 @@ subjects:
   - kind: ServiceAccount
     name: k8s-spark-spark-operator
     namespace: spark-operator
+  - kind: ServiceAccount
+    name: airflow-worker
+    namespace: airflow
 roleRef:
   kind: ClusterRole
   name: k8s-spark-spark-operator
