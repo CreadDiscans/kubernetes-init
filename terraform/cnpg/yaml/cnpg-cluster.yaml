@@ -43,6 +43,7 @@ spec:
         - CREATE USER ${item.username} WITH ENCRYPTED PASSWORD '${item.password}';
         - GRANT ALL PRIVILEGES ON DATABASE ${item.db_name} TO ${item.username};
         - ALTER DATABASE ${item.db_name} OWNER TO ${item.username};
+        - GRANT ALL ON SCHEMA public TO ${item.username};
         %{ endfor ~}
 
     # recovery:
