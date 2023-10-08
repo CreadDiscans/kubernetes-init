@@ -18,18 +18,29 @@ resource "kubernetes_secret" "webserver_secret" {
   }
 }
 
-module "config" {
-  count  = var.git_repo == "" ? 0 : 1
-  source = "../utils/apply"
-  yaml   = "${path.module}/yaml/config.yaml"
-  args = {
-    git_repo = var.git_repo
+data "kubernetes_secret" "db" {
+  metadata {
+    name      = "airflow-db-secret"
+    namespace = "cnpg-system"
+  }
+}
+
+resource "kubernetes_secret" "cnpg_db" {
+  metadata {
+    name      = "cnpg-db"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    connection = "postgresql://${data.kubernetes_secret.db.data.username}:${data.kubernetes_secret.db.data.password}@cluster-cnpg-rw.cnpg-system:5432/${data.kubernetes_secret.db.data.db_name}"
   }
 }
 
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
+  args = {
+    git_repo = var.git_repo
+  }
 }
 
 module "service" {
