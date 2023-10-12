@@ -45,22 +45,8 @@ def every_minute():
                 else:
                     requests.get(f'http://localhost/api/magic/{node.name}')
 
-        for item in raw:
-            node_name = item['metric']['node'].strip()
-            node_model = Node.objects.filter(name=node_name)
-            if node_model.count() == 0:
-                ip = item['metric']['instance'].split(':')[0]
-                Node(
-                    name=node_name,
-                    mac=get_mac_address(ip),
-                    ip=ip,
-                    status='fix' if node_name == 'master' else 'up',
-                    info=json.dumps({
-                        'cpu':nodes[node_name]['cpu_max'],
-                        'memory':round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
-                        }, indent=2)
-                ).save()
-                node_action = True
+        if update_model_info(nodes, raw):
+            node_action = True
 
         if not node_action:
             action, node = autoscale(node_models)
@@ -84,6 +70,41 @@ def every_minute():
         return 'action'
     except Exception as ex:
         return str(ex)
+
+def update_model_info(nodes, raw):
+    node_action = False
+    for item in raw:
+        node_name = item['metric']['node'].strip()
+        node_model = Node.objects.filter(name=node_name)
+        cpu = nodes[node_name]['cpu_max']
+        mem = round(nodes[node_name]['mem_max']/1024/1024/1024, 2)
+        if node_model.count() == 0:
+            ip = item['metric']['instance'].split(':')[0]
+            Node(
+                name=node_name,
+                mac=get_mac_address(ip),
+                ip=ip,
+                status='fix' if node_name == 'master' else 'up',
+                info=json.dumps({
+                    'cpu':cpu,
+                    'memory':mem
+                }, indent=2)
+            ).save()
+            node_action = True
+        else:
+            node_item = node_model[0]
+            info = json.loads(node_item.info)
+            modified = False
+            if info['cpu'] != cpu: 
+                info['cpu'] = cpu
+                modified = True
+            if info['memory'] != mem: 
+                info['memory'] = mem
+                modified = True
+            if modified:
+                node_item.info = json.dumps(info, indent=2)
+                node_item.save()
+    return node_action
 
 def merge(source, query, key, type):
     data = requests.get(f'{url}?query={query}').json()['data']['result']

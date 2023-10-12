@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "foreground" {
         node_name = "master"
         container {
           name    = "localscaler-background"
-          image   = "creaddiscans/localscaler:0.31"
+          image   = "creaddiscans/localscaler:0.32"
           command = ["/bin/bash", "run_foreground.sh"]
           volume_mount {
             name       = "db"
@@ -127,7 +127,7 @@ resource "kubernetes_deployment" "background" {
         host_network = true
         container {
           name    = "localscaler"
-          image   = "creaddiscans/localscaler:0.31"
+          image   = "creaddiscans/localscaler:0.32"
           command = ["/bin/bash", "run_background.sh"]
           env {
             name  = "PROMETHEUS"
