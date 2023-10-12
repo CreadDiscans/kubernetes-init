@@ -815,11 +815,11 @@ scheduler:
 
   resources:
     limits:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 500m
+      memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 512Mi
 
   # This setting tells kubernetes that its ok to evict
   # when it wants to scale a node down.
@@ -1186,11 +1186,11 @@ webserver:
 
   resources:
     limits:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 1000m
+      memory: 1024Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 1024Mi
 
   # Create initial user.
   defaultUser:
@@ -1369,11 +1369,11 @@ triggerer:
 
   resources:
     limits:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 512Mi
 
   # Grace period for triggerer to finish after SIGTERM is sent from kubernetes
   terminationGracePeriodSeconds: 60

@@ -737,11 +737,11 @@ spec:
         - name: wait-for-airflow-migrations
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 500m
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -911,11 +911,11 @@ spec:
                   airflow jobs check --job-type SchedulerJob --local
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 500m
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1173,11 +1173,11 @@ spec:
         - name: wait-for-airflow-migrations
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 1000m
+              memory: 1024Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 1024Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1252,11 +1252,11 @@ spec:
             - airflow connections add s3_conn --conn-json '${connection}' & airflow webserver
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 1000m
+              memory: 1024Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 1024Mi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1407,11 +1407,11 @@ spec:
         - name: wait-for-airflow-migrations
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1523,11 +1523,11 @@ spec:
             - exec airflow triggerer
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
@@ -1952,7 +1952,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "ZFVWMVNGUXdSRmcwV0dSb1YzZEdUMlJLVFVVMFUzVlNjbWRVWVV4bmJFND0="
+  fernet-key: "U0cxR1VsWTNiV1pWVkc1MVkwNUxVVEpMWXpaMGNYUjVhbFJLWldGTVV6RT0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
