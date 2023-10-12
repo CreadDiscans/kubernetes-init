@@ -35,6 +35,16 @@ resource "kubernetes_deployment" "gitlab_deploy" {
         container {
           image = "gitlab/gitlab-ce:16.4.1-ce.0"
           name  = "gitlab"
+          resources {
+            requests = {
+              cpu = "250m"
+              memory = "16384Mi"
+            }
+            limits = {
+              cpu = 1
+              memory = "16384Mi"
+            }
+          }
           env {
             name  = "TZ"
             value = "Asia/Seoul"

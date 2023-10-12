@@ -138,6 +138,16 @@ resource "kubernetes_deployment" "runner" {
           image             = "gitlab/gitlab-runner:v16.4.1"
           image_pull_policy = "Always"
           name              = "gitlab-runner"
+          resources {
+            requests = {
+              cpu    = "50m"
+              memory = "128Mi"
+            }
+            limits = {
+              cpu    = "50m"
+              memory = "128Mi"
+            }
+          }
           volume_mount {
             name       = "config-with-token"
             mount_path = "/etc/gitlab-runner/config.toml"
@@ -159,7 +169,7 @@ resource "kubernetes_deployment" "runner" {
         volume {
           name = "config-with-token"
           persistent_volume_claim {
-           claim_name = kubernetes_persistent_volume_claim.pvc.metadata.0.name 
+            claim_name = kubernetes_persistent_volume_claim.pvc.metadata.0.name
           }
         }
         volume {
