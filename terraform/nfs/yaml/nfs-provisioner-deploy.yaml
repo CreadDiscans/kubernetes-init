@@ -27,6 +27,13 @@ spec:
           value: ${server_path}
         image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
         name: nfs-client-provisioner
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
         volumeMounts:
         - mountPath: /persistentvolumes
           name: nfs-client-root
