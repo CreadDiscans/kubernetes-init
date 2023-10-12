@@ -63,6 +63,19 @@ module "gitlab" {
   depends_on = [module.nginx]
 }
 
+module "spark" {
+  source = "./spark"
+  mode   = var.mode
+  domain = var.domain
+}
+
+module "airflow" {
+  source   = "./airflow"
+  mode     = var.mode
+  domain   = var.domain
+  git_repo = var.airflow_repo
+}
+
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -75,17 +88,4 @@ module "sso" {
     module.autoscaler.client,
     module.argocd.client
   ]
-}
-
-module "spark" {
-  source = "./spark"
-  mode   = var.mode
-  domain = var.domain
-}
-
-module "airflow" {
-  source   = "./airflow"
-  mode     = var.mode
-  domain   = var.domain
-  git_repo = var.airflow_repo
 }

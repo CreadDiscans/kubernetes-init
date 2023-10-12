@@ -32,6 +32,7 @@ resource "kubernetes_ingress_v1" "ingress" {
     namespace = var.gateway ? "istio-system" : var.namespace
   }
   spec {
+    ingress_class_name = "nginx"
     tls {
       hosts       = ["${var.prefix}.${var.domain}"]
       secret_name = "${var.prefix}-cert"
