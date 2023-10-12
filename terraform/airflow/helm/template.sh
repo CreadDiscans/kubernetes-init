@@ -1,0 +1,1 @@
+helm template airflow apache-airflow/airflow -n airflow --values airflow/helm/values.yaml  > airflow/yaml/airflow.yaml
