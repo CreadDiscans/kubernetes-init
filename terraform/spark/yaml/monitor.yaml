@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: prometheus
+  name: spark-servicemonitor
+  namespace: spark-apps
+spec:
+  endpoints:
+  - interval: 5s
+    port: spark-ui
+    path: /metrics/prometheus/
+  - interval: 5s
+    port: spark-ui
+    path: /metrics/executors/prometheus/
+  selector:
+    matchLabels:
+      spark-role: driver
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    release: prometheus
+  name: spark-podmonitor
+  namespace: spark-apps
+spec:
+  podMetricsEndpoints:
+  - interval: 5s
+    port: spark-ui
+    path: /metrics/prometheus/
+  - interval: 5s
+    port: spark-ui
+    path: /metrics/executors/prometheus/
+  selector:
+    matchLabels:
+      spark-role: driver

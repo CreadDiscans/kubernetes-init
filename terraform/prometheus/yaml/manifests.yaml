@@ -42858,6 +42858,16 @@ rules:
   - /metrics
   verbs:
   - get
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

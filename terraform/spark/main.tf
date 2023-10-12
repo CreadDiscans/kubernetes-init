@@ -39,3 +39,8 @@ module "history_service" {
   }
   depends_on = [module.history]
 }
+
+module "monitor" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/monitor.yaml"
+}

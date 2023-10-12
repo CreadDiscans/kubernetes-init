@@ -18,6 +18,8 @@ spec:
     spark.kubernetes.driver.volumes.persistentVolumeClaim.rwxpvc.mount.path: /opt/spark/work-dir/log
     spark.kubernetes.executor.volumes.persistentVolumeClaim.rwxpvc.options.claimName: spark-pvc
     spark.kubernetes.executor.volumes.persistentVolumeClaim.rwxpvc.mount.path: /opt/spark/work-dir/log
+    spark.ui.prometheus.enabled: "true"
+    spark.executor.processTreeMetrics.enabled: "true"
   restartPolicy:
     type: Never
   driver:
