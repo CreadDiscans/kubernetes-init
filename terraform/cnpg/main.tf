@@ -54,7 +54,7 @@ module "cluster" {
   depends_on = [time_sleep.wait]
 }
 
-module "backup_daily" {
+module "backup_weekly" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/backup-scheduled.yaml"
   depends_on = [module.cluster]
