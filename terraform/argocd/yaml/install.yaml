@@ -19177,6 +19177,13 @@ spec:
         image: quay.io/argoproj/argocd:v2.8.4
         imagePullPolicy: Always
         name: argocd-applicationset-controller
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
         ports:
         - containerPort: 7000
           name: webhook
@@ -19273,6 +19280,13 @@ spec:
           tcpSocket:
             port: 9001
         name: argocd-notifications-controller
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -19350,6 +19364,13 @@ spec:
         name: redis
         ports:
         - containerPort: 6379
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -19553,6 +19574,13 @@ spec:
           value: /helm-working-dir
         image: quay.io/argoproj/argocd:v2.8.4
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -19894,6 +19922,13 @@ spec:
               optional: true
         image: quay.io/argoproj/argocd:v2.8.4
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
         livenessProbe:
           httpGet:
             path: /healthz?full=true
@@ -20142,6 +20177,13 @@ spec:
         image: quay.io/argoproj/argocd:v2.8.4
         imagePullPolicy: Always
         name: argocd-application-controller
+        resources:
+          requests:
+            cpu: 50m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
         - containerPort: 8082
         readinessProbe:
