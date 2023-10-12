@@ -85,6 +85,12 @@ resource "kubernetes_deployment" "foreground" {
           name    = "localscaler-background"
           image   = "creaddiscans/localscaler:0.32"
           command = ["/bin/bash", "run_foreground.sh"]
+          resources {
+            requests = {
+              cpu    = "250m"
+              memory = "512Mi"
+            }
+          }
           volume_mount {
             name       = "db"
             mount_path = "/app/db"
@@ -129,6 +135,12 @@ resource "kubernetes_deployment" "background" {
           name    = "localscaler"
           image   = "creaddiscans/localscaler:0.32"
           command = ["/bin/bash", "run_background.sh"]
+          resources {
+            requests = {
+              cpu    = "250m"
+              memory = "512Mi"
+            }
+          }
           env {
             name  = "PROMETHEUS"
             value = data.kubernetes_service.prometheus.spec.0.cluster_ip
