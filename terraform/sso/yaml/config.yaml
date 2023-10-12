@@ -26,7 +26,7 @@ data:
               {
                 "authorization_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/auth",
                 "token_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/token",
-                "callback_uri": "${client.valid_redirect_uris.0}",
+                "callback_uri": "https://${client.client_id}.${domain}/authservice_callback",
                 "jwks_fetcher": {
                   "jwks_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/certs",
                   "periodic_fetch_interval_sec": 10,

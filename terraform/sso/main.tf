@@ -8,7 +8,7 @@ resource "keycloak_openid_client" "openid_client" {
   client_secret                   = each.value.client_secret
   direct_access_grants_enabled    = true
   standard_flow_enabled           = true
-  valid_redirect_uris             = each.value.valid_redirect_uris
+  valid_redirect_uris             = concat(["https://${each.value.client_id}.${var.domain}/authservice_callback"],each.value.valid_redirect_uris)
   valid_post_logout_redirect_uris = each.value.valid_post_logout_redirect_uris
   base_url                        = each.value.base_url
   root_url                        = each.value.base_url
@@ -61,4 +61,19 @@ resource "keycloak_openid_client_default_scopes" "default_scopes" {
     "${each.key}-auth"
   ]
   depends_on = [keycloak_openid_group_membership_protocol_mapper.auth_mapper]
+}
+
+module "config" {
+  source   = "../utils/apply"
+  yaml     = "${path.module}/yaml/config.yaml"
+  args = {
+    clients       = var.clients
+    domain        = var.domain
+  }
+}
+
+module "authservice" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/authservice.yaml"
+  depends_on = [module.config]
 }

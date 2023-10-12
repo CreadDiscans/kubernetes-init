@@ -67,6 +67,8 @@ spec:
           "/styles/*", 
           "/images/*", 
           "/api/*", 
+          "/public/*",
+          "/favicon.ico",
           "/oauth_callback"
         ]
 ---

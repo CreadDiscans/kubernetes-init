@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "minio_deploy" {
             run_as_user = 0
           }
           command = ["/bin/sh", "-c"]
-          args    = [
+          args = [
             "sleep 5 && mc mb /storage/cnpg && mc mb /storage/airflow && minio server --console-address :9001 /storage --address :9000"
           ]
           env {
@@ -149,6 +149,7 @@ module "service" {
   prefix    = "minio"
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 9001
+  gateway   = true
   selector = {
     app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
   }
