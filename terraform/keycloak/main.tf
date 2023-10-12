@@ -45,6 +45,16 @@ resource "kubernetes_deployment" "keycloak_deploy" {
             "--db-username ${data.kubernetes_secret.db_secret.data.username}",
             "--db-password ${data.kubernetes_secret.db_secret.data.password}"
           ]
+          resources {
+            requests = {
+              cpu    = "50m"
+              memory = "1024Mi"
+            }
+            limits = {
+              cpu    = "500m"
+              memory = "1024Mi"
+            }
+          }
           env {
             name  = "KEYCLOAK_ADMIN"
             value = var.username
