@@ -447,6 +447,25 @@ data:
         labels:
           pool: "$1"
 ---
+# Source: airflow/templates/configmaps/webserver-configmap.yaml
+################################
+## Airflow ConfigMap
+#################################
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-webserver-config
+  labels:
+    tier: airflow
+    component: config
+    release: airflow
+    chart: "airflow-1.11.0"
+    heritage: Helm
+  namespace: airflow
+data:
+  webserver_config.py: |-
+    AUTH_ROLE_PUBLIC = 'Admin'
+---
 # Source: airflow/templates/rbac/pod-launcher-role.yaml
 ################################
 ## Airflow Pod Launcher Role
@@ -678,7 +697,7 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: a0083acc0f5b4b4908e15c32afc496d59467d159af4581a31d52227cfb3e4168
+        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -724,6 +743,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
           args:          
             - airflow
             - db
@@ -883,6 +906,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: True        
@@ -934,10 +961,17 @@ spec:
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
       volumes:
         - name: config
           configMap:
             name: airflow-config
+        - name: webserver-config
+          configMap:
+            name: airflow-webserver-config
         - name: dags
           emptyDir: {}
         - name: logs
@@ -1070,8 +1104,8 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
         checksum/webserver-secret-key: 97ccb485bcb4d6b5d625617645f8cda75f82731afbd1fa58b643a3bd927c7026
-        checksum/airflow-config: a0083acc0f5b4b4908e15c32afc496d59467d159af4581a31d52227cfb3e4168
-        checksum/webserver-config: 2f3fdfd294a37094d2abee43b2b09888a5c195ee03414996bf99a4681658af94
+        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
+        checksum/webserver-config: 70ae487c6a2a097ffa264adc3fff485ddb26bacee9e1244f62e27058c923ba9f
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
     spec:
@@ -1115,6 +1149,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
           args:          
             - airflow
             - db
@@ -1163,8 +1201,9 @@ spec:
             capabilities:
               drop:
                 - ALL
-          command: ["bash", "-c"]
           args:
+            - bash
+            - -c
             - airflow connections add s3_conn --conn-json '${connection}' & airflow webserver
           resources:
             {}
@@ -1181,6 +1220,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
           ports:
             - name: airflow-ui
               containerPort: 8080
@@ -1248,6 +1291,9 @@ spec:
         - name: config
           configMap:
             name: airflow-config
+        - name: webserver-config
+          configMap:
+            name: airflow-webserver-config
 ---
 # Source: airflow/templates/triggerer/triggerer-deployment.yaml
 ################################
@@ -1281,7 +1327,7 @@ spec:
       annotations:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: a0083acc0f5b4b4908e15c32afc496d59467d159af4581a31d52227cfb3e4168
+        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -1327,6 +1373,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
           args:          
             - airflow
             - db
@@ -1424,6 +1474,10 @@ spec:
               mountPath: "/opt/airflow/config/airflow_local_settings.py"
               subPath: airflow_local_settings.py
               readOnly: true
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: True
@@ -1526,10 +1580,17 @@ spec:
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
+            - name: webserver-config
+              mountPath: "/opt/airflow/webserver_config.py"
+              subPath: webserver_config.py
+              readOnly: True
       volumes:
         - name: config
           configMap:
             name: airflow-config
+        - name: webserver-config
+          configMap:
+            name: airflow-webserver-config
         - name: dags
           emptyDir: {}
   volumeClaimTemplates:
@@ -1555,11 +1616,6 @@ spec:
 ####################################################
 ## Extra ConfigMaps provisioned via the chart values
 ####################################################
----
-# Source: airflow/templates/configmaps/webserver-configmap.yaml
-################################
-## Airflow ConfigMap
-#################################
 ---
 # Source: airflow/templates/dag-processor/dag-processor-deployment.yaml
 ################################
@@ -1821,7 +1877,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "V1UxdllVeDRNWFJ2Y3pVeFpsSTJUMlJEYnpCaldVTjNlbFZpU0ZRMGNFbz0="
+  fernet-key: "V1hSVmQwWjNVemRKVWtoNWNYcFNRVk5rUWxoMWRsVlFiR1UzVkdvMmQxaz0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
@@ -1834,27 +1890,6 @@ data:
 ################################
 ## Airflow Redis Password Secret
 #################################
-# If passwordSecretName is not set, we will either use the set password, or use the generated one
-apiVersion: v1
-kind: Secret
-metadata:
-  name: airflow-redis-password
-  namespace: airflow
-  labels:
-    tier: airflow
-    component: redis
-    release: airflow
-    chart: airflow
-    heritage: Helm
-  annotations:
-    "helm.sh/hook": "pre-install"
-    "helm.sh/hook-delete-policy": "before-hook-creation"
-    "helm.sh/hook-weight": "0"
-type: Opaque
-data:
-  password: "Nlg5VDRHcGpzMA=="
----
-# Source: airflow/templates/secrets/redis-secrets.yaml
 ##################################
 ## Airflow Redis Connection Secret
 ##################################
@@ -1875,7 +1910,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  connection: "cmVkaXM6Ly86Nlg5VDRHcGpzMEBhaXJmbG93LXJlZGlzOjYzNzkvMA=="
+  connection: "JSFzKDxuaWw+KQ=="
 ---
 # Source: airflow/templates/jobs/create-user-job.yaml
 ################################

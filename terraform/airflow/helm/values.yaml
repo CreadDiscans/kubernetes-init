@@ -1226,15 +1226,9 @@ webserver:
   # as a custom webserver_config.py. You can bake a webserver_config.py in to
   # your image instead or specify a configmap containing the
   # webserver_config.py.
-  webserverConfig: ~
-  # webserverConfig: |
-  #   from airflow import configuration as conf
+  webserverConfig: |
+    AUTH_ROLE_PUBLIC = 'Admin'
 
-  #   # The SQLAlchemy connection string.
-  #   SQLALCHEMY_DATABASE_URI = conf.get('database', 'SQL_ALCHEMY_CONN')
-
-  #   # Flask-WTF flag for CSRF
-  #   CSRF_ENABLED = True
   webserverConfigConfigMapName: ~
 
   service:
@@ -2039,7 +2033,7 @@ pgbouncer:
 
 # Configuration for the redis provisioned by the chart
 redis:
-  enabled: true
+  enabled: false
   terminationGracePeriodSeconds: 600
 
   # Create ServiceAccount

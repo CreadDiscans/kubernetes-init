@@ -87,6 +87,7 @@ module "sso" {
     module.prometheus.client,
     module.autoscaler.client,
     module.argocd.client,
-    module.spark.client
+    module.spark.client,
+    module.airflow.client
   ]
 }
