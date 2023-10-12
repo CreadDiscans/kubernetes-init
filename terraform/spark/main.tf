@@ -34,6 +34,7 @@ module "history_service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns_apps.metadata.0.name
   port      = 18080
+  gateway   = true
   selector = {
     app = "spark-history-server"
   }

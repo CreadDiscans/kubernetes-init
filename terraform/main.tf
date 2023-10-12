@@ -86,6 +86,7 @@ module "sso" {
     module.minio.client,
     module.prometheus.client,
     module.autoscaler.client,
-    module.argocd.client
+    module.argocd.client,
+    module.spark.client
   ]
 }
