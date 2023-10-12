@@ -19,12 +19,12 @@ module "cnpg" {
 }
 
 module "keycloak" {
-  source      = "./keycloak"
-  domain      = var.domain
-  mode        = var.mode
-  username    = var.username
-  password    = var.password
-  depends_on  = [module.nginx, module.cnpg]
+  source     = "./keycloak"
+  domain     = var.domain
+  mode       = var.mode
+  username   = var.username
+  password   = var.password
+  depends_on = [module.nginx, module.cnpg]
 }
 
 module "minio" {
@@ -79,6 +79,8 @@ module "sso" {
 
 module "spark" {
   source = "./spark"
+  mode   = var.mode
+  domain = var.domain
 }
 
 module "airflow" {
