@@ -60,6 +60,16 @@ resource "kubernetes_deployment" "minio_deploy" {
           args = [
             "sleep 5 && mc mb /storage/cnpg && mc mb /storage/airflow && minio server --console-address :9001 /storage --address :9000"
           ]
+          resources {
+            requests = {
+              cpu    = "50m"
+              memory = "2048Mi"
+            }
+            limits = {
+              cpu    = "500m"
+              memory = "2048Mi"
+            }
+          }
           env {
             name  = "MINIO_ROOT_USER"
             value = kubernetes_secret.root_creds.data.username
