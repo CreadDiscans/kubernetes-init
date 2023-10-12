@@ -254,7 +254,12 @@ data:
             - name: GIT_SYNC_ONE_TIME
               value: "true"
           resources: 
-              {}
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -304,7 +309,12 @@ data:
                 - ALL
           name: base
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - mountPath: "/opt/airflow/logs"
               name: logs
@@ -697,7 +707,7 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
+        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -726,7 +736,12 @@ spec:
       initContainers:
         - name: wait-for-airflow-migrations
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -814,7 +829,12 @@ spec:
             - name: GIT_SYNC_ONE_TIME
               value: "true"
           resources: 
-              {}
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -890,7 +910,12 @@ spec:
                   CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
                   airflow jobs check --job-type SchedulerJob --local
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -938,13 +963,23 @@ spec:
             - name: GIT_SYNC_MAX_SYNC_FAILURES
               value: "0"
           resources: 
-              {}
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
         - name: scheduler-log-groomer
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1030,7 +1065,12 @@ spec:
           args: 
             - --statsd.mapping-config=/etc/statsd-exporter/mappings.yml
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           ports:
             - name: statsd-ingest
               protocol: UDP
@@ -1104,8 +1144,8 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
         checksum/webserver-secret-key: 97ccb485bcb4d6b5d625617645f8cda75f82731afbd1fa58b643a3bd927c7026
-        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
-        checksum/webserver-config: 70ae487c6a2a097ffa264adc3fff485ddb26bacee9e1244f62e27058c923ba9f
+        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
+        checksum/webserver-config: ed8d8a39a39730e4799625f197b201016172b5bb1f92006498ce8983c255a9b1
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
     spec:
@@ -1132,7 +1172,12 @@ spec:
       initContainers:
         - name: wait-for-airflow-migrations
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1206,7 +1251,12 @@ spec:
             - -c
             - airflow connections add s3_conn --conn-json '${connection}' & airflow webserver
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1327,7 +1377,7 @@ spec:
       annotations:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: e0aa8ba10abbe7b61983d33ee70b1fba49987ba8583e849f1d96377534b2d989
+        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -1356,7 +1406,12 @@ spec:
       initContainers:
         - name: wait-for-airflow-migrations
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1444,7 +1499,12 @@ spec:
             - name: GIT_SYNC_ONE_TIME
               value: "true"
           resources: 
-              {}
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -1462,7 +1522,12 @@ spec:
             - -c
             - exec airflow triggerer
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
@@ -1557,13 +1622,23 @@ spec:
             - name: GIT_SYNC_MAX_SYNC_FAILURES
               value: "0"
           resources: 
-              {}
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
         - name: triggerer-log-groomer
           resources:
-            {}
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
           securityContext: 
@@ -1877,7 +1952,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "V1hSVmQwWjNVemRKVWtoNWNYcFNRVk5rUWxoMWRsVlFiR1UzVkdvMmQxaz0="
+  fernet-key: "ZFVWMVNGUXdSRmcwV0dSb1YzZEdUMlJLVFVVMFUzVlNjbWRVWVV4bmJFND0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
@@ -2016,7 +2091,12 @@ spec:
                   name: webserver-secret
                   key: webserver-secret-key          
           resources:
-            {}
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
           volumeMounts:
             - name: config
               mountPath: "/opt/airflow/airflow.cfg"
@@ -2124,7 +2204,12 @@ spec:
                   name: webserver-secret
                   key: webserver-secret-key
           resources:
-            {}
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
           volumeMounts:
             - name: config
               mountPath: "/opt/airflow/airflow.cfg"
