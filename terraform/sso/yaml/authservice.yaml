@@ -23,6 +23,13 @@ spec:
       - name: authservice 
         image: creaddiscans/authservice:0.10
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
           - containerPort: 10003
         volumeMounts:
