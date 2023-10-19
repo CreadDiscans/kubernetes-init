@@ -57,6 +57,8 @@ resource "kubernetes_config_map" "runner_config" {
             namespace = "${kubernetes_namespace.ns.metadata.0.name}"
             image = "docker:latest"
             privileged = true
+            cpu_request = "1"
+            memory_request = "4Gi"
             [[runners.kubernetes.volumes.host_path]]
               name = "docker"
               mount_path = "/var/run/docker.sock"
