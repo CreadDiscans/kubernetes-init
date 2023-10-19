@@ -60,7 +60,7 @@ resource "kubernetes_config_map" "runner_config" {
             cpu_request = "1"
             cpu_limit = "1"
             memory_request = "4Gi"
-            memory_limit = "1"
+            memory_limit = "4Gi"
             [[runners.kubernetes.volumes.host_path]]
               name = "docker"
               mount_path = "/var/run/docker.sock"
@@ -145,11 +145,11 @@ resource "kubernetes_deployment" "runner" {
           resources {
             requests = {
               cpu    = "50m"
-              memory = "128Mi"
+              memory = "100Mi"
             }
             limits = {
-              cpu    = "50m"
-              memory = "128Mi"
+              cpu    = "500m"
+              memory = "200Mi"
             }
           }
           volume_mount {
