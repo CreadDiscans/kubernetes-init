@@ -45,11 +45,14 @@ def every_tick():
                 else:
                     requests.get(f'http://localhost/api/magic/{node.name}')
         
-        config = Config.objects.all()[0]
-        if config.enable and update_model_info(nodes, raw):
+        if update_model_info(nodes, raw):
             node_action = True
 
-        if not node_action:
+
+        config = Config.objects.all()[0]
+        if not config.enable:
+            return 'disable'
+        elif not node_action:
             action, node = autoscale(node_models)
             if action == 'boot':
                 nodes = Node.objects.filter(status='down')
