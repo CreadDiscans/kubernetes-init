@@ -14,7 +14,7 @@ with open('.env', 'r') as f:
 url = f'http://{target}:9090/api/v1/query'
 
 @shared_task
-def every_minute():
+def every_tick():
     try:
         nodes = {}
         raw = merge(nodes, 'machine_cpu_cores','cpu_max', int)

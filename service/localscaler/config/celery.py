@@ -18,9 +18,9 @@ app.conf.update(
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'every-minute': {
-        'task':'dashboard.tasks.every_minute',
-        'schedule':60
+    'every-tick': {
+        'task':'dashboard.tasks.every_tick',
+        'schedule':10
     }
 }
 
