@@ -1,127 +1,122 @@
 <html>
-  <head>
-    <title>Cluster Dahsboard</title>
-    <link href="/static/dashboard/bootstrap.min.css" rel="stylesheet" />
-    <script src="/static/dashboard/bootstrap.bundle.min.js"></script>
-    <script src="/static/dashboard/angular.min.js"></script>
-  </head>
-  <body ng-app="myApp">
-    <header class="p-3 text-bg-dark">
-      <div class="container">
-        <div
-          class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
-        >
-          <ul
-            class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
-          >
-            <li>
-              <a href="#" class="nav-link px-2 text-secondary">LocalScaler</a>
-            </li>
-          </ul>
-        </div>
+
+<head>
+  <title>Cluster Dahsboard</title>
+  <link href="/static/dashboard/bootstrap.min.css" rel="stylesheet" />
+  <script src="/static/dashboard/bootstrap.bundle.min.js"></script>
+  <script src="/static/dashboard/angular.min.js"></script>
+</head>
+
+<body ng-app="myApp">
+  <header class="p-3 text-bg-dark">
+    <div class="container d-flex align-items-center justify-content-between">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li>
+            <a href="#" class="nav-link px-2 text-secondary">LocalScaler</a>
+          </li>
+        </ul>
       </div>
-    </header>
-    <div class="container mt-5" ng-controller="nodeCtrl">
-      <div class="row">
-        <div class="col-12">
-          <table class="table">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Mac Address</th>
-                <th>IP</th>
-                <th>Status</th>
-                <th>Info</th>
-                <th>Updated</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="node in nodes">
-                <td>[[$index]]</td>
-                <td>[[node.name]]</td>
-                <td>[[node.mac]]</td>
-                <td>[[node.ip]]</td>
-                <td>[[node.status]]</td>
-                <td>[[node.info]]</td>
-                <td>[[parseTime(node.updated)]]</td>
-                <td>
-                  <button
-                    class="btn btn-primary"
-                    ng-if="node.status == 'down'"
-                    ng-click="powerOn(node)"
-                  >
-                    Power On
-                  </button>
-                  <button
-                    class="btn btn-danger"
-                    ng-if="node.status == 'up'"
-                    ng-click="powerOff(node)"
-                  >
-                    Power Off
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch">
+        <label class="form-check-label">활성화</label>
       </div>
     </div>
-    {% csrf_token %}
-    <script>
-      (function () {
-        var app = angular.module("myApp", []);
-        app.config(function ($interpolateProvider) {
-          $interpolateProvider.startSymbol("[[");
-          $interpolateProvider.endSymbol("]]");
-        });
-        app.controller("nodeCtrl", function ($scope) {
-          $scope.parseTime = (val) => {
-            return new Date(val).toLocaleString();
-          };
-          $scope.powerOff = (node) => {
-            fetch("/api/power/off", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
-              },
-              body: JSON.stringify({
-                node: node.name,
-              }),
-            }).then(() => {
-              load();
-            });
-          };
-          $scope.powerOn = (node) => {
-            fetch("/api/power/on", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
-              },
-              body: JSON.stringify({
-                node: node.name,
-              }),
-            }).then(() => {
-              load();
-            });
-          };
-          const load = () => {
-            fetch("/api/node/")
-              .then((res) => res.json())
-              .then((nodes) => {
-                $scope.nodes = nodes;
-                $scope.$apply();
-              });
-          };
-          load();
-          setInterval(() => {
+  </header>
+  <div class="container mt-5" ng-controller="nodeCtrl">
+    <div class="row">
+      <div class="col-12">
+        <table class="table">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mac Address</th>
+              <th>IP</th>
+              <th>Status</th>
+              <th>Info</th>
+              <th>Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="node in nodes">
+              <td>[[$index]]</td>
+              <td>[[node.name]]</td>
+              <td>[[node.mac]]</td>
+              <td>[[node.ip]]</td>
+              <td>[[node.status]]</td>
+              <td>[[node.info]]</td>
+              <td>[[parseTime(node.updated)]]</td>
+              <td>
+                <button class="btn btn-primary" ng-if="node.status == 'down'" ng-click="powerOn(node)">
+                  Power On
+                </button>
+                <button class="btn btn-danger" ng-if="node.status == 'up'" ng-click="powerOff(node)">
+                  Power Off
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% csrf_token %}
+  <script>
+    (function () {
+      var app = angular.module("myApp", []);
+      app.config(function ($interpolateProvider) {
+        $interpolateProvider.startSymbol("[[");
+        $interpolateProvider.endSymbol("]]");
+      });
+      app.controller("nodeCtrl", function ($scope) {
+        $scope.parseTime = (val) => {
+          return new Date(val).toLocaleString();
+        };
+        $scope.powerOff = (node) => {
+          fetch("/api/power/off", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({
+              node: node.name,
+            }),
+          }).then(() => {
             load();
-          }, 10 * 1000);
-        });
-      })();
-    </script>
-  </body>
+          });
+        };
+        $scope.powerOn = (node) => {
+          fetch("/api/power/on", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": document.querySelector('input[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({
+              node: node.name,
+            }),
+          }).then(() => {
+            load();
+          });
+        };
+        const load = () => {
+          fetch("/api/node/")
+            .then((res) => res.json())
+            .then((nodes) => {
+              $scope.nodes = nodes;
+              $scope.$apply();
+            });
+        };
+        load();
+        setInterval(() => {
+          load();
+        }, 10 * 1000);
+      });
+    })();
+  </script>
+</body>
+
 </html>

@@ -1,5 +1,5 @@
 from celery import shared_task
-from .models import Node
+from .models import Node, Config
 import requests
 from subprocess import Popen, PIPE
 import re
@@ -44,8 +44,9 @@ def every_tick():
                     node.save()
                 else:
                     requests.get(f'http://localhost/api/magic/{node.name}')
-
-        if update_model_info(nodes, raw):
+        
+        config = Config.objects.all()[0]
+        if config.enable and update_model_info(nodes, raw):
             node_action = True
 
         if not node_action:

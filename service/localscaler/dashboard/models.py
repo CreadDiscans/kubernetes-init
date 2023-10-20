@@ -10,3 +10,6 @@ class Node(models.Model):
     info = models.CharField(max_length=100)
     updated = models.DateTimeField(auto_now=True)
     
+class Config(models.Model):
+
+    enable = models.BooleanField(default=True)
