@@ -7,7 +7,7 @@
   <script src="/static/dashboard/angular.min.js"></script>
 </head>
 
-<body ng-app="myApp">
+<body ng-app="myApp" ng-controller="nodeCtrl">
   <header class="p-3 text-bg-dark">
     <div class="container d-flex align-items-center justify-content-between">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -18,12 +18,12 @@
         </ul>
       </div>
       <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch">
+        <input class="form-check-input" type="checkbox" role="switch" ng-model="enable" ng-click="change_enable()">
         <label class="form-check-label">활성화</label>
       </div>
     </div>
   </header>
-  <div class="container mt-5" ng-controller="nodeCtrl">
+  <div class="container mt-5">
     <div class="row">
       <div class="col-12">
         <table class="table">
@@ -102,11 +102,21 @@
             load();
           });
         };
+        $scope.change_enable = () => {
+          fetch('/api/config/', {
+            method: 'PUT',
+            body: JSON.stringify({
+              enable: !$scope.enable
+            })
+          }).then(res => res.json())
+            .then(res => console.log(res))
+        }
         const load = () => {
           fetch("/api/node/")
             .then((res) => res.json())
-            .then((nodes) => {
-              $scope.nodes = nodes;
+            .then((res) => {
+              $scope.nodes = res.nodes;
+              $scope.enable = res.config.enable
               $scope.$apply();
             });
         };

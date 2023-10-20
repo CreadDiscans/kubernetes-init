@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
-from .models import Node
+from .models import Node, Config
 import os
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -13,6 +13,7 @@ def home(request):
 def node(request):
     if request.method == 'GET':
         nodes = Node.objects.all().order_by('-id')
+        config = Config.objects.all()[0]
         output = []
         for node in nodes:
             output.append({
@@ -23,8 +24,23 @@ def node(request):
                 'info':node.info,
                 'updated':node.updated
             })
-        return JsonResponse(output, safe=False)
+        return JsonResponse({
+            'nodes':output,
+            'config':{
+                'enable':config.enable,
+            }
+        }, safe=False)
     
+@csrf_exempt
+def config(request):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        config = Config.objects.all()[0]
+        if 'enable' in data:
+            config.enable = data['enable']
+            config.save()
+        return JsonResponse({'message':'success'})
+
 @csrf_exempt
 def powerOffReq(request):
     if request.method == 'POST':
