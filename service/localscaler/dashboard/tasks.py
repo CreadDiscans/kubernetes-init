@@ -176,43 +176,36 @@ def autoscale(models):
     pods_list = []
     for key, item in pods.items():
         pods_list.append(item)
-    pods_list.append({'cpu':1, 'memory': 512*1024**2}) # 유휴 자원
-    result = {'opt_node':0, 'need_more_node':False}
-    dfs(pods_list, workers, result)
-    if result['need_more_node']:
-        return 'boot', None
-    else:
-        for node, info in result['workers'].items():
-            if len(info['stack']) == 0:
-                return 'drain', node
-        return None, None
-
-def dfs(pods, workers, result, i=0):
-    if len(pods) == i:
-        use_node = 0
-        for node, info in workers.items():
-            if len(info['stack']) > 0:
-                use_node += 1
-        if result['opt_node'] == 0:
-            result['opt_node'] = use_node
-            result['workers'] = copy.deepcopy(workers)
+    # 메모리 기준으로 scale
+    pods_list.sort(key=lambda x:-x['memory'])
+    # pods_list.append({'cpu':1, 'memory': 512*1024**2}) # 유휴 자원
+    worker_names = list(workers.keys())
+    idx = 0
+    i = 0
+    while len(pods_list) > i:
+        pod = pods_list[i]
+        if len(worker_names) > idx:
+            worker = workers[worker_names[idx]]
+            if can_allocate(worker, pod):
+                worker['stack'].append(pod)
+                i += 1
+            else:
+                idx += 1
         else:
-            if result['opt_node'] > use_node:
-                result['opt_node'] = use_node
-                result['workers'] = copy.deepcopy(workers)
-        return
-    item = pods[i]
-    need_more_node = True
-    for node, info in workers.items():
-        cpu = sum(list(map(lambda d:d['cpu'], info['stack']))) + info['daemonset']['cpu']
-        mem = sum(list(map(lambda d:d['memory'], info['stack']))) + info['daemonset']['memory']
-        if cpu + item['cpu'] < info['cpu'] and mem + item['memory'] < info['memory']:
-            need_more_node = False
-            info['stack'].append(item)
-            dfs(pods, workers, result, i+1)
-            info['stack'].pop()
-    if result['need_more_node'] == False:
-        result['need_more_node'] = need_more_node
+            return 'boot', None
+    if len(worker_names) -1 > idx:
+        return 'drain', worker_names[-1]
+    return None, None
+
+def can_allocate(worker, pod):
+    memory = 0
+    cpu = 0
+    for d in worker['stack']:
+        memory += d['memory']
+        cpu += d['cpu']
+    mem_avail = worker['memory'] > worker['daemonset']['memory'] + memory + pod['memory']
+    cpu_avail = worker['cpu'] > worker['daemonset']['cpu'] + cpu + pod['cpu']
+    return mem_avail and cpu_avail
 
 def load(prome_sql):
     response = requests.get(url, params={'query': prome_sql})

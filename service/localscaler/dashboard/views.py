@@ -4,6 +4,7 @@ from django.conf import settings
 from .models import Node
 import os
 import json
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 def home(request):
@@ -24,6 +25,7 @@ def node(request):
             })
         return JsonResponse(output, safe=False)
     
+@csrf_exempt
 def powerOffReq(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -33,6 +35,7 @@ def powerOffReq(request):
         model.save()
         return JsonResponse({}, safe=False)
 
+@csrf_exempt
 def powerOnReq(request):
     if request.method == 'POST':
         data = json.loads(request.body)

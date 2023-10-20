@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "foreground" {
         node_name = "master"
         container {
           name    = "localscaler-background"
-          image   = "creaddiscans/localscaler:0.32"
+          image   = "creaddiscans/localscaler:0.35"
           command = ["/bin/bash", "run_foreground.sh"]
           resources {
             requests = {
@@ -133,7 +133,7 @@ resource "kubernetes_deployment" "background" {
         host_network = true
         container {
           name    = "localscaler"
-          image   = "creaddiscans/localscaler:0.32"
+          image   = "creaddiscans/localscaler:0.35"
           command = ["/bin/bash", "run_background.sh"]
           resources {
             requests = {
