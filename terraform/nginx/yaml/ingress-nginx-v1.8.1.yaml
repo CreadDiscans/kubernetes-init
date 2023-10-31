@@ -360,6 +360,10 @@ spec:
     port: 443
     protocol: TCP
     targetPort: https
+  - name: 22-tcp
+    port: 22
+    protocol: TCP
+    targetPort: 22
   selector:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
@@ -424,6 +428,7 @@ spec:
         - --controller-class=k8s.io/ingress-nginx
         - --ingress-class=nginx
         - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --tcp-services-configmap=$(POD_NAMESPACE)/ingress-nginx-tcp
         - --validating-webhook=:8443
         - --validating-webhook-certificate=/usr/local/certificates/cert
         - --validating-webhook-key=/usr/local/certificates/key

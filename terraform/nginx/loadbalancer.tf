@@ -3,6 +3,11 @@ module "ingress_nginx" {
   yaml   = "${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
 }
 
+module "tcp_config" {
+  source = "../utils/apply"
+  yaml = "${path.module}/yaml/ingress-nginx-tcp.yaml"
+}
+
 module "arp_protocol" {
   source     = "../utils/update"
   get        = "kubectl get configmap kube-proxy -n kube-system -o yaml"

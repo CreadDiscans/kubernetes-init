@@ -111,6 +111,24 @@ module "service" {
   depends_on = [time_sleep.wait_deploy]
 }
 
+resource "kubernetes_service" "service_ssh" {
+  metadata {
+    name      = "gitlab-ssh-service"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  spec {
+    selector = {
+      app = "gitlab"
+    }
+    port {
+      name        = "22-tcp"
+      port        = 22
+      target_port = 22
+    }
+    type = "NodePort"
+  }
+}
+
 module "service_registry" {
   source    = "../utils/service"
   mode      = var.mode
