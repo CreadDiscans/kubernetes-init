@@ -41,6 +41,12 @@ sudo apt-get update
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# Pod errors due to “too many open files” - https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
+cat <<EOF | sudo tee -a /etc/sysctl.conf
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 512
+EOF
+
 # kubernetes 설치
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
