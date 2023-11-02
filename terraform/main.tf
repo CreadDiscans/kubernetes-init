@@ -76,6 +76,13 @@ module "airflow" {
   git_repo = var.airflow_repo
 }
 
+module "kubeflow" {
+  source = "./kubeflow"
+  mode   = var.mode
+  domain = var.domain
+}
+
+
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -88,6 +95,7 @@ module "sso" {
     module.autoscaler.client,
     module.argocd.client,
     module.spark.client,
-    module.airflow.client
+    module.airflow.client,
+    module.kubeflow.client
   ]
 }
