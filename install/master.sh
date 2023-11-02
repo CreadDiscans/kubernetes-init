@@ -19,4 +19,4 @@ kubectl create secret generic node-ssh \
     --from-file=$HOME/.ssh/id_rsa.pub \
     --from-literal=username=$USER \
     -n kube-system
-
+kubectl create -f nvidia-device-plugin-daemonset.yaml
