@@ -50,6 +50,24 @@ module "admission_webhook" {
   depends_on = [kubernetes_namespace.ns]
 }
 
+module "knative_serving" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/knative-serving.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
+
+module "kserve" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/kserve.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
+
+module "katib" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/katib.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
+
 module "centraldashboard" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/centraldashboard.yaml"
@@ -98,4 +116,10 @@ module "service" {
     "app" = "centraldashboard"
   }
   depends_on = [module.centraldashboard]
+}
+
+module "training_operator" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/training-operator.yaml"
+  depends_on = [kubernetes_namespace.ns]
 }

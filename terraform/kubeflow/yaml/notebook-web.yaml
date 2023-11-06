@@ -792,7 +792,7 @@ spec:
           value: ""
         - name: APP_SECURE_COOKIES
           value: "true"
-        image: docker.io/kubeflownotebookswg/jupyter-web-app:v1.8.0-rc.0
+        image: docker.io/kubeflownotebookswg/jupyter-web-app:v1.8.0
         name: jupyter-web-app
         ports:
         - containerPort: 5000
