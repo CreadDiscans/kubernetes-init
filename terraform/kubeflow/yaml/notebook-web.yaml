@@ -275,10 +275,11 @@ data:
       ################################################################
       imageGroupOne:
         # the default container image
-        value: kubeflownotebookswg/codeserver-python:v1.8.0-rc.0
+        value: creaddiscans/codeserver-python:v1.8.0
 
         # the list of available container images in the dropdown
         options:
+        - creaddiscans/codeserver-python:v1.8.0
         - kubeflownotebookswg/codeserver-python:v1.8.0-rc.0
 
       ################################################################
@@ -344,10 +345,10 @@ data:
           # the list of available vendors in the dropdown
           #  `limitsKey` - what will be set as the actual limit
           #  `uiName` - what will be displayed in the dropdown UI
-          vendors: []
-          #vendors:
-          #  - limitsKey: "nvidia.com/gpu"
-          #    uiName: "NVIDIA"
+          # vendors: []
+          vendors:
+           - limitsKey: "nvidia.com/gpu"
+             uiName: "NVIDIA"
           #  - limitsKey: "amd.com/gpu"
           #    uiName: "AMD"
 
@@ -417,20 +418,20 @@ data:
         value: ""
 
         # the list of available affinity configs in the dropdown
-        options: []
-        #options:
-        #  - configKey: "dedicated_node_per_notebook"
-        #    displayName: "Dedicated Node Per Notebook"
-        #    affinity:
-        #      # Require a Node with label `lifecycle=kubeflow-notebook`
-        #      nodeAffinity:
-        #        requiredDuringSchedulingIgnoredDuringExecution:
-        #          nodeSelectorTerms:
-        #            - matchExpressions:
-        #                - key: "lifecycle"
-        #                  operator: "In"
-        #                  values:
-        #                    - "kubeflow-notebook"
+        # options: []
+        options:
+         - configKey: "gpu_2g"
+           displayName: "GPU 2G"
+           affinity:
+             # Require a Node with label `lifecycle=kubeflow-notebook`
+             nodeAffinity:
+               requiredDuringSchedulingIgnoredDuringExecution:
+                 nodeSelectorTerms:
+                   - matchExpressions:
+                       - key: "kubernetes.io/vram"
+                         operator: "In"
+                         values:
+                           - "2G"
         #
         #      # Require a Node WITHOUT an existing Pod having `notebook-name` label
         #      podAntiAffinity:
