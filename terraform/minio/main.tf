@@ -88,7 +88,7 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CONFIG_URL"
-            value = "http://keycloak-service.keycloak/realms/master/.well-known/openid-configuration"
+            value = "https://keycloak.${var.domain}/realms/master/.well-known/openid-configuration"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CLIENT_ID"
