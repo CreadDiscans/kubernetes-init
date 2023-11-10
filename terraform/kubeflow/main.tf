@@ -56,10 +56,22 @@ module "knative_serving" {
   depends_on = [kubernetes_namespace.ns]
 }
 
+module "knative_gateway" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/knative-gateway.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
+
 module "kserve" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/kserve.yaml"
   depends_on = [kubernetes_namespace.ns]
+}
+
+module "kserve_web" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/kserve-web.yaml"
+  depends_on = [module.kserve]
 }
 
 module "katib" {
@@ -122,4 +134,19 @@ module "training_operator" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/training-operator.yaml"
   depends_on = [kubernetes_namespace.ns]
+}
+
+module "user" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/user.yaml"
+  args = {
+    domain = var.domain
+  }
+  depends_on = [module.profile]
+}
+
+module "user_policy" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/user-policy.yaml"
+  depends_on = [module.user]
 }

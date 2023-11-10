@@ -77,9 +77,10 @@ module "airflow" {
 }
 
 module "kubeflow" {
-  source = "./kubeflow"
-  mode   = var.mode
-  domain = var.domain
+  source     = "./kubeflow"
+  mode       = var.mode
+  domain     = var.domain
+  depends_on = [module.istio]
 }
 
 

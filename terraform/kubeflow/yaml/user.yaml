@@ -1,8 +1,8 @@
 apiVersion: kubeflow.org/v1beta1
 kind: Profile
 metadata:
-  name: kubeflow-user-admin
+  name: kubeflow-api
 spec:
   owner:
     kind: User
-    name: admin@domain.com
+    name: admin@${domain}
