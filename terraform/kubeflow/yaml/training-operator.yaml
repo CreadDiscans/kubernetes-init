@@ -48624,6 +48624,16 @@ spec:
       labels:
         control-plane: kubeflow-training-operator
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - command:
         - /manager

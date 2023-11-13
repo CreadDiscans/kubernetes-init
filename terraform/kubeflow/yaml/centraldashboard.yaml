@@ -307,6 +307,16 @@ spec:
         app.kubernetes.io/name: centraldashboard
         kustomize.component: centraldashboard
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: USERID_HEADER

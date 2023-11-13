@@ -781,6 +781,16 @@ spec:
         app: jupyter-web-app
         kustomize.component: jupyter-web-app
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: APP_PREFIX

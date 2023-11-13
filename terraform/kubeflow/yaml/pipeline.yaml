@@ -2305,6 +2305,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --db_driver=$(DBCONFIG_DRIVER)
@@ -2413,6 +2423,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - command:
         - python
@@ -2476,6 +2496,16 @@ spec:
         application-crd-id: kubeflow-pipelines
         component: metadata-envoy
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - image: gcr.io/ml-pipeline/metadata-envoy:2.0.1
         name: container
@@ -2505,6 +2535,16 @@ spec:
         application-crd-id: kubeflow-pipelines
         component: metadata-grpc-server
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --grpc_port=8080
@@ -2587,6 +2627,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: NAMESPACE_TO_WATCH
@@ -2622,6 +2672,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: KUBEFLOW_USERID_HEADER
@@ -2764,6 +2824,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: NAMESPACE
@@ -2826,6 +2896,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: NAMESPACE
@@ -2867,6 +2947,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: VIEWER_TENSORBOARD_POD_TEMPLATE_SPEC_PATH
@@ -2971,6 +3061,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: NAMESPACE
@@ -3009,6 +3109,16 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - image: gcr.io/ml-pipeline/visualization-server:2.0.1
         imagePullPolicy: IfNotPresent
@@ -3066,6 +3176,16 @@ spec:
         app: workflow-controller
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --configmap
@@ -3138,6 +3258,16 @@ spec:
         application-crd-id: kubeflow-pipelines
         kustomize.component: metacontroller
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - command:
         - /usr/bin/metacontroller
@@ -3570,6 +3700,16 @@ spec:
         app: mysql
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --datadir
@@ -3676,6 +3816,16 @@ spec:
         app: minio
         application-crd-id: kubeflow-pipelines
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - server

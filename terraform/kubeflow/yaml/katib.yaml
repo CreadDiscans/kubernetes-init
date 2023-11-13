@@ -645,6 +645,16 @@ spec:
         katib.kubeflow.org/component: controller
         katib.kubeflow.org/metrics-collector-injection: disabled
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --katib-config=/katib-config.yaml
@@ -712,6 +722,16 @@ spec:
       labels:
         katib.kubeflow.org/component: db-manager
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - command:
         - ./katib-db-manager
@@ -756,6 +776,16 @@ spec:
       labels:
         katib.kubeflow.org/component: mysql
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --datadir
@@ -829,6 +859,16 @@ spec:
       labels:
         katib.kubeflow.org/component: ui
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - args:
         - --port=8080

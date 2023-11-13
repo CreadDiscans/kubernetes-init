@@ -7871,6 +7871,16 @@ spec:
         app.kubernetes.io/version: 1.10.2
         role: activator
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: GOGC
@@ -7977,6 +7987,15 @@ spec:
                   app: autoscaler
               topologyKey: kubernetes.io/hostname
             weight: 100
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: POD_NAME
@@ -8069,6 +8088,15 @@ spec:
                   app: controller
               topologyKey: kubernetes.io/hostname
             weight: 100
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: POD_NAME
@@ -8158,6 +8186,15 @@ spec:
                   app: domain-mapping
               topologyKey: kubernetes.io/hostname
             weight: 100
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: SYSTEM_NAMESPACE
@@ -8237,6 +8274,15 @@ spec:
         role: domainmapping-webhook
     spec:
       affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - podAffinityTerm:
@@ -8333,6 +8379,16 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.10.1
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: SYSTEM_NAMESPACE
@@ -8414,6 +8470,16 @@ spec:
         app.kubernetes.io/version: 1.10.1
         role: net-istio-webhook
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: SYSTEM_NAMESPACE
@@ -8509,6 +8575,15 @@ spec:
                   app: webhook
               topologyKey: kubernetes.io/hostname
             weight: 100
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: "kubernetes.io/gpu"
+                  operator: "In"
+                  values:
+                  - none
       containers:
       - env:
         - name: POD_NAME
