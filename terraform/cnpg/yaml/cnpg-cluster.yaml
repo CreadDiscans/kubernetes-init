@@ -11,14 +11,24 @@ spec:
 
   resources:
     requests:
-      memory: "4096Mi"
-      cpu: 250m
+      memory: "500Mi"
+      cpu: 100m
     limits:
       memory: "4096Mi"
       cpu: 1000m
   storage:
     size: 1Gi
   
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "kubernetes.io/gpu"
+            operator: "In"
+            values:
+            - none
+
   backup:
     barmanObjectStore:
       destinationPath: s3://cnpg/${current} # 값 변경 후 사용할 것
