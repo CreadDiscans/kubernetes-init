@@ -33,3 +33,7 @@ sudo mv k9s /usr/bin/k9s
 rm k9s_Linux_amd64.tar.gz
 rm README.md
 rm LICENSE
+
+# node/gpu feeature discovery
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/v0.8.2/deployments/static/nfd.yaml
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/v0.8.2/deployments/static/gpu-feature-discovery-daemonset.yaml
