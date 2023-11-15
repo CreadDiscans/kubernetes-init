@@ -18,6 +18,6 @@ sudo mount -t $2 /mnt/backup
 chmod u+x backup.sh
 
 sudo crontab -l > mycron
-echo "0 0 * * * bash $pwd/backup.sh" >> mycron
+echo "0 15 * * * bash $pwd/backup.sh" >> mycron
 sudo crontab mycron
 rm mycron
