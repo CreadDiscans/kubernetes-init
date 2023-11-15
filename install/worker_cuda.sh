@@ -1,5 +1,6 @@
 if [ -f "cuda_ready" ]; then
     # CUDA 설치
+    sudo echo 'detect cuda_ready'
     wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
     sudo sh cuda_11.8.0_520.61.05_linux.run
     echo 'export PATH=$PATH:/usr/local/cuda-11.8/bin' >> ~/.bashrc
