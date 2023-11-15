@@ -67,5 +67,5 @@ sudo systemctl daemon-reload
 sudo systemctl restart kubelet
 
 # disable network check on boot
-systemctl disable systemd-networkd-wait-online.service
-systemctl mask systemd-networkd-wait-online.service
+sudo systemctl disable systemd-networkd-wait-online.service
+sudo systemctl mask systemd-networkd-wait-online.service
