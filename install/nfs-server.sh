@@ -7,9 +7,8 @@ fi
 
 sudo apt install nfs-kernel-server
 sudo mkdir -p /mnt/nfs
-sudo chown -R nobody:nogroup /mnt/nfs
 
-sudo echo "/mnt/nfs       $1(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+sudo echo "/mnt/nfs       $1(rw,sync,no_root_squash,no_subtree_check)" | sudo tee -a /etc/exports
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server.service
 

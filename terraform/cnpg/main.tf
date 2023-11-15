@@ -34,11 +34,13 @@ resource "time_static" "current" {}
 module "keycloak" {
   source = "./service"
   name   = "keycloak"
+  depends_on = [time_sleep.wait]
 }
 
 module "airflow" {
   source = "./service"
   name   = "airflow"
+  depends_on = [time_sleep.wait]
 }
 
 module "cluster" {

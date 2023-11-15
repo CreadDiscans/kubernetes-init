@@ -14,6 +14,13 @@ module "istio" {
   source = "./istio"
 }
 
+module "minio" {
+  source     = "./minio"
+  domain     = var.domain
+  mode       = var.mode
+  depends_on = [module.nfs]
+}
+
 module "cnpg" {
   source = "./cnpg"
 }
@@ -25,13 +32,6 @@ module "keycloak" {
   username   = var.username
   password   = var.password
   depends_on = [module.nginx, module.cnpg]
-}
-
-module "minio" {
-  source     = "./minio"
-  domain     = var.domain
-  mode       = var.mode
-  depends_on = [module.nfs, module.keycloak]
 }
 
 module "prometheus" {
