@@ -7,6 +7,7 @@ if [ -f "cuda_ready" ]; then
 && \
     sudo apt-get update
     sudo apt-get install -y nvidia-container-toolkit
+    sudo apt-get install -y nvidia-docker2
     # nvidia docker 
     cat <<EOF | sudo tee /etc/docker/daemon.json
 {
@@ -30,6 +31,7 @@ EOF
     nvidia_config+="          runtime_type = \"io\.containerd\.runc\.v2\"\n"
     nvidia_config+="          \[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes.nvidia.options\]\n"
     nvidia_config+="            BinaryName = \"\/usr\/bin\/nvidia-container-runtime\"\n"
+    nvidia_config+="            SystemdCgroup = true\n"
     sudo sed -i "s/\[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes\]/$nvidia_config/g" /etc/containerd/config.toml
     sudo systemctl restart containerd
 else
