@@ -1,17 +1,10 @@
 if [ -f "cuda_ready" ]; then
-    # CUDA 설치
-    sudo echo 'detect cuda_ready'
-    wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
-    sudo sh cuda_11.8.0_520.61.05_linux.run
-    echo 'export PATH=$PATH:/usr/local/cuda-11.8/bin' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64' >> ~/.bashrc
-    source ~/.bashrc
     # nvidia-container-toolkit 설치
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+&& curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list \
-  && \
+&& \
     sudo apt-get update
     sudo apt-get install -y nvidia-container-toolkit
     # nvidia docker 
@@ -40,19 +33,14 @@ EOF
     sudo sed -i "s/\[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes\]/$nvidia_config/g" /etc/containerd/config.toml
     sudo systemctl restart containerd
 else
-    sudo apt update
-    sudo apt install -y build-essential
-    # nouveau 비활성화
-    cat <<EOF | sudo tee -a /etc/modprobe.d/blacklist.conf
-# For nvidia original driver
-# disable nouveau driver
-blacklist nouveau
-blacklist lbm-nouveau
-options nouveau modset=0
-alias nouveau off
-alias lbm-nouveau off
-EOF
-    sudo update-initramfs -u
+    sudo echo 'install cuda 11.8'
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+    sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+    wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
+    sudo dpkg -i cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
+    sudo cp /var/cuda-repo-ubuntu2204-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+    sudo apt-get update
+    sudo apt-get -y install cuda
     touch cuda_ready
     sudo reboot
 fi
