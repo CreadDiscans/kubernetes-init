@@ -532,9 +532,7 @@ data:
 
         # the list of PodDefault names that are selected by default
         # (take care to ensure these PodDefaults exist in Profile Namespaces)
-        value: 
-          - add-docker-socket
-          - add-minio-secret
+        value: []
         #value:
         #  - my-pod-default
 
