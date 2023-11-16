@@ -534,6 +534,7 @@ data:
         # (take care to ensure these PodDefaults exist in Profile Namespaces)
         value: 
           - add-docker-socket
+          - add-minio-secret
         #value:
         #  - my-pod-default
 
