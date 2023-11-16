@@ -645,16 +645,6 @@ spec:
         katib.kubeflow.org/component: controller
         katib.kubeflow.org/metrics-collector-injection: disabled
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                - key: "kubernetes.io/gpu"
-                  operator: "In"
-                  values:
-                  - none
       containers:
       - args:
         - --katib-config=/katib-config.yaml

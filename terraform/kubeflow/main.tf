@@ -145,8 +145,13 @@ module "user" {
   depends_on = [module.profile]
 }
 
+resource "time_sleep" "wait" {
+  create_duration = "200s"
+  depends_on      = [module.user]
+}
+
 module "user_policy" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/user-policy.yaml"
-  depends_on = [module.user]
+  depends_on = [time_sleep.wait]
 }

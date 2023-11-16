@@ -147,16 +147,6 @@ spec:
         app.kubernetes.io/name: kserve
         kustomize.component: kserve-models-web-app
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                - key: "kubernetes.io/gpu"
-                  operator: "In"
-                  values:
-                  - none
       containers:
       - envFrom:
         - configMapRef:
