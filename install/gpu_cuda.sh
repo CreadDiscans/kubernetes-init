@@ -31,7 +31,7 @@ EOF
     nvidia_config+="          runtime_type = \"io\.containerd\.runc\.v2\"\n"
     nvidia_config+="          \[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes.nvidia.options\]\n"
     nvidia_config+="            BinaryName = \"\/usr\/bin\/nvidia-container-runtime\"\n"
-    nvidia_config+="            SystemdCgroup = true\n"
+    nvidia_config+="            SystemdCgroup = true\n\n"
     sudo sed -i "s/\[plugins.\"io.containerd.grpc.v1.cri\".containerd.runtimes\]/$nvidia_config/g" /etc/containerd/config.toml
     sudo systemctl restart containerd
 else
