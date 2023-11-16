@@ -41,13 +41,6 @@ module "prometheus" {
   depends_on = [module.keycloak]
 }
 
-module "autoscaler" {
-  source     = "./autoscaler"
-  domain     = var.domain
-  mode       = var.mode
-  depends_on = [module.prometheus]
-}
-
 module "argocd" {
   source     = "./argocd"
   mode       = var.mode
@@ -83,7 +76,6 @@ module "kubeflow" {
   depends_on = [module.istio]
 }
 
-
 module "sso" {
   source   = "./sso"
   username = var.username
@@ -93,7 +85,6 @@ module "sso" {
   clients = [
     module.minio.client,
     module.prometheus.client,
-    module.autoscaler.client,
     module.argocd.client,
     module.spark.client,
     module.airflow.client,
