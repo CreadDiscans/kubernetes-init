@@ -150,8 +150,20 @@ resource "time_sleep" "wait" {
   depends_on      = [module.user]
 }
 
+
+data "kubernetes_secret" "minio" {
+  metadata {
+    name      = "minio-creds"
+    namespace = "minio-storage"
+  }
+}
+
 module "user_policy" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/user-policy.yaml"
+  args = {
+    username = data.kubernetes_secret.minio.data.username
+    password = data.kubernetes_secret.minio.data.password
+  }
   depends_on = [time_sleep.wait]
 }
