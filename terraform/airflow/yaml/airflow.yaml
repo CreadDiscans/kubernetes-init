@@ -210,6 +210,9 @@ data:
     [webserver]
     enable_proxy_fix = True
     rbac = True
+
+    [api]
+    auth_backends = airflow.api.auth.backend.basic_auth
     
   airflow_local_settings.py: |-
     
@@ -255,7 +258,7 @@ data:
               value: "true"
           resources: 
               limits:
-                cpu: 100m
+                cpu: 1000m
                 memory: 128Mi
               requests:
                 cpu: 100m
@@ -310,11 +313,11 @@ data:
           name: base
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 1000m
+              memory: 2Gi
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 512Mi
           volumeMounts:
             - mountPath: "/opt/airflow/logs"
               name: logs
@@ -911,8 +914,8 @@ spec:
                   airflow jobs check --job-type SchedulerJob --local
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 1000m
+              memory: 2Gi
             requests:
               cpu: 250m
               memory: 512Mi
