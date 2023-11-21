@@ -1256,10 +1256,10 @@ spec:
           resources:
             limits:
               cpu: 1000m
-              memory: 1024Mi
+              memory: 4Gi
             requests:
               cpu: 250m
-              memory: 1024Mi
+              memory: 1Gi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
