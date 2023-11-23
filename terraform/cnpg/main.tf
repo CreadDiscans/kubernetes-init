@@ -32,14 +32,14 @@ resource "time_sleep" "wait" {
 resource "time_static" "current" {}
 
 module "keycloak" {
-  source = "./service"
-  name   = "keycloak"
+  source     = "./service"
+  name       = "keycloak"
   depends_on = [time_sleep.wait]
 }
 
 module "airflow" {
-  source = "./service"
-  name   = "airflow"
+  source     = "./service"
+  name       = "airflow"
   depends_on = [time_sleep.wait]
 }
 
@@ -59,5 +59,24 @@ module "cluster" {
 module "backup_weekly" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/backup-scheduled.yaml"
+  depends_on = [module.cluster]
+}
+
+resource "kubernetes_service" "export_cnpg" {
+  metadata {
+    name      = "cnpg-service"
+    namespace = "cnpg-system"
+  }
+  spec {
+    selector = {
+      "cnpg.io/cluster" = "cluster-cnpg"
+      role              = "primary"
+    }
+    port {
+      port        = 5432
+      target_port = 5432
+    }
+    type = "LoadBalancer"
+  }
   depends_on = [module.cluster]
 }
