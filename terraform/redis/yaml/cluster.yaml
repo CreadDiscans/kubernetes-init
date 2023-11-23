@@ -1,0 +1,60 @@
+---
+# Source: redis-cluster/templates/redis-cluster.yaml
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisCluster
+metadata:
+  name: redis-cluster
+  namespace: redis
+  labels:
+    app.kubernetes.io/name: redis-cluster
+    helm.sh/chart: redis-cluster-0.15.11
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: redis-cluster
+    app.kubernetes.io/version: 0.15.1
+    app.kubernetes.io/component: middleware
+spec:
+  clusterSize: 3
+  persistenceEnabled: true
+  clusterVersion: v7
+
+  redisLeader:
+    replicas: 3
+  
+  redisFollower:
+    replicas: 3
+
+  redisExporter:
+    enabled: false
+    image: "quay.io/opstree/redis-exporter:v1.44.0"
+    imagePullPolicy: "IfNotPresent"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    
+  kubernetesConfig:
+    image: "quay.io/opstree/redis:v7.0.12"
+    imagePullPolicy: "IfNotPresent"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+  storage: 
+    nodeConfVolume: true
+    nodeConfVolumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  podSecurityContext: 
+    fsGroup: 1000
+    runAsUser: 1000

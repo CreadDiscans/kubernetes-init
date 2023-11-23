@@ -48,6 +48,10 @@ module "argocd" {
   depends_on = [module.keycloak]
 }
 
+module "redis" {
+  source = "./redis"
+}
+
 module "gitlab" {
   source     = "./gitlab"
   domain     = var.domain
