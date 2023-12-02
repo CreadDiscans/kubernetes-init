@@ -27,10 +27,6 @@ module "cnpg" {
   depends_on = [module.minio]
 }
 
-# module "redis" {
-#   source = "./redis"
-# }
-
 module "gitlab" {
   source     = "./gitlab"
   domain     = var.domain
@@ -39,61 +35,66 @@ module "gitlab" {
   depends_on = [module.nginx]
 }
 
-module "keycloak" {
-  source     = "./keycloak"
-  domain     = var.domain
-  mode       = var.mode
-  username   = var.username
-  password   = var.password
-  depends_on = [module.nginx, module.cnpg]
-}
+# module "prometheus" {
+#   source     = "./prometheus"
+#   domain     = var.domain
+#   mode       = var.mode
+# }
 
-module "prometheus" {
-  source     = "./prometheus"
-  domain     = var.domain
-  mode       = var.mode
-  depends_on = [module.keycloak]
-}
+# module "redis" {
+#   source = "./redis"
+# }
 
-module "argocd" {
-  source     = "./argocd"
-  mode       = var.mode
-  domain     = var.domain
-  depends_on = [module.keycloak]
-}
 
-module "spark" {
-  source = "./spark"
-  mode   = var.mode
-  domain = var.domain
-}
+# module "keycloak" {
+#   source     = "./keycloak"
+#   domain     = var.domain
+#   mode       = var.mode
+#   username   = var.username
+#   password   = var.password
+#   depends_on = [module.nginx, module.cnpg]
+# }
 
-module "airflow" {
-  source   = "./airflow"
-  mode     = var.mode
-  domain   = var.domain
-  git_repo = var.airflow_repo
-}
 
-module "kubeflow" {
-  source     = "./kubeflow"
-  mode       = var.mode
-  domain     = var.domain
-  depends_on = [module.istio]
-}
+# module "argocd" {
+#   source     = "./argocd"
+#   mode       = var.mode
+#   domain     = var.domain
+#   depends_on = [module.keycloak]
+# }
 
-module "sso" {
-  source   = "./sso"
-  username = var.username
-  password = var.password
-  domain   = var.domain
-  url      = module.keycloak.url
-  clients = [
-    module.minio.client,
-    module.prometheus.client,
-    module.argocd.client,
-    module.spark.client,
-    module.airflow.client,
-    module.kubeflow.client
-  ]
-}
+# module "spark" {
+#   source = "./spark"
+#   mode   = var.mode
+#   domain = var.domain
+# }
+
+# module "airflow" {
+#   source   = "./airflow"
+#   mode     = var.mode
+#   domain   = var.domain
+#   git_repo = var.airflow_repo
+# }
+
+# module "kubeflow" {
+#   source     = "./kubeflow"
+#   mode       = var.mode
+#   domain     = var.domain
+#   depends_on = [module.istio]
+# }
+
+# module "sso" {
+#   source   = "./sso"
+#   username = var.username
+#   password = var.password
+#   domain   = var.domain
+#   url      = module.keycloak.url
+#   clients = [
+#     module.minio.client,
+#     module.prometheus.client,
+#     module.argocd.client,
+#     module.spark.client,
+#     module.airflow.client,
+#     module.kubeflow.client
+#   ]
+# }
