@@ -43,6 +43,12 @@ module "airflow" {
   depends_on = [time_sleep.wait]
 }
 
+module "gitlab" {
+  source     = "./service"
+  name       = "gitlab"
+  depends_on = [time_sleep.wait]
+}
+
 module "cluster" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/cnpg-cluster.yaml"
@@ -50,7 +56,8 @@ module "cluster" {
     current = time_static.current.rfc3339
     services = [
       module.keycloak.info,
-      module.airflow.info
+      module.airflow.info,
+      module.gitlab.info
     ]
   }
   depends_on = [time_sleep.wait]

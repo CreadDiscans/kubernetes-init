@@ -4,14 +4,14 @@ metadata:
   name: cluster-cnpg
   namespace: cnpg-system
 spec:
-  instances: 3
+  instances: 2
   postgresql:
     parameters:
-      shared_buffers: "256MB"
+      shared_buffers: "64MB"
 
   resources:
     requests:
-      memory: "1024Mi"
+      memory: "256Mi"
       cpu: 100m
     limits:
       memory: "4096Mi"

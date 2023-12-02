@@ -10,6 +10,14 @@ module "volume" {
   namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
+
+data "kubernetes_secret" "db" {
+  metadata {
+    name      = "gitlab-db-secret"
+    namespace = "cnpg-system"
+  }
+}
+
 resource "kubernetes_deployment" "gitlab_deploy" {
   metadata {
     name      = "gitlab-deploy"
@@ -33,16 +41,16 @@ resource "kubernetes_deployment" "gitlab_deploy" {
       }
       spec {
         container {
-          image = "gitlab/gitlab-ce:16.4.1-ce.0"
+          image = "gitlab/gitlab-ce:16.6.0-ce.0"
           name  = "gitlab"
           resources {
             requests = {
-              cpu = "250m"
-              memory = "16384Mi"
+              cpu = "100m"
+              memory = "512Mi"
             }
             limits = {
               cpu = 1
-              memory = "16384Mi"
+              memory = "4096Mi"
             }
           }
           env {
@@ -69,6 +77,15 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             registry_nginx['listen_https'] = false
             registry_nginx['ssl_verify_client'] = "off"
             prometheus_monitoring['enable'] = false
+            postgresql['enable'] = false
+            gitlab_rails['db_database'] = "gitlab"
+            gitlab_rails['db_username'] = "${data.kubernetes_secret.db.data.username}"
+            gitlab_rails['db_password'] = "${data.kubernetes_secret.db.data.password}"
+            gitlab_rails['db_host'] = "cluster-cnpg-rw.cnpg-system"
+            gitlab_rails['db_port'] = 5432
+            # redis['enable'] = false
+            # gitlab_rails['redis_host'] = 'redis-sentinel-sentinel.redis'
+            # gitlab_rails['redis_port'] = 26379
             EOF
           }
           volume_mount {

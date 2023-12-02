@@ -18,11 +18,25 @@ module "minio" {
   source     = "./minio"
   domain     = var.domain
   mode       = var.mode
+  oidc       = var.minio_oidc
   depends_on = [module.nfs]
 }
 
 module "cnpg" {
-  source = "./cnpg"
+  source     = "./cnpg"
+  depends_on = [module.minio]
+}
+
+# module "redis" {
+#   source = "./redis"
+# }
+
+module "gitlab" {
+  source     = "./gitlab"
+  domain     = var.domain
+  password   = var.password
+  mode       = var.mode
+  depends_on = [module.nginx]
 }
 
 module "keycloak" {
@@ -46,18 +60,6 @@ module "argocd" {
   mode       = var.mode
   domain     = var.domain
   depends_on = [module.keycloak]
-}
-
-module "redis" {
-  source = "./redis"
-}
-
-module "gitlab" {
-  source     = "./gitlab"
-  domain     = var.domain
-  password   = var.password
-  mode       = var.mode
-  depends_on = [module.nginx]
 }
 
 module "spark" {

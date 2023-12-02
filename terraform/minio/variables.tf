@@ -14,6 +14,13 @@ variable "domain" {
   type = string
 }
 
+variable "oidc" {
+  type = object({
+    client_id = string
+    client_secret = string
+  })
+}
+
 output "client" {
   value = {
     client_id                       = local.client_id

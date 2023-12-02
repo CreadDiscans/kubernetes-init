@@ -42,3 +42,11 @@ variable "airflow_repo" {
   type    = string
   default = ""
 }
+
+variable "minio_oidc" {
+  type = object({
+    client_id = string
+    client_secret = string
+  })
+}
+

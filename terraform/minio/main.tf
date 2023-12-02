@@ -88,19 +88,19 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CONFIG_URL"
-            value = "https://keycloak.${var.domain}/realms/master/.well-known/openid-configuration"
+            value = "https://gitlab.${var.domain}/.well-known/openid-configuration"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CLIENT_ID"
-            value = local.client_id
+            value = var.oidc.client_id
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CLIENT_SECRET"
-            value = local.client_secret
+            value = var.oidc.client_secret
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_DISPLAY_NAME"
-            value = "keycloak"
+            value = "gitlab-oidc"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_SCOPES"
@@ -108,23 +108,11 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CLAIM_NAME"
-            value = "policy"
+            value = "groups_direct"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC"
             value = "on"
-          }
-          env {
-            name  = "MINIO_IDENTITY_OPENID_VENDOR"
-            value = "keycloak"
-          }
-          env {
-            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_ADMIN_URL"
-            value = "http://keycloak-service.keycloak/admin"
-          }
-          env {
-            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_REALM"
-            value = "master"
           }
           port {
             container_port = 9000
