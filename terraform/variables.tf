@@ -50,3 +50,10 @@ variable "minio_oidc" {
   })
 }
 
+variable "grafana_oidc" {
+  type = object({
+    client_id = string
+    client_secret = string
+  })
+}
+

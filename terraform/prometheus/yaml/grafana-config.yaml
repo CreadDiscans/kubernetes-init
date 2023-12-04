@@ -16,24 +16,14 @@ stringData:
     [server]
     root_url = https://${prefix}.${domain}
     [auth]
-    signout_redirect_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/logout
     disable_login_form = true
-    [auth.generic_oauth]
+    [auth.gitlab]
     enabled = true
-    name = Keycloak-OAuth
-    allow_sign_up = true
     client_id = ${client_id}
     client_secret = ${client_secret}
-    scopes = openid email profile offline_access
-    email_attribute_path = email
-    login_attribute_path = username
-    name_attribute_path = full_name
-    auth_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/auth
-    token_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/token
-    api_url = https://keycloak.${domain}/realms/master/protocol/openid-connect/userinfo
-    role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
-    tls_skip_verify_insecure = false
-    tls_client_cert = /etc/keycloak/ssl/tls.crt
-    tls_client_key = /etc/keycloak/ssl/tls.key
-    tls_client_ca = /etc/keycloak/ssl/tls.crt
+    auth_url = https://gitlab.${domain}/oauth/authorize
+    token_url = https://gitlab.${domain}/oauth/token
+    api_url = https://gitlab.${domain}/api/v4
+    scopes = openid email profile api
+    role_attribute_path: contains(groups_direct[*], 'consoleAdmin') && 'Admin' || 'Viewer'
 type: Opaque

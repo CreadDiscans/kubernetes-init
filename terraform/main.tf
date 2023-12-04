@@ -35,11 +35,13 @@ module "gitlab" {
   depends_on = [module.nginx]
 }
 
-# module "prometheus" {
-#   source     = "./prometheus"
-#   domain     = var.domain
-#   mode       = var.mode
-# }
+module "prometheus" {
+  source     = "./prometheus"
+  domain     = var.domain
+  mode       = var.mode
+  oidc       = var.grafana_oidc
+  depends_on = [module.gitlab]
+}
 
 # module "redis" {
 #   source = "./redis"

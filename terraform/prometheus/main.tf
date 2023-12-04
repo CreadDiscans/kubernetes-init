@@ -8,28 +8,13 @@ resource "time_sleep" "wait" {
   depends_on      = [module.setup]
 }
 
-data "kubernetes_secret" "cert" {
-  metadata {
-    name      = "keycloak-cert"
-    namespace = "keycloak"
-  }
-}
-
-resource "kubernetes_secret" "cert" {
-  metadata {
-    name      = "keycloak-cert"
-    namespace = "monitoring"
-  }
-  data       = data.kubernetes_secret.cert.data
-  depends_on = [module.setup]
-}
 
 module "grafana_config" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/grafana-config.yaml"
   args = {
-    client_id     = local.client_id
-    client_secret = local.client_secret
+    client_id     = var.oidc.client_id
+    client_secret = var.oidc.client_secret
     domain        = var.domain
     prefix        = local.prefix
   }
@@ -39,7 +24,7 @@ module "grafana_config" {
 module "manifests" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/manifests.yaml"
-  depends_on = [time_sleep.wait, module.grafana_config, kubernetes_secret.cert]
+  depends_on = [time_sleep.wait, module.grafana_config]
 }
 
 module "grafana" {

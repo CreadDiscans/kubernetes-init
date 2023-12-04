@@ -74,6 +74,11 @@ resource "kubernetes_service" "export_cnpg" {
     name      = "cnpg-service"
     namespace = "cnpg-system"
   }
+  lifecycle {
+    ignore_changes = [
+      metadata.0.annotations
+    ]
+  }
   spec {
     selector = {
       "cnpg.io/cluster" = "cluster-cnpg"
