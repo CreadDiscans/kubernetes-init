@@ -261,7 +261,7 @@ data:
                 cpu: 1000m
                 memory: 128Mi
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 128Mi
           volumeMounts:
           - name: dags
@@ -316,7 +316,7 @@ data:
               cpu: 1000m
               memory: 2Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 512Mi
           volumeMounts:
             - mountPath: "/opt/airflow/logs"
@@ -477,7 +477,66 @@ metadata:
   namespace: airflow
 data:
   webserver_config.py: |-
-    AUTH_ROLE_PUBLIC = 'Admin'
+    import logging
+    import jwt
+    import requests
+    from airflow.www.security import AirflowSecurityManager
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+
+    MY_PROVIDER = 'gitlab'
+    AUTH_TYPE = AUTH_OAUTH
+
+    CLIENT_ID = '${client_id}'
+    CLIENT_SECRET = '${client_secret}'
+    AUTH_USER_REGISTRATION = True
+    AUTH_USER_REGISTRATION_ROLE = "Public"
+    AUTH_ROLES_SYNC_AT_LOGIN = True
+    CSRF_ENABLED = True
+
+    AUTH_ROLES_MAPPING = {
+        "Airflow_Users": ["User"],
+        "Airflow_Admins": ["Admin"],
+    }
+    OAUTH_PROVIDERS = [
+      {
+        'name': MY_PROVIDER,
+        'icon': 'fa-circle-o',
+        'token_key': 'access_token',
+        'remote_app': {
+          'client_id': CLIENT_ID,
+          'client_secret': CLIENT_SECRET,
+          'client_kwargs': {
+            'scope': 'email profile api',
+          },
+          'api_base_url': 'https://gitlab.${domain}/api/v4',
+          'request_token_url': None,
+          'access_token_url': 'https://gitlab.${domain}/oauth/token',
+          'authorize_url': 'https://gitlab.${domain}/oauth/authorize',
+        }
+      }
+    ]
+    
+    class CustomSecurityManager(AirflowSecurityManager):
+      def oauth_user_info(self, provider, response):
+        if provider == MY_PROVIDER:
+          token = response['access_token']
+          res = requests.get('https://gitlab.${domain}/api/v4/user/', headers={
+            'Authorization': response['token_type'] + ' ' + token
+          })
+          data = res.json()
+          userinfo = {
+            'username': data['username'],
+            'email': data['email'],
+            'first_name': data['name'],
+            'last_name': data['name'],
+            'role_keys': ["Airflow_Admins"]
+          }
+          return userinfo
+        else:
+          return {}
+
+    SECURITY_MANAGER_CLASS = CustomSecurityManager
+
 ---
 # Source: airflow/templates/rbac/pod-launcher-role.yaml
 ################################
@@ -743,7 +802,7 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 512Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
@@ -836,7 +895,7 @@ spec:
                 cpu: 100m
                 memory: 128Mi
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 128Mi
           volumeMounts:
           - name: dags
@@ -917,7 +976,7 @@ spec:
               cpu: 1000m
               memory: 2Gi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 512Mi
           volumeMounts:
             - name: config
@@ -970,7 +1029,7 @@ spec:
                 cpu: 100m
                 memory: 128Mi
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 128Mi
           volumeMounts:
           - name: dags
@@ -981,7 +1040,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
@@ -1072,7 +1131,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 128Mi
           ports:
             - name: statsd-ingest
@@ -1179,7 +1238,7 @@ spec:
               cpu: 1000m
               memory: 1024Mi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 1024Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
@@ -1258,7 +1317,7 @@ spec:
               cpu: 1000m
               memory: 4Gi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 1Gi
           volumeMounts:
             - name: config
@@ -1413,7 +1472,7 @@ spec:
               cpu: 250m
               memory: 512Mi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 512Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
@@ -1506,7 +1565,7 @@ spec:
                 cpu: 100m
                 memory: 128Mi
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 128Mi
           volumeMounts:
           - name: dags
@@ -1529,7 +1588,7 @@ spec:
               cpu: 250m
               memory: 512Mi
             requests:
-              cpu: 250m
+              cpu: 10m
               memory: 512Mi
           volumeMounts:
             - name: logs
@@ -1629,7 +1688,7 @@ spec:
                 cpu: 100m
                 memory: 128Mi
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 128Mi
           volumeMounts:
           - name: dags
@@ -1640,7 +1699,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 128Mi
           image: apache/airflow:2.7.1
           imagePullPolicy: IfNotPresent
@@ -2098,7 +2157,7 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 500m
+              cpu: 10m
               memory: 512Mi
           volumeMounts:
             - name: config
@@ -2211,7 +2270,7 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 500m
+              cpu: 10m
               memory: 512Mi
           volumeMounts:
             - name: config

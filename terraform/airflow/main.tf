@@ -48,8 +48,8 @@ module "airflow" {
   args = {
     git_repo      = var.git_repo
     connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${data.kubernetes_secret.minio.data.username}\",\"aws_secret_access_key\":\"${data.kubernetes_secret.minio.data.password}\"}}"
-    client_id     = local.client_id
-    client_secret = local.client_secret
+    client_id     = var.oidc.client_id
+    client_secret = var.oidc.client_secret
     domain        = var.domain
   }
 }
@@ -61,7 +61,6 @@ module "service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
-  gateway   = true
   selector = {
     tier      = "airflow"
     component = "webserver"

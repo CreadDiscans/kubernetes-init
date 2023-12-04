@@ -51,6 +51,14 @@ module "argocd" {
   depends_on = [module.gitlab]
 }
 
+module "airflow" {
+  source   = "./airflow"
+  mode     = var.mode
+  domain   = var.domain
+  git_repo = var.airflow_repo
+  oidc     = var.airflow_oidc
+}
+
 # module "redis" {
 #   source = "./redis"
 # }
@@ -70,13 +78,6 @@ module "argocd" {
 #   source = "./spark"
 #   mode   = var.mode
 #   domain = var.domain
-# }
-
-# module "airflow" {
-#   source   = "./airflow"
-#   mode     = var.mode
-#   domain   = var.domain
-#   git_repo = var.airflow_repo
 # }
 
 # module "kubeflow" {

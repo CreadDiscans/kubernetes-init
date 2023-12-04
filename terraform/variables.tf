@@ -63,3 +63,10 @@ variable "argocd_oidc" {
     client_secret = string
   })
 }
+
+variable "airflow_oidc" {
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+}
