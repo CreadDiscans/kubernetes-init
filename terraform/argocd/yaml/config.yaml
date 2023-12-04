@@ -9,8 +9,8 @@ metadata:
 data:
   url: ${url}
   oidc.config: |
-    name: Keycloak
-    issuer: https://keycloak.${domain}/realms/master
+    name: Gitlab
+    issuer: https://gitlab.${domain}
     clientID: ${client_id}
     clientSecret: $oidc.keycloak.clientSecret
     requestedScopes: ["openid", "profile", "email"]
@@ -39,4 +39,4 @@ metadata:
   namespace: argocd
 data:
   policy.csv: |
-    g, /argocd, role:admin
+    g, consoleAdmin, role:admin

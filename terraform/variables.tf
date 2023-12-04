@@ -45,15 +45,21 @@ variable "airflow_repo" {
 
 variable "minio_oidc" {
   type = object({
-    client_id = string
+    client_id     = string
     client_secret = string
   })
 }
 
 variable "grafana_oidc" {
   type = object({
-    client_id = string
+    client_id     = string
     client_secret = string
   })
 }
 
+variable "argocd_oidc" {
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+}

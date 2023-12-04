@@ -43,6 +43,14 @@ module "prometheus" {
   depends_on = [module.gitlab]
 }
 
+module "argocd" {
+  source     = "./argocd"
+  mode       = var.mode
+  domain     = var.domain
+  oidc       = var.argocd_oidc
+  depends_on = [module.gitlab]
+}
+
 # module "redis" {
 #   source = "./redis"
 # }
@@ -57,13 +65,6 @@ module "prometheus" {
 #   depends_on = [module.nginx, module.cnpg]
 # }
 
-
-# module "argocd" {
-#   source     = "./argocd"
-#   mode       = var.mode
-#   domain     = var.domain
-#   depends_on = [module.keycloak]
-# }
 
 # module "spark" {
 #   source = "./spark"

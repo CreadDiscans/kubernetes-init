@@ -6,8 +6,8 @@ resource "kubernetes_namespace" "ns" {
 
 data "kubernetes_secret" "cert" {
   metadata {
-    name      = "keycloak-cert"
-    namespace = "keycloak"
+    name      = "gitlab-cert"
+    namespace = "gitlab-devops"
   }
 }
 
@@ -16,8 +16,8 @@ module "config" {
   yaml   = "${path.module}/yaml/config.yaml"
   args = {
     url           = "https://${local.prefix}.${var.domain}"
-    client_id     = local.client_id
-    client_secret = base64encode(local.client_secret)
+    client_id     = var.oidc.client_id
+    client_secret = base64encode(var.oidc.client_secret)
     domain        = var.domain
     rootCA        = replace(data.kubernetes_secret.cert.data["tls.crt"], "\n", "\n      ")
   }
