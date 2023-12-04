@@ -147,7 +147,6 @@ module "service" {
   prefix    = "minio"
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 9001
-  gateway   = true
   selector = {
     app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
   }

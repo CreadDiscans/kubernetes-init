@@ -37,7 +37,6 @@ module "service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
-  gateway   = true
   selector = {
     "app.kubernetes.io/name" = "argocd-server"
   }
