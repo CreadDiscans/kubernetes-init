@@ -25,5 +25,5 @@ stringData:
     token_url = https://gitlab.${domain}/oauth/token
     api_url = https://gitlab.${domain}/api/v4
     scopes = openid email profile api
-    role_attribute_path: contains(groups_direct[*], 'consoleAdmin') && 'Admin' || 'Viewer'
+    role_attribute_path: contains(groups[*], 'consoleAdmin') && 'Admin' || 'Viewer'
 type: Opaque
