@@ -144,7 +144,7 @@ resource "kubernetes_deployment" "runner" {
           name              = "gitlab-runner"
           resources {
             requests = {
-              cpu    = "50m"
+              cpu    = "10m"
               memory = "100Mi"
             }
             limits = {

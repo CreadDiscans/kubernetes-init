@@ -19179,7 +19179,7 @@ spec:
         name: argocd-applicationset-controller
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 128Mi
           limits:
             cpu: 500m
@@ -19282,7 +19282,7 @@ spec:
         name: argocd-notifications-controller
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 256Mi
           limits:
             cpu: 500m
@@ -19366,7 +19366,7 @@ spec:
         - containerPort: 6379
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 128Mi
           limits:
             cpu: 500m
@@ -19576,7 +19576,7 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 128Mi
           limits:
             cpu: 1000m
@@ -19924,7 +19924,7 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 128Mi
           limits:
             cpu: 500m
@@ -20179,7 +20179,7 @@ spec:
         name: argocd-application-controller
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 512Mi
           limits:
             cpu: 500m

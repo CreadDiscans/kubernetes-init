@@ -39637,7 +39637,7 @@ spec:
             cpu: 200m
             memory: 200Mi
           requests:
-            cpu: 100m
+            cpu: 10m
             memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -41961,7 +41961,7 @@ spec:
             cpu: 40m
             memory: 40Mi
           requests:
-            cpu: 20m
+            cpu: 10m
             memory: 20Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -42271,7 +42271,7 @@ spec:
             cpu: 250m
             memory: 180Mi
           requests:
-            cpu: 102m
+            cpu: 10m
             memory: 180Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -43820,7 +43820,7 @@ spec:
             cpu: 250m
             memory: 180Mi
           requests:
-            cpu: 102m
+            cpu: 10m
             memory: 180Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -44148,7 +44148,7 @@ spec:
             cpu: 200m
             memory: 200Mi
           requests:
-            cpu: 100m
+            cpu: 10m
             memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false

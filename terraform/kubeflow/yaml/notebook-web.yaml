@@ -552,23 +552,23 @@ metadata:
     kustomize.component: jupyter-web-app
   name: jupyter-web-app-config-h4bh7454m6
   namespace: kubeflow
----
-apiVersion: "kubeflow.org/v1alpha1"
-kind: PodDefault
-metadata:
-  name: add-docker-socket
-spec:
-  selector:
-    matchLabels:
-      add-docker-socket: "true"
-  desc: "add docker socket"
-  volumeMounts:
-  - mountPath: /var/run/docker.sock
-    name: docker-sock
-  volumes:
-  - name: docker-sock
-    hostPath:
-      path: /var/run/docker.sock
+# ---
+# apiVersion: "kubeflow.org/v1alpha1"
+# kind: PodDefault
+# metadata:
+#   name: add-docker-socket
+# spec:
+#   selector:
+#     matchLabels:
+#       add-docker-socket: "true"
+#   desc: "add docker socket"
+#   volumeMounts:
+#   - mountPath: /var/run/docker.sock
+#     name: docker-sock
+#   volumes:
+#   - name: docker-sock
+#     hostPath:
+#       path: /var/run/docker.sock
 ---
 apiVersion: v1
 data:

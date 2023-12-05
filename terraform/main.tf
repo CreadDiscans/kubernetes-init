@@ -52,11 +52,19 @@ module "argocd" {
 }
 
 module "airflow" {
-  source   = "./airflow"
-  mode     = var.mode
-  domain   = var.domain
-  git_repo = var.airflow_repo
-  oidc     = var.airflow_oidc
+  source     = "./airflow"
+  mode       = var.mode
+  domain     = var.domain
+  git_repo   = var.airflow_repo
+  oidc       = var.airflow_oidc
+  depends_on = [module.gitlab]
+}
+
+module "kubeflow" {
+  source     = "./kubeflow"
+  mode       = var.mode
+  domain     = var.domain
+  depends_on = [module.istio, module.gitlab]
 }
 
 # module "redis" {
@@ -78,13 +86,6 @@ module "airflow" {
 #   source = "./spark"
 #   mode   = var.mode
 #   domain = var.domain
-# }
-
-# module "kubeflow" {
-#   source     = "./kubeflow"
-#   mode       = var.mode
-#   domain     = var.domain
-#   depends_on = [module.istio]
 # }
 
 # module "sso" {
