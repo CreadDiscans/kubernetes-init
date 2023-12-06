@@ -71,35 +71,19 @@ module "kubeflow" {
 #   source = "./redis"
 # }
 
-
-# module "keycloak" {
-#   source     = "./keycloak"
-#   domain     = var.domain
-#   mode       = var.mode
-#   username   = var.username
-#   password   = var.password
-#   depends_on = [module.nginx, module.cnpg]
-# }
-
-
 # module "spark" {
 #   source = "./spark"
 #   mode   = var.mode
 #   domain = var.domain
 # }
 
-# module "sso" {
-#   source   = "./sso"
-#   username = var.username
-#   password = var.password
-#   domain   = var.domain
-#   url      = module.keycloak.url
-#   clients = [
-#     module.minio.client,
-#     module.prometheus.client,
-#     module.argocd.client,
-#     module.spark.client,
-#     module.airflow.client,
-#     module.kubeflow.client
-#   ]
-# }
+module "sso" {
+  source = "./sso"
+  domain = var.domain
+  clients = [{
+    prefix        = "kubeflow",
+    client_id     = var.kubeflow_oidc.client_id
+    client_secret = var.kubeflow_oidc.client_secret
+  }]
+
+}

@@ -21,11 +21,11 @@ spec:
             name: authservice
       containers:
       - name: authservice 
-        image: creaddiscans/authservice:0.13
+        image: creaddiscans/authservice:1.0.13
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 50m
+            cpu: 10m
             memory: 128Mi
           limits:
             cpu: 500m
@@ -73,10 +73,9 @@ spec:
           "/static/*",
           "/styles/*", 
           "/images/*", 
-          "/api/*", 
+          "/assets/*", 
           "/public/*",
           "/favicon.ico",
-          "/oauth_callback"
         ]
 ---
 apiVersion: networking.istio.io/v1beta1

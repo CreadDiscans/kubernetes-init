@@ -18,24 +18,25 @@ data:
           "name": "idp_filter_chain",
           "match": {
             "header": ":authority",
-            "prefix": "${client.client_id}",
+            "prefix": "${client.prefix}",
           },
           "filters": [
           {
             "oidc":
               {
-                "authorization_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/auth",
-                "token_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/token",
-                "callback_uri": "https://${client.client_id}.${domain}/authservice_callback",
+                "authorization_uri": "https://gitlab.${domain}/oauth/authorize",
+                "token_uri": "https://gitlab.${domain}/oauth/token",
+                "user_api_uri": "https://gitlab.dshome.kro.kr/api/v4/user/",
+                "callback_uri": "https://${client.prefix}.${domain}/authservice_callback",
                 "jwks_fetcher": {
-                  "jwks_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/certs",
+                  "jwks_uri": "https://gitlab.${domain}/oauth/discovery/keys",
                   "periodic_fetch_interval_sec": 10,
                   "skip_verify_peer_cert": true
                 },
                 "client_id": "${client.client_id}",
                 "client_secret": "${client.client_secret}",
-                "cookie_name_prefix":"${client.client_id}",
-                "scopes": [],
+                "cookie_name_prefix":"${client.prefix}",
+                "scopes": ["openid", "email", "api"],
                 "id_token": {
                   "preamble": "Bearer",
                   "header": "Authorization"
@@ -46,11 +47,9 @@ data:
                 },
                 "logout": {
                   "path": "/authservice_logout",
-                  "redirect_uri": "https://keycloak.${domain}/realms/master/protocol/openid-connect/logout"
+                  "redirect_uri": "https://gitlab.${domain}/users/sign_out"
                 },
                 "skip_verify_peer_cert": true,
-                "group":"/${client.client_id}",
-                "error_uri":"https://keycloak.${domain}/403"
               }
             }
           ]

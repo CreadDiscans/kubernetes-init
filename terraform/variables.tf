@@ -70,3 +70,10 @@ variable "airflow_oidc" {
     client_secret = string
   })
 }
+
+variable "kubeflow_oidc" {
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+}
