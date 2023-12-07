@@ -44,11 +44,11 @@ module "notebook_web" {
   depends_on = [kubernetes_namespace.ns]
 }
 
-# module "admission_webhook" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/admission-webook.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
+module "admission_webhook" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/admission-webook.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
 # module "knative_serving" {
 #   source     = "../utils/apply"
