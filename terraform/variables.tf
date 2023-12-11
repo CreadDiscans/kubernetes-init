@@ -46,11 +46,13 @@ variable "prefix" {
     gitlab   = string
     registry = string
     minio    = string
+    grafana  = string
   })
   default = {
     gitlab   = "gitlab"
     registry = "registry"
     minio    = "minio"
+    grafana  = "grafana"
   }
 }
 

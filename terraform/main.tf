@@ -43,13 +43,16 @@ module "minio" {
   depends_on  = [module.gitlab]
 }
 
-# module "prometheus" {
-#   source     = "./prometheus"
-#   domain     = var.domain
-#   mode       = var.mode
-#   oidc       = var.grafana_oidc
-#   depends_on = [module.gitlab]
-# }
+module "prometheus" {
+  source = "./prometheus"
+  domain = var.domain
+  prefix = {
+    grafana = var.prefix.grafana
+    gitlab  = var.prefix.gitlab
+  }
+  password   = var.password
+  depends_on = [module.gitlab]
+}
 
 # module "argocd" {
 #   source     = "./argocd"
