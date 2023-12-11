@@ -31,11 +31,17 @@ module "gitlab" {
   depends_on = [module.nginx, module.cnpg]
 }
 
-# module "minio" {
-#   source     = "./minio"
-#   domain     = var.domain
-#   depends_on = [module.nfs, module.nginx]
-# }
+module "minio" {
+  source = "./minio"
+  domain = var.domain
+  prefix = {
+    minio  = var.prefix.minio
+    gitlab = var.prefix.gitlab
+  }
+  password    = var.password
+  minio_creds = local.minio_creds
+  depends_on  = [module.gitlab]
+}
 
 # module "prometheus" {
 #   source     = "./prometheus"

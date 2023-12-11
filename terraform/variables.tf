@@ -45,10 +45,12 @@ variable "prefix" {
   type = object({
     gitlab   = string
     registry = string
+    minio    = string
   })
   default = {
     gitlab   = "gitlab"
     registry = "registry"
+    minio    = "minio"
   }
 }
 
