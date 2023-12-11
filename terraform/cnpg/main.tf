@@ -1,14 +1,16 @@
-
-module "operator" {
-  source = "../utils/apply"
-  yaml   = "${path.module}/yaml/cnpg-1.20.2.yaml"
+resource "kubernetes_namespace" "ns" {
+  metadata {
+    name = "cnpg-system"
+    labels = {
+      "app.kubernetes.io/name" = "cloudnative-pg"
+    }
+  }
 }
 
-data "kubernetes_secret" "creds" {
-  metadata {
-    name      = "minio-creds"
-    namespace = "minio-storage"
-  }
+module "operator" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/cnpg-1.20.2.yaml"
+  depends_on = [kubernetes_namespace.ns]
 }
 
 resource "kubernetes_secret" "minio_creds" {
@@ -18,8 +20,8 @@ resource "kubernetes_secret" "minio_creds" {
   }
 
   data = {
-    MINIO_ACCESS_KEY = data.kubernetes_secret.creds.data.username
-    MINIO_SECRET_KEY = data.kubernetes_secret.creds.data.password
+    MINIO_ACCESS_KEY = var.minio_creds.username
+    MINIO_SECRET_KEY = var.minio_creds.password
   }
   depends_on = [module.operator]
 }
@@ -30,12 +32,6 @@ resource "time_sleep" "wait" {
 }
 
 resource "time_static" "current" {}
-
-module "keycloak" {
-  source     = "./service"
-  name       = "keycloak"
-  depends_on = [time_sleep.wait]
-}
 
 module "airflow" {
   source     = "./service"
@@ -55,7 +51,6 @@ module "cluster" {
   args = {
     current = time_static.current.rfc3339
     services = [
-      module.keycloak.info,
       module.airflow.info,
       module.gitlab.info
     ]
@@ -91,4 +86,27 @@ resource "kubernetes_service" "export_cnpg" {
     type = "LoadBalancer"
   }
   depends_on = [module.cluster]
+}
+
+resource "null_resource" "wait" {
+  provisioner "local-exec" {
+    command = <<EOF
+      while true; do
+        if [ $(kubectl get pod cluster-cnpg-1 -n cnpg-system 2> /dev/null | grep -c Running) -eq 1 ]
+        then
+            break
+        else
+            sleep 10
+        fi
+      done
+    EOF
+  }
+  depends_on = [module.cluster]
+}
+
+resource "null_resource" "wait2" {
+  provisioner "local-exec" {
+    command = "kubectl wait --for=condition=ready pod -l cnpg.io/podRole=instance -n cnpg-system"
+  }
+  depends_on = [null_resource.wait]
 }

@@ -1,9 +1,5 @@
 locals {
-  clusterissuer = var.mode == "prod" ? "letsencrypt-prod" : "letsencrypt-staging"
-}
-
-variable "mode" {
-  type = string
+  clusterissuer = "letsencrypt-prod"
 }
 
 variable "domain" {

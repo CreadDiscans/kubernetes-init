@@ -50,7 +50,7 @@ resource "kubernetes_config_map" "runner_config" {
         [[runners]]
         tls-ca-file = "/etc/gitlab-runner/certs/tls.crt"
         name = "kubernetes-runner"
-        url = "https://${local.prefix}.${var.domain}"
+        url = "https://${var.prefix.gitlab}.${var.domain}"
         token = "$TOKEN"
         executor = "kubernetes"
         [runners.kubernetes]
@@ -84,6 +84,103 @@ resource "kubernetes_persistent_volume_claim" "pvc" {
   }
 }
 
+resource "kubernetes_config_map" "runner_script" {
+  metadata {
+    name = "runner-scipt"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    "script.py" = <<EOF
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+import os
+
+host = "https://${var.prefix.gitlab}.${var.domain}"
+username = "root"
+password = "${var.password}"
+source = "/etc/gitlab-runner/config.toml"
+destination = "/etc/gitlab-runner-getter/config.toml"
+
+def get_token():
+    
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--window-size=1920,1000')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.20 Safari/537.36")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.get(host)
+    print('open gitlab', host)
+    while True:
+        try:
+            driver.find_element(By.ID, 'user_login')
+            break
+        except KeyboardInterrupt:
+            return
+        except Exception as ex:
+            pass
+    driver.find_element(By.ID, 'user_login').send_keys(username)
+    driver.find_element(By.ID, 'user_password').send_keys(password)
+    driver.find_element(By.CLASS_NAME, 'js-sign-in-button').click()
+    print('login')
+    driver.get(f'{host}/admin/runners')
+    time.sleep(2)
+    driver.get(f'{host}/admin/runners/new')
+    while True:
+        try:
+            checkbox = driver.find_element(By.ID,'35')
+            break
+        except KeyboardInterrupt:
+            return
+        except:
+            pass
+    driver.execute_script("arguments[0].click();", checkbox)
+    driver.find_element(By.CLASS_NAME, 'js-no-auto-disable').click()
+    time.sleep(1)
+    path = '/admin/'+driver.current_url.split('/admin/')[1]
+    register_url = host + path
+    print('created new runner')
+    
+    driver.get(register_url)
+    while True:
+        section = driver.find_elements(By.TAG_NAME, 'section')
+        if len(section) == 3:
+            break
+    print('find section')
+    section = section[0]
+    while True:
+        try:
+            command = section.find_element(By.CLASS_NAME, 'gl-display-flex').text
+            break
+        except KeyboardInterrupt:
+            return
+        except:
+            pass
+    print('find command')
+    token = command.split('--token')[1].strip()
+    driver.close()
+    return token
+
+if __name__ == '__main__':
+    if os.path.exists(destination):
+        print('destination exists so skip')
+    else: 
+        token = get_token()
+        with open(source, 'r') as f:
+            body = f.read()
+        body = body.replace('$TOKEN', token)
+        with open(destination, 'w') as f:
+            f.write(body)
+    EOF
+  }
+}
+
 resource "kubernetes_deployment" "runner" {
   metadata {
     name      = "gitlab-runner"
@@ -106,27 +203,7 @@ resource "kubernetes_deployment" "runner" {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
         init_container {
           name  = "gitlab-runner-token-getter"
-          image = "creaddiscans/gitlab-runner-token-getter:0.8"
-          env {
-            name  = "HOST"
-            value = "https://${local.prefix}.${var.domain}"
-          }
-          env {
-            name  = "USERNAME"
-            value = "root"
-          }
-          env {
-            name  = "PASSWORD"
-            value = var.password
-          }
-          env {
-            name  = "SOURCE"
-            value = "/etc/gitlab-runner/config.toml"
-          }
-          env {
-            name  = "DESTINATION"
-            value = "/etc/gitlab-runner-getter/config.toml"
-          }
+          image = "creaddiscans/selenium_script:0.1"
           volume_mount {
             name       = "config"
             mount_path = "/etc/gitlab-runner/config.toml"
@@ -136,6 +213,10 @@ resource "kubernetes_deployment" "runner" {
           volume_mount {
             name       = "config-with-token"
             mount_path = "/etc/gitlab-runner-getter"
+          }
+          volume_mount {
+            name = "script"
+            mount_path = "/app"
           }
         }
         container {
@@ -165,6 +246,12 @@ resource "kubernetes_deployment" "runner" {
           }
         }
         volume {
+          name = "script"
+          config_map {
+            name = kubernetes_config_map.runner_script.metadata.0.name
+          }
+        }
+        volume {
           name = "config"
           config_map {
             name = kubernetes_config_map.runner_config.metadata.0.name
@@ -179,12 +266,12 @@ resource "kubernetes_deployment" "runner" {
         volume {
           name = "gitlab-cert"
           secret {
-            secret_name = "${local.prefix}-cert"
+            secret_name = "${var.prefix.gitlab}-cert"
           }
         }
         restart_policy = "Always"
       }
     }
   }
-  depends_on = [time_sleep.wait_deploy]
+  depends_on = [kubernetes_deployment.gitlab_deploy]
 }

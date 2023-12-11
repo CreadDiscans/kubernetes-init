@@ -1,11 +1,23 @@
+resource "kubernetes_namespace" "ns" {
+  metadata {
+    name = "ingress-nginx"
+    labels = {
+      "app.kubernetes.io/instance" = "ingress-nginx"
+      "app.kubernetes.io/name"     = "0ingress-nginx"
+    }
+  }
+}
+
 module "ingress_nginx" {
-  source = "../utils/apply"
-  yaml   = "${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
+  depends_on = [kubernetes_namespace.ns]
 }
 
 module "tcp_config" {
-  source = "../utils/apply"
-  yaml = "${path.module}/yaml/ingress-nginx-tcp.yaml"
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/ingress-nginx-tcp.yaml"
+  depends_on = [kubernetes_namespace.ns]
 }
 
 module "arp_protocol" {

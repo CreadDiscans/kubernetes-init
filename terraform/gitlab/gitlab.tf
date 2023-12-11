@@ -4,17 +4,26 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-module "volume" {
-  source    = "../utils/volume"
-  name      = "gitlab"
-  namespace = kubernetes_namespace.ns.metadata.0.name
-}
-
-
 data "kubernetes_secret" "db" {
   metadata {
     name      = "gitlab-db-secret"
     namespace = "cnpg-system"
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "deploy_pvc" {
+  metadata {
+    name      = "gitlab-pvc"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  spec {
+    access_modes = ["ReadWriteMany"]
+    resources {
+      requests = {
+        storage = "1Gi"
+      }
+    }
+    storage_class_name = "nfs-volume"
   }
 }
 
@@ -45,13 +54,20 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           name  = "gitlab"
           resources {
             requests = {
-              cpu = "100m"
+              cpu    = "100m"
               memory = "512Mi"
             }
             limits = {
-              cpu = 1
+              cpu    = 1
               memory = "4096Mi"
             }
+          }
+          startup_probe {
+            http_get {
+              path = "/users/sign_in"
+              port = 80
+            }
+            failure_threshold = 1000
           }
           env {
             name  = "TZ"
@@ -68,8 +84,8 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           env {
             name  = "GITLAB_OMNIBUS_CONFIG"
             value = <<-EOF
-            external_url 'https://${local.prefix}.${var.domain}'
-            registry_external_url 'https://${local.prefix_registry}.${var.domain}'
+            external_url 'https://${var.prefix.gitlab}.${var.domain}'
+            registry_external_url 'https://${var.prefix.registry}.${var.domain}'
             nginx['listen_port'] = 80
             nginx['listen_https'] = false
             registry['enable'] = true
@@ -102,30 +118,29 @@ resource "kubernetes_deployment" "gitlab_deploy" {
         volume {
           name = "gitlab-volume"
           persistent_volume_claim {
-            claim_name = module.volume.pvc_name
+            claim_name = kubernetes_persistent_volume_claim.deploy_pvc.metadata.0.name
           }
         }
       }
     }
+    progress_deadline_seconds = 6000
   }
-}
-
-resource "time_sleep" "wait_deploy" {
-  create_duration = "180s"
-  depends_on      = [kubernetes_deployment.gitlab_deploy]
+  timeouts {
+    create = "60m"
+    update = "60m"
+  }
 }
 
 module "service" {
   source    = "../utils/service"
-  mode      = var.mode
   domain    = var.domain
-  prefix    = local.prefix
+  prefix    = var.prefix.gitlab
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
   selector = {
     app = "gitlab"
   }
-  depends_on = [time_sleep.wait_deploy]
+  depends_on = [kubernetes_deployment.gitlab_deploy]
 }
 
 resource "kubernetes_service" "service_ssh" {
@@ -144,17 +159,17 @@ resource "kubernetes_service" "service_ssh" {
     }
     type = "NodePort"
   }
+  depends_on = [kubernetes_deployment.gitlab_deploy]
 }
 
 module "service_registry" {
   source    = "../utils/service"
-  mode      = var.mode
   domain    = var.domain
-  prefix    = local.prefix_registry
+  prefix    = var.prefix.registry
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 5005
   selector = {
     app = "gitlab"
   }
-  depends_on = [time_sleep.wait_deploy]
+  depends_on = [kubernetes_deployment.gitlab_deploy]
 }

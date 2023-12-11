@@ -1,3 +1,16 @@
+locals {
+  minio_creds = {
+    username = "minioadmin"
+    password = random_password.minio_password.result
+  }
+}
+
+resource "random_password" "minio_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 variable "external_ips" {
   type    = string
   default = "x.x.x.x-x.x.x.x"
@@ -23,57 +36,58 @@ variable "nfs_path" {
   default = "/nfs"
 }
 
-variable "username" {
-  type    = string
-  default = "admin"
-}
-
 variable "password" {
   type    = string
   default = "defaultpassword"
 }
 
-variable "mode" {
-  type    = string
-  default = "staging"
-}
-
-variable "airflow_repo" {
-  type    = string
-  default = ""
-}
-
-variable "minio_oidc" {
+variable "prefix" {
   type = object({
-    client_id     = string
-    client_secret = string
+    gitlab   = string
+    registry = string
   })
+  default = {
+    gitlab   = "gitlab"
+    registry = "registry"
+  }
 }
 
-variable "grafana_oidc" {
-  type = object({
-    client_id     = string
-    client_secret = string
-  })
-}
+# variable "airflow_repo" {
+#   type    = string
+#   default = ""
+# }
 
-variable "argocd_oidc" {
-  type = object({
-    client_id     = string
-    client_secret = string
-  })
-}
+# variable "minio_oidc" {
+#   type = object({
+#     client_id     = string
+#     client_secret = string
+#   })
+# }
 
-variable "airflow_oidc" {
-  type = object({
-    client_id     = string
-    client_secret = string
-  })
-}
+# variable "grafana_oidc" {
+#   type = object({
+#     client_id     = string
+#     client_secret = string
+#   })
+# }
 
-variable "kubeflow_oidc" {
-  type = object({
-    client_id     = string
-    client_secret = string
-  })
-}
+# variable "argocd_oidc" {
+#   type = object({
+#     client_id     = string
+#     client_secret = string
+#   })
+# }
+
+# variable "airflow_oidc" {
+#   type = object({
+#     client_id     = string
+#     client_secret = string
+#   })
+# }
+
+# variable "kubeflow_oidc" {
+#   type = object({
+#     client_id     = string
+#     client_secret = string
+#   })
+# }

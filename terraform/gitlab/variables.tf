@@ -1,6 +1,8 @@
-locals {
-  prefix          = "gitlab"
-  prefix_registry = "registry"
+variable "prefix" {
+  type = object({
+    gitlab = string
+    registry = string
+  })
 }
 
 variable "domain" {
@@ -8,9 +10,5 @@ variable "domain" {
 }
 
 variable "password" {
-  type = string
-}
-
-variable "mode" {
   type = string
 }
