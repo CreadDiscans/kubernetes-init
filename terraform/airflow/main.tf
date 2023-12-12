@@ -35,10 +35,19 @@ resource "kubernetes_secret" "cnpg_db" {
   }
 }
 
-data "kubernetes_secret" "minio" {
+module "oidc" {
+  source       = "../utils/oidc"
+  namespace    = kubernetes_namespace.ns.metadata.0.name
+  gitlab_host  = "https://${var.prefix.gitlab}.${var.domain}"
+  password     = var.password
+  redirect_uri = "https://${var.prefix.airflow}.${var.domain}/oauth-authorized/gitlab"
+  name         = "airflow"
+}
+
+data "kubernetes_secret" "oidc_secret" {
   metadata {
-    name      = "minio-creds"
-    namespace = "minio-storage"
+    name      = module.oidc.secret
+    namespace = kubernetes_namespace.ns.metadata.0.name
   }
 }
 
@@ -46,19 +55,19 @@ module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
   args = {
-    git_repo      = var.git_repo
-    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${data.kubernetes_secret.minio.data.username}\",\"aws_secret_access_key\":\"${data.kubernetes_secret.minio.data.password}\"}}"
-    client_id     = var.oidc.client_id
-    client_secret = var.oidc.client_secret
+    git_repo      = "https://root:${var.password}@${var.prefix.gitlab}.${var.domain}/consoleAdmin/airflow"
+    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
+    client_id     = data.kubernetes_secret.oidc_secret.data.client_id
+    client_secret = data.kubernetes_secret.oidc_secret.data.client_secret
     domain        = var.domain
   }
+  depends_on = [time_sleep.wait]
 }
 
 module "service" {
   source    = "../utils/service"
-  mode      = var.mode
   domain    = var.domain
-  prefix    = local.prefix
+  prefix    = var.prefix.airflow
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {

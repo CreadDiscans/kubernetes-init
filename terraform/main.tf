@@ -55,24 +55,27 @@ module "prometheus" {
 }
 
 module "argocd" {
-  source     = "./argocd"
-  domain     = var.domain
+  source = "./argocd"
+  domain = var.domain
   prefix = {
     argocd = var.prefix.argocd
-    gitlab  = var.prefix.gitlab
+    gitlab = var.prefix.gitlab
   }
   password   = var.password
   depends_on = [module.gitlab]
 }
 
-# module "airflow" {
-#   source     = "./airflow"
-#   mode       = var.mode
-#   domain     = var.domain
-#   git_repo   = var.airflow_repo
-#   oidc       = var.airflow_oidc
-#   depends_on = [module.gitlab]
-# }
+module "airflow" {
+  source = "./airflow"
+  domain = var.domain
+  prefix = {
+    airflow = var.prefix.airflow
+    gitlab  = var.prefix.gitlab
+  }
+  password    = var.password
+  minio_creds = local.minio_creds
+  depends_on  = [module.minio]
+}
 
 # module "kubeflow" {
 #   source     = "./kubeflow"

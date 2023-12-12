@@ -138,6 +138,6 @@ resource "kubernetes_job" "oidc_job" {
 
 
 resource "time_sleep" "wait" {
-  create_duration = "10s"
+  create_duration = "30s"
   depends_on      = [kubernetes_job.oidc_job]
 }

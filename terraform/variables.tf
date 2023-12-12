@@ -48,6 +48,7 @@ variable "prefix" {
     minio    = string
     grafana  = string
     argocd   = string
+    airflow  = string
   })
   default = {
     gitlab   = "gitlab"
@@ -55,6 +56,7 @@ variable "prefix" {
     minio    = "minio"
     grafana  = "grafana"
     argocd   = "argocd"
+    airflow  = "airflow"
   }
 }
 

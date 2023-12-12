@@ -1,23 +1,25 @@
 locals {
-  prefix        = "airflow"
-  minio_url     = "http://minio-gateway-service.minio-storage:9000"
-}
-
-variable "mode" {
-  type = string
+  minio_url = "http://minio-gateway-service.minio-storage:9000"
 }
 
 variable "domain" {
   type = string
 }
 
-variable "git_repo" {
+variable "prefix" {
+  type = object({
+    airflow = string
+    gitlab  = string
+  })
+}
+
+variable "password" {
   type = string
 }
 
-variable "oidc" {
+variable "minio_creds" {
   type = object({
-    client_id     = string
-    client_secret = string
+    username = string
+    password = string
   })
 }
