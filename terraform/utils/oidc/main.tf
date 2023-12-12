@@ -79,9 +79,9 @@ resource "kubernetes_role" "oidc_role" {
     namespace = var.namespace
   }
   rule {
-    api_groups     = ["*"]
-    resources      = ["secrets"]
-    verbs          = ["get", "list", "watch", "create", "update"]
+    api_groups = ["*"]
+    resources  = ["secrets"]
+    verbs      = ["get", "list", "watch", "create", "update"]
   }
 }
 
@@ -113,8 +113,8 @@ resource "kubernetes_job" "oidc_job" {
       spec {
         service_account_name = kubernetes_service_account.oidc_sa.metadata.0.name
         container {
-          name    = "gitlab-oidc"
-          image   = "creaddiscans/selenium_script:0.2"
+          name  = "gitlab-oidc"
+          image = "creaddiscans/selenium_script:0.2"
           volume_mount {
             name       = "script"
             mount_path = "/app"
@@ -134,4 +134,10 @@ resource "kubernetes_job" "oidc_job" {
     update = "10m"
   }
   wait_for_completion = true
+}
+
+
+resource "time_sleep" "wait" {
+  create_duration = "10s"
+  depends_on      = [kubernetes_job.oidc_job]
 }

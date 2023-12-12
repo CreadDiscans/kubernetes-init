@@ -54,13 +54,16 @@ module "prometheus" {
   depends_on = [module.gitlab]
 }
 
-# module "argocd" {
-#   source     = "./argocd"
-#   mode       = var.mode
-#   domain     = var.domain
-#   oidc       = var.argocd_oidc
-#   depends_on = [module.gitlab]
-# }
+module "argocd" {
+  source     = "./argocd"
+  domain     = var.domain
+  prefix = {
+    argocd = var.prefix.argocd
+    gitlab  = var.prefix.gitlab
+  }
+  password   = var.password
+  depends_on = [module.gitlab]
+}
 
 # module "airflow" {
 #   source     = "./airflow"
