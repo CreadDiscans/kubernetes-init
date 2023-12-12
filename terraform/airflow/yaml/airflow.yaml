@@ -508,10 +508,10 @@ data:
           'client_kwargs': {
             'scope': 'email profile api',
           },
-          'api_base_url': 'https://gitlab.${domain}/api/v4',
+          'api_base_url': '${gitlab_host}/api/v4',
           'request_token_url': None,
-          'access_token_url': 'https://gitlab.${domain}/oauth/token',
-          'authorize_url': 'https://gitlab.${domain}/oauth/authorize',
+          'access_token_url': '${gitlab_host}/oauth/token',
+          'authorize_url': '${gitlab_host}/oauth/authorize',
         }
       }
     ]
@@ -520,7 +520,7 @@ data:
       def oauth_user_info(self, provider, response):
         if provider == MY_PROVIDER:
           token = response['access_token']
-          res = requests.get('https://gitlab.${domain}/api/v4/user/', headers={
+          res = requests.get('${gitlab_host}/api/v4/user/', headers={
             'Authorization': response['token_type'] + ' ' + token
           })
           data = res.json()

@@ -59,6 +59,7 @@ module "airflow" {
     connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
     client_id     = data.kubernetes_secret.oidc_secret.data.client_id
     client_secret = data.kubernetes_secret.oidc_secret.data.client_secret
+    gitlab_host   = "https://${var.prefix.gitlab}.${var.domain}"
     domain        = var.domain
   }
   depends_on = [time_sleep.wait]
