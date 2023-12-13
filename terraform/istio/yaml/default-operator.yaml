@@ -19,3 +19,10 @@ spec:
       k8s:
         service:
           type: "NodePort"
+  values:
+    global:
+      proxy:
+        resources:
+          requests:
+            cpu: "0m"
+            memory: "0Mi"
