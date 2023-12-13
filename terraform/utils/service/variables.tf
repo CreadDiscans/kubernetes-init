@@ -23,6 +23,6 @@ variable "selector" {
 }
 
 variable "gateway" {
-  type    = bool
-  default = false
+  type    = string
+  default = ""
 }

@@ -7,7 +7,7 @@ spec:
   hosts:
   - ${hostname}
   gateways:
-  - ${name}-gateway
+  - ${gateway}
   http:
   - route:
     - destination:

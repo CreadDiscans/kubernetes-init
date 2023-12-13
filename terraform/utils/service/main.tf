@@ -29,7 +29,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       "cert-manager.io/cluster-issuer"                = local.clusterissuer
       "nginx.ingress.kubernetes.io/proxy-buffer-size" = "128k"
     }
-    namespace = var.gateway ? "istio-system" : var.namespace
+    namespace = var.gateway != "" ? "istio-system" : var.namespace
   }
   spec {
     ingress_class_name = "nginx"
@@ -45,7 +45,7 @@ resource "kubernetes_ingress_v1" "ingress" {
           path = "/"
           backend {
             service {
-              name = var.gateway ? "istio-ingressgateway" : kubernetes_service.service.metadata.0.name
+              name = var.gateway != "" ? "istio-ingressgateway" : kubernetes_service.service.metadata.0.name
               port {
                 number = 80
               }
@@ -58,7 +58,7 @@ resource "kubernetes_ingress_v1" "ingress" {
 }
 
 resource "time_sleep" "wait" {
-  count           = var.gateway ? 1 : 0
+  count           = var.gateway != "" ? 1 : 0
   create_duration = "10s"
   depends_on      = [kubernetes_ingress_v1.ingress]
 }
@@ -66,6 +66,7 @@ resource "time_sleep" "wait" {
 data "template_file" "gateway" {
   template = file("${path.module}/yaml/gateway.yaml")
   vars = {
+    gateway   = var.gateway
     name      = var.prefix
     namespace = var.namespace
     hostname  = "${var.prefix}.${var.domain}"
@@ -74,7 +75,7 @@ data "template_file" "gateway" {
 }
 
 resource "null_resource" "gateway" {
-  count = var.gateway ? 1 : 0
+  count = var.gateway != "" ? 1 : 0
 
   triggers = {
     template = data.template_file.gateway.rendered
@@ -94,6 +95,7 @@ resource "null_resource" "gateway" {
 data "template_file" "vertual_service" {
   template = file("${path.module}/yaml/virtual-service.yaml")
   vars = {
+    gateway   = var.gateway
     name      = var.prefix
     namespace = var.namespace
     hostname  = "${var.prefix}.${var.domain}"
@@ -102,7 +104,7 @@ data "template_file" "vertual_service" {
 }
 
 resource "null_resource" "vertual_service" {
-  count = var.gateway ? 1 : 0
+  count = var.gateway != "" ? 1 : 0
 
   triggers = {
     template = data.template_file.vertual_service.rendered
