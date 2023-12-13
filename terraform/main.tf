@@ -77,12 +77,18 @@ module "airflow" {
   depends_on  = [module.minio]
 }
 
-# module "kubeflow" {
-#   source     = "./kubeflow"
-#   mode       = var.mode
-#   domain     = var.domain
-#   depends_on = [module.istio, module.gitlab]
-# }
+module "kubeflow" {
+  source = "./kubeflow"
+  domain = var.domain
+  prefix = {
+    kubeflow = var.prefix.kubeflow
+    gitlab   = var.prefix.gitlab
+  }
+  password    = var.password
+  email       = var.email
+  minio_creds = local.minio_creds
+  depends_on  = [module.istio, module.gitlab]
+}
 
 # # module "redis" {
 # #   source = "./redis"
@@ -93,14 +99,3 @@ module "airflow" {
 # #   mode   = var.mode
 # #   domain = var.domain
 # # }
-
-# module "sso" {
-#   source = "./sso"
-#   domain = var.domain
-#   clients = [{
-#     prefix        = "kubeflow",
-#     client_id     = var.kubeflow_oidc.client_id
-#     client_secret = var.kubeflow_oidc.client_secret
-#   }]
-
-# }

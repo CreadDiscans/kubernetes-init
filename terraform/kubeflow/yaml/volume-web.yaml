@@ -284,6 +284,9 @@ spec:
         - mountPath: /etc/config/viewer-spec.yaml
           name: viewer-spec
           subPath: viewer-spec.yaml
+        resources:
+          requests:
+            cpu: "0m"
       serviceAccountName: volumes-web-app-service-account
       volumes:
       - configMap:

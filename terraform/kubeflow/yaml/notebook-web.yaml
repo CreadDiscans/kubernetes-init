@@ -419,43 +419,19 @@ data:
 
         # the list of available affinity configs in the dropdown
         # options: []
-        options:
-         - configKey: "GTX750Ti-2G"
-           displayName: "GTX750Ti-2G"
-           affinity:
-             # Require a Node with label `lifecycle=kubeflow-notebook`
-             nodeAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 nodeSelectorTerms:
-                   - matchExpressions:
-                       - key: "nvidia.com/gpu.product"
-                         operator: "In"
-                         values:
-                           - "NVIDIA-GeForce-GTX-750-Ti"
-         - configKey: "GT730-2G"
-           displayName: "GT730-2G"
-           affinity:
-             # Require a Node with label `lifecycle=kubeflow-notebook`
-             nodeAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 nodeSelectorTerms:
-                   - matchExpressions:
-                       - key: "nvidia.com/gpu.product"
-                         operator: "In"
-                         values:
-                           - "NVIDIA-GeForce-GT-730"
-         - configKey: "RTX2080Ti-12G"
-           displayName: "RTX2080Ti-12G"
-           affinity:
-             # Require a Node with label `lifecycle=kubeflow-notebook`
-             nodeAffinity:
-               requiredDuringSchedulingIgnoredDuringExecution:
-                 nodeSelectorTerms:
-                   - matchExpressions:
-                       - key: "nvidia.com/gpu.product"
-                         operator: "In"
-                         values:
-                           - "NVIDIA-GeForce-RTX-2080-Ti"
+        # options:
+        #  - configKey: "GTX750Ti-2G"
+        #    displayName: "GTX750Ti-2G"
+        #    affinity:
+        #      # Require a Node with label `lifecycle=kubeflow-notebook`
+        #      nodeAffinity:
+        #        requiredDuringSchedulingIgnoredDuringExecution:
+        #          nodeSelectorTerms:
+        #            - matchExpressions:
+        #                - key: "nvidia.com/gpu.product"
+        #                  operator: "In"
+        #                  values:
+        #                    - "NVIDIA-GeForce-GTX-750-Ti"
         #
         #      # Require a Node WITHOUT an existing Pod having `notebook-name` label
         #      podAntiAffinity:

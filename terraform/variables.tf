@@ -49,6 +49,7 @@ variable "prefix" {
     grafana  = string
     argocd   = string
     airflow  = string
+    kubeflow = string
   })
   default = {
     gitlab   = "gitlab"
@@ -57,45 +58,6 @@ variable "prefix" {
     grafana  = "grafana"
     argocd   = "argocd"
     airflow  = "airflow"
+    kubeflow = "kubeflow"
   }
 }
-
-# variable "airflow_repo" {
-#   type    = string
-#   default = ""
-# }
-
-# variable "minio_oidc" {
-#   type = object({
-#     client_id     = string
-#     client_secret = string
-#   })
-# }
-
-# variable "grafana_oidc" {
-#   type = object({
-#     client_id     = string
-#     client_secret = string
-#   })
-# }
-
-# variable "argocd_oidc" {
-#   type = object({
-#     client_id     = string
-#     client_secret = string
-#   })
-# }
-
-# variable "airflow_oidc" {
-#   type = object({
-#     client_id     = string
-#     client_secret = string
-#   })
-# }
-
-# variable "kubeflow_oidc" {
-#   type = object({
-#     client_id     = string
-#     client_secret = string
-#   })
-# }

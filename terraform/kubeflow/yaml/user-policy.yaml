@@ -1,34 +1,35 @@
-apiVersion: security.istio.io/v1
-kind: AuthorizationPolicy
+apiVersion: "kubeflow.org/v1alpha1"
+kind: PodDefault
 metadata:
-  name: kubeflow-api
-  namespace: kubeflow-api
+  name: add-docker-socket
+  namespace: kubeflow-user
 spec:
-  action: ALLOW
-  rules:
-  - to:
-    - operation:
-        paths: ["/v1/models/*"]
+  selector:
+    matchLabels:
+      add-docker-socket: "true"
+  desc: "add docker socket"
+  volumeMounts:
+  - mountPath: /var/run/docker.sock
+    name: docker-sock
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
 ---
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: "kubeflow.org/v1alpha1"
+kind: PodDefault
 metadata:
-  name: sa
-  namespace: kubeflow-api
-secrets:
-- name: s3creds
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: s3creds
-  namespace: kubeflow-api
-  annotations:
-     serving.kserve.io/s3-endpoint: minio-gateway-service.minio-storage:9000 # replace with your s3 endpoint e.g minio-service.kubeflow:9000
-     serving.kserve.io/s3-usehttps: "0" # by default 1, if testing with minio you can set to 0
-     serving.kserve.io/s3-region: "us-east-2"
-     serving.kserve.io/s3-useanoncredential: "false" # omitting this is the same as false, if true will ignore provided credential and use anonymous credentials
-type: Opaque
-stringData: # use `stringData` for raw credential string or `data` for base64 encoded string
-  AWS_ACCESS_KEY_ID: ${username}
-  AWS_SECRET_ACCESS_KEY: ${password}
+  name: add-minio-secret
+  namespace: kubeflow-user
+spec:
+  selector:
+    matchLabels:
+      add-minio-socket: "true"
+  desc: "add minio secret"
+  volumeMounts:
+  - mountPath: /secret/minio
+    name: secret-volume
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: minio-secret

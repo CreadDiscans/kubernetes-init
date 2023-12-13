@@ -20,12 +20,6 @@ module "pipeline_crds" {
   depends_on = [kubernetes_namespace.ns]
 }
 
-# module "pipeline" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/pipeline.yaml"
-#   depends_on = [module.pipeline_crds]
-# }
-
 module "istio_resource" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/istio-resource.yaml"
@@ -50,36 +44,6 @@ module "admission_webhook" {
   depends_on = [kubernetes_namespace.ns]
 }
 
-# module "knative_serving" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/knative-serving.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
-
-# module "knative_gateway" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/knative-gateway.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
-
-# module "kserve" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/kserve.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
-
-# module "kserve_web" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/kserve-web.yaml"
-#   depends_on = [module.kserve]
-# }
-
-# module "katib" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/katib.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
-
 module "centraldashboard" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/centraldashboard.yaml"
@@ -91,18 +55,6 @@ module "profile" {
   yaml       = "${path.module}/yaml/profile.yaml"
   depends_on = [kubernetes_namespace.ns]
 }
-
-# module "tensorboard" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/tensorboard.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
-
-# module "tensorboard_web" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/tensorboard-web.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
 
 module "pvc_viewer" {
   source     = "../utils/apply"
@@ -118,52 +70,105 @@ module "volume_web" {
 
 module "service" {
   source    = "../utils/service"
-  mode      = var.mode
   domain    = var.domain
-  prefix    = local.prefix
+  prefix    = var.prefix.kubeflow
   namespace = kubernetes_namespace.ns.metadata.0.name
-  port      = 8002
-  gateway   = true
+  port      = 8082
+  gateway   = "kubeflow-gateway"
   selector = {
     "app" = "centraldashboard"
   }
   depends_on = [module.centraldashboard]
 }
 
-# module "training_operator" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/training-operator.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
+resource "time_sleep" "wait_profile" {
+  create_duration = "60s"
+  depends_on      = [module.profile, module.admission_webhook]
+}
 
 module "user" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/user.yaml"
   args = {
-    domain = var.domain
+    email = var.email
   }
-  depends_on = [module.profile]
+  depends_on = [time_sleep.wait_profile]
 }
 
-# resource "time_sleep" "wait" {
-#   create_duration = "200s"
-#   depends_on      = [module.user]
-# }
+resource "time_sleep" "wait" {
+  create_duration = "200s"
+  depends_on      = [module.user]
+}
+
+resource "kubernetes_secret" "minio_creds" {
+  metadata {
+    name = "minio-secret"
+    namespace = "kubeflow-user"
+  }
+  data = {
+    AWS_ACCESS_KEY_ID = var.minio_creds.username
+    AWS_SECRET_ACCESS_KEY = var.minio_creds.password
+  }
+  depends_on = [time_sleep.wait]
+}
+
+module "user_policy" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/user-policy.yaml"
+  depends_on = [time_sleep.wait]
+}
 
 
-# data "kubernetes_secret" "minio" {
-#   metadata {
-#     name      = "minio-creds"
-#     namespace = "minio-storage"
-#   }
-# }
+module "pipeline" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/pipeline.yaml"
+  depends_on = [module.pipeline_crds]
+}
 
-# module "user_policy" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/user-policy.yaml"
-#   args = {
-#     username = data.kubernetes_secret.minio.data.username
-#     password = data.kubernetes_secret.minio.data.password
-#   }
-#   depends_on = [time_sleep.wait]
-# }
+# # module "knative_serving" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/knative-serving.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "knative_gateway" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/knative-gateway.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "kserve" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/kserve.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "kserve_web" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/kserve-web.yaml"
+# #   depends_on = [module.kserve]
+# # }
+
+# # module "katib" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/katib.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "tensorboard" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/tensorboard.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "tensorboard_web" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/tensorboard-web.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
+
+# # module "training_operator" {
+# #   source     = "../utils/apply"
+# #   yaml       = "${path.module}/yaml/training-operator.yaml"
+# #   depends_on = [kubernetes_namespace.ns]
+# # }
