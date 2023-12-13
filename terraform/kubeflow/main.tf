@@ -73,7 +73,7 @@ module "service" {
   domain    = var.domain
   prefix    = var.prefix.kubeflow
   namespace = kubernetes_namespace.ns.metadata.0.name
-  port      = 8082
+  port      = 8002
   gateway   = "kubeflow-gateway"
   selector = {
     "app" = "centraldashboard"
@@ -125,50 +125,50 @@ module "pipeline" {
   depends_on = [module.pipeline_crds]
 }
 
-# # module "knative_serving" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/knative-serving.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "tensorboard" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/tensorboard.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "knative_gateway" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/knative-gateway.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "tensorboard_web" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/tensorboard-web.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "kserve" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/kserve.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "knative_serving" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/knative-serving.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "kserve_web" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/kserve-web.yaml"
-# #   depends_on = [module.kserve]
-# # }
+module "knative_gateway" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/knative-gateway.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "katib" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/katib.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "kserve" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/kserve.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "tensorboard" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/tensorboard.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "kserve_web" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/kserve-web.yaml"
+  depends_on = [module.kserve]
+}
 
-# # module "tensorboard_web" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/tensorboard-web.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "katib" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/katib.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
-# # module "training_operator" {
-# #   source     = "../utils/apply"
-# #   yaml       = "${path.module}/yaml/training-operator.yaml"
-# #   depends_on = [kubernetes_namespace.ns]
-# # }
+module "training_operator" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/training-operator.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
