@@ -112,6 +112,22 @@ resource "kubernetes_secret" "minio_creds" {
   depends_on = [time_sleep.wait]
 }
 
+data "kubernetes_secret" "kubeconfig" {
+  metadata {
+    name = "kubeconfig"
+    namespace = "kube-system"
+  }
+  depends_on = [time_sleep.wait]
+}
+
+resource "kubernetes_secret" "admin_config" {
+  metadata {
+    name = "kubeconfig"
+    namespace = "kubeflow-user"
+  }
+  data = data.kubernetes_secret.kubeconfig.data
+}
+
 module "user_policy" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/user-policy.yaml"

@@ -33,3 +33,24 @@ spec:
   - name: secret-volume
     secret:
       secretName: minio-secret
+---
+apiVersion: "kubeflow.org/v1alpha1"
+kind: PodDefault
+metadata:
+  name: add-admin-permission
+  namespace: kubeflow-user
+spec:
+  selector:
+    matchLabels:
+      add-admin-permission: "true"
+  desc: "add admin permission"
+  volumeMounts:
+  - mountPath: /home/jovyan/.kube
+    name: config
+  volumes:
+  - name: config
+    secret:
+      secretName: kubeconfig
+      items:
+      - key: config
+        path: config
