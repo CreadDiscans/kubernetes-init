@@ -52,7 +52,7 @@ def get_token():
     driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_profile'))
     driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_email'))
     driver.find_element(By.CSS_SELECTOR, '[data-testid=save-application-button]').click()
-    time.sleep(1)
+    time.sleep(5)
     client_id = driver.find_element(By.ID, 'application_id').get_attribute('value')
     client_secret = driver.find_element(By.ID, '__BVID__194').get_attribute('value')
 

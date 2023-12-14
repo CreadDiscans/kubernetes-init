@@ -102,11 +102,11 @@ resource "time_sleep" "wait" {
 
 resource "kubernetes_secret" "minio_creds" {
   metadata {
-    name = "minio-secret"
+    name      = "minio-secret"
     namespace = "kubeflow-user"
   }
   data = {
-    AWS_ACCESS_KEY_ID = var.minio_creds.username
+    AWS_ACCESS_KEY_ID     = var.minio_creds.username
     AWS_SECRET_ACCESS_KEY = var.minio_creds.password
   }
   depends_on = [time_sleep.wait]
@@ -137,10 +137,15 @@ module "tensorboard_web" {
   depends_on = [kubernetes_namespace.ns]
 }
 
+module "knative_serving_crds" {
+  source = "../utils/apply"
+  yaml   = "${path.module}/yaml/knative-serving-crds.yaml"
+}
+
 module "knative_serving" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/knative-serving.yaml"
-  depends_on = [kubernetes_namespace.ns]
+  depends_on = [module.knative_serving_crds]
 }
 
 module "knative_gateway" {
@@ -149,10 +154,23 @@ module "knative_gateway" {
   depends_on = [kubernetes_namespace.ns]
 }
 
+module "kserve_crds" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/kserve-crds.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
+
+resource "null_resource" "solve_deadlock" {
+  provisioner "local-exec" {
+    command = "kubectl patch crd/inferenceservices.serving.kserve.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
+  }
+  depends_on = [module.kserve_crds]
+}
+
 module "kserve" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/kserve.yaml"
-  depends_on = [kubernetes_namespace.ns]
+  depends_on = [module.knative_serving, module.kserve_crds]
 }
 
 module "kserve_web" {
