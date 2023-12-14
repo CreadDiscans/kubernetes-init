@@ -49,6 +49,7 @@ data "kubernetes_secret" "oidc_secret" {
     name      = module.oidc.secret
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
+  depends_on = [module.oidc]
 }
 
 module "airflow" {

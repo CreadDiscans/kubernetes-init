@@ -27,7 +27,7 @@ resource "kubernetes_secret" "minio_creds" {
 }
 
 resource "time_sleep" "wait" {
-  create_duration = "40s"
+  create_duration = "80s"
   depends_on      = [module.operator]
 }
 

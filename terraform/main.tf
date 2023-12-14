@@ -5,19 +5,21 @@ module "nginx" {
 }
 
 module "nfs" {
-  source   = "./nfs"
-  nfs_ip   = var.nfs_ip
-  nfs_path = var.nfs_path
+  source     = "./nfs"
+  nfs_ip     = var.nfs_ip
+  nfs_path   = var.nfs_path
+  depends_on = [module.nginx]
 }
 
 module "istio" {
-  source = "./istio"
+  source     = "./istio"
+  depends_on = [module.nfs]
 }
 
 module "cnpg" {
   source      = "./cnpg"
   minio_creds = local.minio_creds
-  depends_on  = [module.nfs]
+  depends_on  = [module.istio]
 }
 
 module "gitlab" {
@@ -28,7 +30,7 @@ module "gitlab" {
     gitlab   = var.prefix.gitlab
     registry = var.prefix.registry
   }
-  depends_on = [module.nginx, module.cnpg]
+  depends_on = [module.cnpg]
 }
 
 module "minio" {
@@ -51,7 +53,7 @@ module "prometheus" {
     gitlab  = var.prefix.gitlab
   }
   password   = var.password
-  depends_on = [module.gitlab]
+  depends_on = [module.minio]
 }
 
 module "argocd" {
@@ -62,7 +64,7 @@ module "argocd" {
     gitlab = var.prefix.gitlab
   }
   password   = var.password
-  depends_on = [module.gitlab]
+  depends_on = [module.prometheus]
 }
 
 module "airflow" {
@@ -74,7 +76,7 @@ module "airflow" {
   }
   password    = var.password
   minio_creds = local.minio_creds
-  depends_on  = [module.minio]
+  depends_on  = [module.argocd]
 }
 
 module "kubeflow" {
@@ -87,7 +89,7 @@ module "kubeflow" {
   password    = var.password
   email       = var.email
   minio_creds = local.minio_creds
-  depends_on  = [module.istio, module.gitlab]
+  depends_on  = [module.istio, module.airflow]
 }
 
 # # module "redis" {

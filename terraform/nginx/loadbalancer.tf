@@ -36,7 +36,7 @@ module "metallb" {
 }
 
 resource "time_sleep" "wait_metallb" {
-  create_duration = "60s"
+  create_duration = "120s"
   depends_on      = [module.metallb]
 }
 
