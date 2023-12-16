@@ -54,7 +54,13 @@ def get_token():
     driver.find_element(By.CSS_SELECTOR, '[data-testid=save-application-button]').click()
     time.sleep(5)
     client_id = driver.find_element(By.ID, 'application_id').get_attribute('value')
-    client_secret = driver.find_element(By.ID, '__BVID__194').get_attribute('value')
+    while True:
+      try:
+        client_secret = driver.find_element(By.ID, '__BVID__194').get_attribute('value')
+        break
+      except:
+        print('error get secret, retrying')
+        time.sleep(10)
 
     return client_id, client_secret
 

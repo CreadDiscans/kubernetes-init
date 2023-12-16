@@ -95,9 +95,20 @@ module "user" {
   depends_on = [time_sleep.wait_profile]
 }
 
-resource "time_sleep" "wait" {
-  create_duration = "200s"
-  depends_on      = [module.user]
+resource "null_resource" "wait" {
+  provisioner "local-exec" {
+    command = <<EOF
+      while true; do
+        if [ $(kubectl get ns kubeflow-user 2> /dev/null | grep -c Active) -eq 1 ]
+        then
+            break
+        else
+            sleep 10
+        fi
+      done
+    EOF
+  }
+  depends_on = [module.user]
 }
 
 resource "kubernetes_secret" "minio_creds" {
@@ -109,29 +120,30 @@ resource "kubernetes_secret" "minio_creds" {
     AWS_ACCESS_KEY_ID     = var.minio_creds.username
     AWS_SECRET_ACCESS_KEY = var.minio_creds.password
   }
-  depends_on = [time_sleep.wait]
+  depends_on = [null_resource.wait]
 }
 
 data "kubernetes_secret" "kubeconfig" {
   metadata {
-    name = "kubeconfig"
+    name      = "kubeconfig"
     namespace = "kube-system"
   }
-  depends_on = [time_sleep.wait]
+  depends_on = [null_resource.wait]
 }
 
 resource "kubernetes_secret" "admin_config" {
   metadata {
-    name = "kubeconfig"
+    name      = "kubeconfig"
     namespace = "kubeflow-user"
   }
-  data = data.kubernetes_secret.kubeconfig.data
+  data       = data.kubernetes_secret.kubeconfig.data
+  depends_on = [null_resource.wait]
 }
 
 module "user_policy" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/user-policy.yaml"
-  depends_on = [time_sleep.wait]
+  depends_on = [null_resource.wait]
 }
 
 
