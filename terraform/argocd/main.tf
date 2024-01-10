@@ -76,6 +76,7 @@ resource "kubernetes_config_map" "rbac_config" {
     }
   }
   data = {
+    scopes = "[groups_direct]"
     "policy.csv" = <<EOF
 g, consoleAdmin, role:admin
     EOF
