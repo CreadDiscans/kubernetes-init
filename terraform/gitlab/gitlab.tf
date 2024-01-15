@@ -50,7 +50,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
       }
       spec {
         container {
-          image = "gitlab/gitlab-ce:16.6.0-ce.0"
+          image = "gitlab/gitlab-ce:16.7.3-ce.0"
           name  = "gitlab"
           resources {
             requests = {
