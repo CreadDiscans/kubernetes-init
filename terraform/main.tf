@@ -42,6 +42,7 @@ module "minio" {
   }
   password    = var.password
   minio_creds = local.minio_creds
+  oidc = var.minio_oidc
   depends_on  = [module.gitlab]
 }
 
@@ -52,6 +53,7 @@ module "prometheus" {
     grafana = var.prefix.grafana
     gitlab  = var.prefix.gitlab
   }
+  oidc = var.grafane_oidc
   password   = var.password
   depends_on = [module.minio]
 }

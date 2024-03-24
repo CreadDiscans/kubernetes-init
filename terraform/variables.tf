@@ -61,3 +61,17 @@ variable "prefix" {
     kubeflow = "kubeflow"
   }
 }
+
+variable "minio_oidc" {
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+}
+
+variable "grafane_oidc" {
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+}

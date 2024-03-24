@@ -12,3 +12,10 @@ variable "prefix" {
 variable "password" {
   type = string
 }
+
+variable "oidc" {
+  type = object({
+    client_id = string
+    client_secret = string
+  })
+}

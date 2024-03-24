@@ -35,25 +35,6 @@ resource "kubernetes_deployment" "grafana_deploy" {
       }
       spec {
         automount_service_account_token = false
-        init_container {
-          name  = "gitlab-oidc"
-          image = "creaddiscans/selenium_script:0.1"
-          volume_mount {
-            name       = "script"
-            mount_path = "/app"
-          }
-          volume_mount {
-            name       = "grafana-config"
-            mount_path = "/etc/grafana-raw"
-          }
-          volume_mount {
-            name = "grafana-config-with-oidc"
-            mount_path = "/etc/grafana"
-          }
-          security_context {
-            run_as_user = 0
-          }
-        }
         container {
           image = "grafana/grafana:9.5.3"
           name  = "grafana"
@@ -239,7 +220,7 @@ resource "kubernetes_deployment" "grafana_deploy" {
           }
           volume_mount {
             mount_path = "/etc/grafana"
-            name       = "grafana-config-with-oidc"
+            name       = "grafana-config"
             read_only  = false
           }
         }
@@ -436,16 +417,6 @@ resource "kubernetes_deployment" "grafana_deploy" {
           name = "grafana-config"
           secret {
             secret_name = "grafana-config"
-          }
-        }
-        volume {
-          name = "grafana-config-with-oidc"
-          empty_dir {}
-        }
-        volume {
-          name = "script"
-          config_map {
-            name = kubernetes_config_map.oidc_script.metadata.0.name
           }
         }
       }
