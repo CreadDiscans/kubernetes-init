@@ -1,15 +1,3 @@
-locals {
-  minio_creds = {
-    username = "minioadmin"
-    password = random_password.minio_password.result
-  }
-}
-
-resource "random_password" "minio_password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
 
 variable "external_ips" {
   type    = string
@@ -19,11 +7,6 @@ variable "external_ips" {
 variable "email" {
   type    = string
   default = "user@example.com"
-}
-
-variable "domain" {
-  type    = string
-  default = "example.com"
 }
 
 variable "nfs_ip" {
@@ -36,13 +19,14 @@ variable "nfs_path" {
   default = "/nfs"
 }
 
-variable "password" {
+variable "domain" {
   type    = string
-  default = "defaultpassword"
+  default = "example.com"
 }
 
 variable "prefix" {
   type = object({
+    keycloak = string
     gitlab   = string
     registry = string
     minio    = string
@@ -52,6 +36,7 @@ variable "prefix" {
     kubeflow = string
   })
   default = {
+    keycloak = "keycloak"
     gitlab   = "gitlab"
     registry = "registry"
     minio    = "minio"
@@ -62,16 +47,14 @@ variable "prefix" {
   }
 }
 
-variable "minio_oidc" {
+variable "admin" {
   type = object({
-    client_id     = string
-    client_secret = string
+    username = string
+    password = string
   })
+  default = {
+    username = "admin"
+    password = "admin"
+  }
 }
 
-variable "grafane_oidc" {
-  type = object({
-    client_id     = string
-    client_secret = string
-  })
-}

@@ -5,101 +5,97 @@ module "nginx" {
 }
 
 module "nfs" {
-  source     = "./nfs"
-  nfs_ip     = var.nfs_ip
-  nfs_path   = var.nfs_path
-  depends_on = [module.nginx]
+  source   = "./nfs"
+  nfs_ip   = var.nfs_ip
+  nfs_path = var.nfs_path
 }
 
 module "istio" {
-  source     = "./istio"
-  depends_on = [module.nfs]
+  source = "./istio"
 }
 
-module "cnpg" {
-  source      = "./cnpg"
-  minio_creds = local.minio_creds
-  depends_on  = [module.istio]
+module "keycloak" {
+  source     = "./keycloak"
+  domain     = var.domain
+  prefix     = var.prefix.keycloak
+  admin      = var.admin
+  depends_on = [module.nfs, module.nginx]
 }
 
-module "gitlab" {
-  source   = "./gitlab"
-  domain   = var.domain
-  password = var.password
-  prefix = {
-    gitlab   = var.prefix.gitlab
-    registry = var.prefix.registry
-  }
-  depends_on = [module.cnpg]
-}
+# module "cnpg" {
+#   source      = "./cnpg"
+#   minio_creds = local.minio_creds
+#   depends_on  = [module.istio]
+# }
 
-module "minio" {
-  source = "./minio"
-  domain = var.domain
-  prefix = {
-    minio  = var.prefix.minio
-    gitlab = var.prefix.gitlab
-  }
-  password    = var.password
-  minio_creds = local.minio_creds
-  oidc = var.minio_oidc
-  depends_on  = [module.gitlab]
-}
+# module "gitlab" {
+#   source   = "./gitlab"
+#   domain   = var.domain
+#   password = var.password
+#   prefix = {
+#     gitlab   = var.prefix.gitlab
+#     registry = var.prefix.registry
+#   }
+#   depends_on = [module.cnpg]
+# }
 
-module "prometheus" {
-  source = "./prometheus"
-  domain = var.domain
-  prefix = {
-    grafana = var.prefix.grafana
-    gitlab  = var.prefix.gitlab
-  }
-  oidc = var.grafane_oidc
-  password   = var.password
-  depends_on = [module.minio]
-}
+# module "minio" {
+#   source = "./minio"
+#   domain = var.domain
+#   prefix = {
+#     minio  = var.prefix.minio
+#     gitlab = var.prefix.gitlab
+#   }
+#   password    = var.password
+#   minio_creds = local.minio_creds
+#   oidc = var.minio_oidc
+#   depends_on  = [module.gitlab]
+# }
 
-module "argocd" {
-  source = "./argocd"
-  domain = var.domain
-  prefix = {
-    argocd = var.prefix.argocd
-    gitlab = var.prefix.gitlab
-  }
-  password   = var.password
-  depends_on = [module.prometheus]
-}
+# module "prometheus" {
+#   source = "./prometheus"
+#   domain = var.domain
+#   prefix = {
+#     grafana = var.prefix.grafana
+#     gitlab  = var.prefix.gitlab
+#   }
+#   oidc = var.grafane_oidc
+#   password   = var.password
+#   depends_on = [module.minio]
+# }
 
-module "airflow" {
-  source = "./airflow"
-  domain = var.domain
-  prefix = {
-    airflow = var.prefix.airflow
-    gitlab  = var.prefix.gitlab
-  }
-  password    = var.password
-  minio_creds = local.minio_creds
-  depends_on  = [module.argocd]
-}
+# module "argocd" {
+#   source = "./argocd"
+#   domain = var.domain
+#   prefix = {
+#     argocd = var.prefix.argocd
+#     gitlab = var.prefix.gitlab
+#   }
+#   password   = var.password
+#   depends_on = [module.prometheus]
+# }
 
-module "kubeflow" {
-  source = "./kubeflow"
-  domain = var.domain
-  prefix = {
-    kubeflow = var.prefix.kubeflow
-    gitlab   = var.prefix.gitlab
-  }
-  password    = var.password
-  email       = var.email
-  minio_creds = local.minio_creds
-  depends_on  = [module.istio, module.airflow]
-}
+# module "airflow" {
+#   source = "./airflow"
+#   domain = var.domain
+#   prefix = {
+#     airflow = var.prefix.airflow
+#     gitlab  = var.prefix.gitlab
+#   }
+#   password    = var.password
+#   minio_creds = local.minio_creds
+#   depends_on  = [module.argocd]
+# }
 
-# # module "redis" {
-# #   source = "./redis"
-# # }
-
-# # module "spark" {
-# #   source = "./spark"
-# #   mode   = var.mode
-# #   domain = var.domain
-# # }
+# module "kubeflow" {
+#   source = "./kubeflow"
+#   domain = var.domain
+#   prefix = {
+#     kubeflow = var.prefix.kubeflow
+#     gitlab   = var.prefix.gitlab
+#   }
+#   password    = var.password
+#   email       = var.email
+#   minio_creds = local.minio_creds
+#   depends_on  = [module.istio, module.airflow]
+# }

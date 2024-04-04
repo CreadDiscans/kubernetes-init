@@ -1,16 +1,4 @@
-resource "kubernetes_namespace" "ns" {
-  metadata {
-    name = "mysql"
-  }
-}
-
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-resource "kubernetes_persistent_volume_claim" "pvc" {
+resource "kubernetes_persistent_volume_claim" "mysql_pvc" {
   metadata {
     name      = "mysql-pvc"
     namespace = kubernetes_namespace.ns.metadata.0.name
@@ -37,13 +25,13 @@ resource "kubernetes_deployment" "mysql" {
     replicas = 1
     selector {
       match_labels = {
-        test = "mysql"
+        app = "mysql"
       }
     }
     template {
       metadata {
         labels = {
-          test = "mysql"
+          app = "mysql"
         }
       }
       spec {
@@ -52,7 +40,19 @@ resource "kubernetes_deployment" "mysql" {
           image = "mysql:8.0.26"
           env {
             name  = "MYSQL_ROOT_PASSWORD"
-            value = random_password.password.result
+            value = local.db.password
+          }
+          env {
+            name = "MYSQL_DATABASE"
+            value = local.db.name
+          }
+          env {
+            name = "MYSQL_USER"
+            value = local.db.user
+          }
+          env {
+            name = "MYSQL_PASSWORD"
+            value = local.db.password
           }
           port {
             container_port = 3306
@@ -65,7 +65,7 @@ resource "kubernetes_deployment" "mysql" {
         volume {
           name = "volume1"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.pvc.metadata.0.name
+            claim_name = kubernetes_persistent_volume_claim.mysql_pvc.metadata.0.name
           }
         }
       }
@@ -73,7 +73,7 @@ resource "kubernetes_deployment" "mysql" {
   }
 }
 
-resource "kubernetes_service" "svc" {
+resource "kubernetes_service" "mysql_svc" {
   metadata {
     name = "mysql-service"
     namespace = kubernetes_namespace.ns.metadata.0.name
