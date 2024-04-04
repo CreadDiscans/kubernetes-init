@@ -3,7 +3,7 @@ resource "kubernetes_namespace" "ns" {
     name = "ingress-nginx"
     labels = {
       "app.kubernetes.io/instance" = "ingress-nginx"
-      "app.kubernetes.io/name"     = "0ingress-nginx"
+      "app.kubernetes.io/name"     = "ingress-nginx"
     }
   }
 }
