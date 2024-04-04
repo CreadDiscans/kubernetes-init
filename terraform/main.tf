@@ -22,6 +22,13 @@ module "keycloak" {
   depends_on = [module.nfs, module.nginx]
 }
 
+module "minio" {
+  source   = "./minio"
+  domain   = var.domain
+  prefix   = var.prefix.minio
+  keycloak = module.keycloak.info
+}
+
 # module "cnpg" {
 #   source      = "./cnpg"
 #   minio_creds = local.minio_creds
@@ -37,19 +44,6 @@ module "keycloak" {
 #     registry = var.prefix.registry
 #   }
 #   depends_on = [module.cnpg]
-# }
-
-# module "minio" {
-#   source = "./minio"
-#   domain = var.domain
-#   prefix = {
-#     minio  = var.prefix.minio
-#     gitlab = var.prefix.gitlab
-#   }
-#   password    = var.password
-#   minio_creds = local.minio_creds
-#   oidc = var.minio_oidc
-#   depends_on  = [module.gitlab]
 # }
 
 # module "prometheus" {

@@ -56,7 +56,7 @@ resource "kubernetes_deployment" "minio_deploy" {
           resources {
             requests = {
               cpu    = "10m"
-              memory = "2048Mi"
+              memory = "1024Mi"
             }
             limits = {
               cpu    = "500m"
@@ -65,11 +65,11 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_ROOT_USER"
-            value = var.minio_creds.username
+            value = local.username
           }
           env {
             name  = "MINIO_ROOT_PASSWORD"
-            value = var.minio_creds.password
+            value = local.password
           }
           env {
             name  = "TZ"
@@ -81,11 +81,19 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CONFIG_URL"
-            value = "https://${var.prefix.gitlab}.${var.domain}/.well-known/openid-configuration"
+            value = "${var.keycloak.url}/realms/${local.realm}/.well-known/openid-configuration"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_CLIENT_ID"
+            value = local.client_id
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_CLIENT_SECRET"
+            value = local.client_secret
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_DISPLAY_NAME"
-            value = "gitlab-oidc"
+            value = "keycloak"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_SCOPES"
@@ -93,19 +101,23 @@ resource "kubernetes_deployment" "minio_deploy" {
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_CLAIM_NAME"
-            value = "groups_direct"
+            value = "policy"
           }
           env {
             name  = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC"
             value = "on"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_CLIENT_ID"
-            value = "${var.oidc.client_id}"
+            name  = "MINIO_IDENTITY_OPENID_VENDOR"
+            value = "keycloak"
           }
           env {
-            name = "MINIO_IDENTITY_OPENID_CLIENT_SECRET"
-            value = "${var.oidc.client_secret}"
+            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_ADMIN_URL"
+            value = "${var.keycloak.url}/admin"
+          }
+          env {
+            name  = "MINIO_IDENTITY_OPENID_KEYCLOAK_REALM"
+            value = local.realm
           }
           port {
             container_port = 9000
@@ -133,10 +145,10 @@ resource "kubernetes_deployment" "minio_deploy" {
   }
 }
 
-module "service" {
+module "web_service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.minio
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 9001
   selector = {
@@ -144,19 +156,13 @@ module "service" {
   }
 }
 
-resource "kubernetes_service" "gateway" {
-  metadata {
-    name      = "minio-gateway-service"
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  spec {
-    port {
-      port        = 9000
-      target_port = 9000
-      protocol    = "TCP"
-    }
-    selector = {
-      app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
-    }
+module "api_service" {
+  source    = "../utils/service"
+  domain    = var.domain
+  prefix    = "${var.prefix}-api"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+  port      = 9000
+  selector = {
+    app = kubernetes_deployment.minio_deploy.metadata.0.labels.app
   }
 }

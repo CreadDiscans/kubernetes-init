@@ -26,3 +26,11 @@ variable "admin" {
     password = string
   })
 }
+
+output "info" {
+    value = {
+        url = "https://${var.prefix}.${var.domain}"
+        username = var.admin.username
+        password = var.admin.password
+    }
+}
