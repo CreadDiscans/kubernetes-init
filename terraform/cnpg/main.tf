@@ -50,6 +50,7 @@ module "cluster" {
   yaml   = "${path.module}/yaml/cnpg-cluster.yaml"
   args = {
     current = time_static.current.rfc3339
+    minio_url = var.minio_creds.url
     services = [
       module.airflow.info,
       module.gitlab.info
@@ -64,29 +65,29 @@ module "backup_weekly" {
   depends_on = [module.cluster]
 }
 
-resource "kubernetes_service" "export_cnpg" {
-  metadata {
-    name      = "cnpg-service"
-    namespace = "cnpg-system"
-  }
-  lifecycle {
-    ignore_changes = [
-      metadata.0.annotations
-    ]
-  }
-  spec {
-    selector = {
-      "cnpg.io/cluster" = "cluster-cnpg"
-      role              = "primary"
-    }
-    port {
-      port        = 5432
-      target_port = 5432
-    }
-    type = "LoadBalancer"
-  }
-  depends_on = [module.cluster]
-}
+# resource "kubernetes_service" "export_cnpg" {
+#   metadata {
+#     name      = "cnpg-service"
+#     namespace = "cnpg-system"
+#   }
+#   lifecycle {
+#     ignore_changes = [
+#       metadata.0.annotations
+#     ]
+#   }
+#   spec {
+#     selector = {
+#       "cnpg.io/cluster" = "cluster-cnpg"
+#       role              = "primary"
+#     }
+#     port {
+#       port        = 5432
+#       target_port = 5432
+#     }
+#     type = "LoadBalancer"
+#   }
+#   depends_on = [module.cluster]
+# }
 
 resource "null_resource" "wait" {
   provisioner "local-exec" {

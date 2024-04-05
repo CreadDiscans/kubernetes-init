@@ -29,3 +29,11 @@ variable "keycloak" {
     password = string
   })
 }
+
+output "creds" {
+  value = {
+    url = "http://${var.prefix}-api-service.minio-storage"
+    username = local.username
+    password = local.password
+  }
+}

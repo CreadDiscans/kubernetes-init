@@ -29,11 +29,10 @@ module "minio" {
   keycloak = module.keycloak.info
 }
 
-# module "cnpg" {
-#   source      = "./cnpg"
-#   minio_creds = local.minio_creds
-#   depends_on  = [module.istio]
-# }
+module "cnpg" {
+  source      = "./cnpg"
+  minio_creds = module.minio.creds
+}
 
 # module "gitlab" {
 #   source   = "./gitlab"
