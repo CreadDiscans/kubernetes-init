@@ -51,16 +51,12 @@ module "prometheus" {
   keycloak = module.keycloak.info
 }
 
-# module "argocd" {
-#   source = "./argocd"
-#   domain = var.domain
-#   prefix = {
-#     argocd = var.prefix.argocd
-#     gitlab = var.prefix.gitlab
-#   }
-#   password   = var.password
-#   depends_on = [module.prometheus]
-# }
+module "argocd" {
+  source = "./argocd"
+  domain = var.domain
+  prefix = var.prefix.argocd
+  keycloak = module.keycloak.info
+}
 
 # module "airflow" {
 #   source = "./airflow"
