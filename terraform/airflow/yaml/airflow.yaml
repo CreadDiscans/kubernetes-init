@@ -477,25 +477,38 @@ metadata:
   namespace: airflow
 data:
   webserver_config.py: |-
+    import os
     import logging
     import jwt
-    import requests
-    from airflow.www.security import AirflowSecurityManager
+    import base64
+    import json
+
+    from flask import redirect, session
+    from flask_appbuilder import expose
     from flask_appbuilder.security.manager import AUTH_OAUTH
+    from flask_appbuilder.security.views import AuthOAuthView
 
-    MY_PROVIDER = 'gitlab'
-    AUTH_TYPE = AUTH_OAUTH
+    from airflow.www.security import AirflowSecurityManager
 
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    log = logging.getLogger(__name__)
+
+    MY_PROVIDER = 'keycloak'
     CLIENT_ID = '${client_id}'
     CLIENT_SECRET = '${client_secret}'
+    KEYCLOAK_BASE_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/'
+    KEYCLOAK_TOKEN_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/token'
+    KEYCLOAK_AUTH_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/auth'
+
+    AUTH_TYPE = AUTH_OAUTH
     AUTH_USER_REGISTRATION = True
     AUTH_USER_REGISTRATION_ROLE = "Public"
     AUTH_ROLES_SYNC_AT_LOGIN = True
-    CSRF_ENABLED = True
+    PERMANENT_SESSION_LIFETIME = 1800
 
     AUTH_ROLES_MAPPING = {
-        "Airflow_Users": ["User"],
-        "Airflow_Admins": ["Admin"],
+        "airflow_public": ["Public"],
+        "airflow_admin": ["Admin"],
     }
     OAUTH_PROVIDERS = [
       {
@@ -506,36 +519,52 @@ data:
           'client_id': CLIENT_ID,
           'client_secret': CLIENT_SECRET,
           'client_kwargs': {
-            'scope': 'email profile api',
+            'scope': 'email profile',
           },
-          'api_base_url': '${gitlab_host}/api/v4',
+          'api_base_url': KEYCLOAK_BASE_URL,
           'request_token_url': None,
-          'access_token_url': '${gitlab_host}/oauth/token',
-          'authorize_url': '${gitlab_host}/oauth/authorize',
+          'access_token_url': KEYCLOAK_TOKEN_URL,
+          'authorize_url': KEYCLOAK_AUTH_URL,
         }
       }
     ]
     
+    class CustomAuthRemoteUserView(AuthOAuthView):
+      @expose("/logout/")
+      def logout(self):
+        """Delete access token before logging out."""
+        return super().logout()
+
     class CustomSecurityManager(AirflowSecurityManager):
+      authoauthview = CustomAuthRemoteUserView
+      
       def oauth_user_info(self, provider, response):
         if provider == MY_PROVIDER:
-          token = response['access_token']
-          res = requests.get('${gitlab_host}/api/v4/user/', headers={
-            'Authorization': response['token_type'] + ' ' + token
-          })
-          data = res.json()
+          token = response["access_token"]
+          payload = token.split('.')[1]
+          me = json.loads(base64.b64decode(payload.encode() + b'='*(-len(payload) % 4)).decode('utf-8'))
+
+          groups = me.get('groups') # unsafe
+          if '/airflow' in groups:
+            groups = ["airflow_admin"]
+          else:
+            groups = ["airflow_public"]
+
           userinfo = {
-            'username': data['username'],
-            'email': data['email'],
-            'first_name': data['name'],
-            'last_name': data['name'],
-            'role_keys': ["Airflow_Admins"]
+            "username": me.get("preferred_username"),
+            "email": me.get("email"),
+            "first_name": me.get("given_name"),
+            "last_name": me.get("family_name"),
+            "role_keys": groups,
           }
+          log.info("user info: {0}".format(userinfo))
           return userinfo
         else:
           return {}
 
     SECURITY_MANAGER_CLASS = CustomSecurityManager
+    
+    APP_THEME = "simplex.css"
 
 ---
 # Source: airflow/templates/rbac/pod-launcher-role.yaml

@@ -58,3 +58,6 @@ variable "admin" {
   }
 }
 
+variable "airflow_repo" {
+  type = string
+}

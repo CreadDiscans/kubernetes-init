@@ -58,17 +58,14 @@ module "argocd" {
   keycloak = module.keycloak.info
 }
 
-# module "airflow" {
-#   source = "./airflow"
-#   domain = var.domain
-#   prefix = {
-#     airflow = var.prefix.airflow
-#     gitlab  = var.prefix.gitlab
-#   }
-#   password    = var.password
-#   minio_creds = local.minio_creds
-#   depends_on  = [module.argocd]
-# }
+module "airflow" {
+  source = "./airflow"
+  domain = var.domain
+  prefix = var.prefix.airflow
+  minio_creds = module.minio.creds
+  keycloak = module.keycloak.info
+  airflow_repo = var.airflow_repo
+}
 
 # module "kubeflow" {
 #   source = "./kubeflow"

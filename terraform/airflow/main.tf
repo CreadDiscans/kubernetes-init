@@ -4,17 +4,13 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-resource "random_password" "password" {
-  length = 16
-}
-
 resource "kubernetes_secret" "webserver_secret" {
   metadata {
     name      = "webserver-secret"
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   data = {
-    webserver-secret-key = random_password.password.result
+    webserver-secret-key = local.password
   }
 }
 
@@ -35,41 +31,30 @@ resource "kubernetes_secret" "cnpg_db" {
   }
 }
 
-module "oidc" {
-  source       = "../utils/oidc"
-  namespace    = kubernetes_namespace.ns.metadata.0.name
-  gitlab_host  = "https://${var.prefix.gitlab}.${var.domain}"
-  password     = var.password
-  redirect_uri = "https://${var.prefix.airflow}.${var.domain}/oauth-authorized/gitlab"
-  name         = "airflow"
-}
-
-data "kubernetes_secret" "oidc_secret" {
+data "kubernetes_secret" "gitlab_secret" {
   metadata {
-    name      = module.oidc.secret
-    namespace = kubernetes_namespace.ns.metadata.0.name
+    name      = "gitlab-secret"
+    namespace = "gitlab-devops"
   }
-  depends_on = [module.oidc]
 }
 
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
   args = {
-    git_repo      = "https://root:${var.password}@${var.prefix.gitlab}.${var.domain}/consoleAdmin/airflow"
-    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${local.minio_url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
-    client_id     = data.kubernetes_secret.oidc_secret.data.client_id
-    client_secret = data.kubernetes_secret.oidc_secret.data.client_secret
-    gitlab_host   = "https://${var.prefix.gitlab}.${var.domain}"
-    domain        = var.domain
+    git_repo      = "https://root:${urlencode(data.kubernetes_secret.gitlab_secret.data.GITLAB_ROOT_PASSWORD)}@${var.airflow_repo}"
+    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${var.minio_creds.url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
+    client_id     = local.client_id
+    client_secret = local.client_secret
+    keycloak_url  = var.keycloak.url
+    realm         = local.realm
   }
-  depends_on = [time_sleep.wait]
 }
 
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.airflow
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {

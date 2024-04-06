@@ -27,6 +27,17 @@ resource "kubernetes_persistent_volume_claim" "deploy_pvc" {
   }
 }
 
+
+resource "kubernetes_secret" "secret" {
+  metadata {
+    name = "gitlab-secret"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    "GITLAB_ROOT_PASSWORD" = local.password
+  }
+}
+
 resource "kubernetes_deployment" "gitlab_deploy" {
   metadata {
     name      = "gitlab-deploy"
@@ -74,9 +85,10 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             name  = "TZ"
             value = "Asia/Seoul"
           }
-          env {
-            name  = "GITLAB_ROOT_PASSWORD"
-            value = local.password
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.secret.metadata.0.name
+            }
           }
           env {
             name  = "GITLAB_SKIP_UNMIGRATED_DATA_CHECK"
