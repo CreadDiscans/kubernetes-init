@@ -50,7 +50,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
       }
       spec {
         container {
-          image = "gitlab/gitlab-ce:16.7.3-ce.0"
+          image = "gitlab/gitlab-ce:16.10.1-ce.0"
           name  = "gitlab"
           resources {
             requests = {
@@ -68,6 +68,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
               port = 80
             }
             failure_threshold = 1000
+            period_seconds = 10
           }
           env {
             name  = "TZ"
@@ -75,7 +76,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           }
           env {
             name  = "GITLAB_ROOT_PASSWORD"
-            value = var.password
+            value = local.password
           }
           env {
             name  = "GITLAB_SKIP_UNMIGRATED_DATA_CHECK"
@@ -99,6 +100,28 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             gitlab_rails['db_password'] = "${data.kubernetes_secret.db.data.password}"
             gitlab_rails['db_host'] = "cluster-cnpg-rw.cnpg-system"
             gitlab_rails['db_port'] = 5432
+            gitlab_rails['omniauth_block_auto_created_users'] = false
+            gitlab_rails['omniauth_providers'] = [
+              {
+                name: "openid_connect", # do not change this parameter
+                label: "Keycloak", # optional label for login button, defaults to "Openid Connect"
+                args: {
+                  name: "openid_connect",
+                  scope: ["openid", "profile", "email"],
+                  response_type: "code",
+                  issuer:  "${var.keycloak.url}/realms/${local.realm}",
+                  client_auth_method: "query",
+                  discovery: true,
+                  uid_field: "preferred_username",
+                  pkce: true,
+                  client_options: {
+                    identifier: "${local.client_id}",
+                    secret: "${local.client_secret}",
+                    redirect_uri: "https://${var.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
+                  }
+                }
+              }
+            ]
             # redis['enable'] = false
             # gitlab_rails['redis_host'] = 'redis-sentinel-sentinel.redis'
             # gitlab_rails['redis_port'] = 26379

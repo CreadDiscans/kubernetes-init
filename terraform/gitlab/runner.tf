@@ -100,7 +100,7 @@ import os
 
 host = "https://${var.prefix.gitlab}.${var.domain}"
 username = "root"
-password = "${var.password}"
+password = "${local.password}"
 source = "/etc/gitlab-runner/config.toml"
 destination = "/etc/gitlab-runner-getter/config.toml"
 

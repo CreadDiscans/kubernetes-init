@@ -34,16 +34,16 @@ module "cnpg" {
   minio_creds = module.minio.creds
 }
 
-# module "gitlab" {
-#   source   = "./gitlab"
-#   domain   = var.domain
-#   password = var.password
-#   prefix = {
-#     gitlab   = var.prefix.gitlab
-#     registry = var.prefix.registry
-#   }
-#   depends_on = [module.cnpg]
-# }
+module "gitlab" {
+  source   = "./gitlab"
+  domain   = var.domain
+  prefix = {
+    gitlab   = var.prefix.gitlab
+    registry = var.prefix.registry
+  }
+  keycloak = module.keycloak.info
+  # depends_on = [module.cnpg]
+}
 
 # module "prometheus" {
 #   source = "./prometheus"

@@ -7,7 +7,7 @@ resource "keycloak_openid_client" "openid_client" {
   client_secret                   = local.client_secret
   direct_access_grants_enabled    = true
   standard_flow_enabled           = true
-  valid_redirect_uris             = ["https://${var.prefix}.${var.domain}/oauth_callback"]
+  valid_redirect_uris             = ["https://${var.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"]
   valid_post_logout_redirect_uris = []
   base_url                        = ""
   root_url                        = ""
@@ -17,9 +17,6 @@ resource "keycloak_openid_client" "openid_client" {
 resource "keycloak_group" "group" {
   realm_id = local.realm
   name     = local.client_id
-  attributes = {
-    policy = "consoleAdmin"
-  }
 }
 
 resource "keycloak_openid_client_scope" "auth" {
@@ -34,18 +31,6 @@ resource "keycloak_openid_group_membership_protocol_mapper" "auth_mapper" {
   client_scope_id = keycloak_openid_client_scope.auth.id
   name            = "groups"
   claim_name      = "groups"
-}
-
-resource "keycloak_openid_user_attribute_protocol_mapper" "minio_auth_mapper" {
-  realm_id             = local.realm
-  client_scope_id      = keycloak_openid_client_scope.auth.id
-  name                 = "minio-policy-mapper"
-  user_attribute       = "policy"
-  claim_name           = "policy"
-  add_to_id_token      = true
-  claim_value_type     = "String"
-  multivalued          = true
-  aggregate_attributes = true
 }
 
 resource "keycloak_openid_client_default_scopes" "default_scopes" {
