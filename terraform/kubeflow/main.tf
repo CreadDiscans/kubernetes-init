@@ -71,7 +71,7 @@ module "volume_web" {
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.kubeflow
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8002
   gateway   = "kubeflow-gateway"
@@ -147,74 +147,74 @@ module "user_policy" {
 }
 
 
-module "pipeline" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/pipeline.yaml"
-  depends_on = [module.pipeline_crds]
-}
+# module "pipeline" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/pipeline.yaml"
+#   depends_on = [module.pipeline_crds]
+# }
 
-module "tensorboard" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/tensorboard.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "tensorboard" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/tensorboard.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
-module "tensorboard_web" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/tensorboard-web.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "tensorboard_web" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/tensorboard-web.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
-module "knative_serving_crds" {
-  source = "../utils/apply"
-  yaml   = "${path.module}/yaml/knative-serving-crds.yaml"
-}
+# module "knative_serving_crds" {
+#   source = "../utils/apply"
+#   yaml   = "${path.module}/yaml/knative-serving-crds.yaml"
+# }
 
-module "knative_serving" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/knative-serving.yaml"
-  depends_on = [module.knative_serving_crds]
-}
+# module "knative_serving" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/knative-serving.yaml"
+#   depends_on = [module.knative_serving_crds]
+# }
 
-module "knative_gateway" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/knative-gateway.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "knative_gateway" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/knative-gateway.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
-module "kserve_crds" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/kserve-crds.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "kserve_crds" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/kserve-crds.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
-resource "null_resource" "solve_deadlock" {
-  provisioner "local-exec" {
-    command = "kubectl patch crd/inferenceservices.serving.kserve.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
-  }
-  depends_on = [module.kserve_crds]
-}
+# resource "null_resource" "solve_deadlock" {
+#   provisioner "local-exec" {
+#     command = "kubectl patch crd/inferenceservices.serving.kserve.io -p '{\"metadata\":{\"finalizers\":[]}}' --type=merge"
+#   }
+#   depends_on = [module.kserve_crds]
+# }
 
-module "kserve" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/kserve.yaml"
-  depends_on = [module.knative_serving, module.kserve_crds]
-}
+# module "kserve" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/kserve.yaml"
+#   depends_on = [module.knative_serving, module.kserve_crds]
+# }
 
-module "kserve_web" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/kserve-web.yaml"
-  depends_on = [module.kserve]
-}
+# module "kserve_web" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/kserve-web.yaml"
+#   depends_on = [module.kserve]
+# }
 
-module "katib" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/katib.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "katib" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/katib.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
-module "training_operator" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/training-operator.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "training_operator" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/training-operator.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }

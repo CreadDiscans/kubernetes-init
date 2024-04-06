@@ -21,7 +21,8 @@ spec:
             name: authservice
       containers:
       - name: authservice 
-        image: creaddiscans/authservice:1.0.14
+        # image: creaddiscans/authservice:1.0.14
+        image: creaddiscans/authservice:0.13
         imagePullPolicy: IfNotPresent
         resources:
           requests:

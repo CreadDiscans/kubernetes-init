@@ -1,19 +1,16 @@
 locals {
-  gitlab_host = "https://${var.prefix.gitlab}.${var.domain}"
+  realm = "master"
+  client_id = "kubeflow"
+  client_secret = random_uuid.client_secret.result
 }
+
+resource "random_uuid" "client_secret" {}
 
 variable "domain" {
   type = string
 }
 
 variable "prefix" {
-  type = object({
-    kubeflow = string
-    gitlab   = string
-  })
-}
-
-variable "password" {
   type = string
 }
 
@@ -23,6 +20,15 @@ variable "email" {
 
 variable "minio_creds" {
   type = object({
+    url = string
+    username = string
+    password = string
+  })
+}
+
+variable "keycloak" {
+  type = object({
+    url = string
     username = string
     password = string
   })

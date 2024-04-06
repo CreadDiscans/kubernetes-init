@@ -1,20 +1,20 @@
 
-module "oidc" {
-  source       = "../utils/oidc"
-  namespace    = "istio-system"
-  gitlab_host  = local.gitlab_host
-  password     = var.password
-  redirect_uri = "https://${var.prefix.kubeflow}.${var.domain}/authservice_callback"
-  name         = "kubeflow"
-}
+# module "oidc" {
+#   source       = "../utils/oidc"
+#   namespace    = "istio-system"
+#   gitlab_host  = local.gitlab_host
+#   password     = var.password
+#   redirect_uri = "https://${var.prefix.kubeflow}.${var.domain}/authservice_callback"
+#   name         = "kubeflow"
+# }
 
-data "kubernetes_secret" "oidc_secret" {
-  metadata {
-    name      = module.oidc.secret
-    namespace = "istio-system"
-  }
-  depends_on = [module.oidc]
-}
+# data "kubernetes_secret" "oidc_secret" {
+#   metadata {
+#     name      = module.oidc.secret
+#     namespace = "istio-system"
+#   }
+#   depends_on = [module.oidc]
+# }
 
 resource "kubernetes_config_map" "authservice_configmap" {
   metadata {
@@ -33,25 +33,24 @@ resource "kubernetes_config_map" "authservice_configmap" {
       "name": "idp_filter_chain",
       "match": {
         "header": ":authority",
-        "prefix": "${var.prefix.kubeflow}",
+        "prefix": "${var.prefix}",
       },
       "filters": [
       {
         "oidc":
           {
-            "authorization_uri": "${local.gitlab_host}/oauth/authorize",
-            "token_uri": "${local.gitlab_host}/oauth/token",
-            "user_api_uri": "${local.gitlab_host}/api/v4/user/",
-            "callback_uri": "https://${var.prefix.kubeflow}.${var.domain}/authservice_callback",
+            "authorization_uri": "${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/auth",
+            "token_uri": "${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/token",
+            "callback_uri": "https://${var.prefix}.${var.domain}/authservice_callback",
             "jwks_fetcher": {
-              "jwks_uri": "${local.gitlab_host}/oauth/discovery/keys",
+              "jwks_uri": "${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/certs",
               "periodic_fetch_interval_sec": 10,
               "skip_verify_peer_cert": true
             },
-            "client_id": "${data.kubernetes_secret.oidc_secret.data.client_id}",
-            "client_secret": "${data.kubernetes_secret.oidc_secret.data.client_secret}",
-            "cookie_name_prefix":"${var.prefix.kubeflow}",
-            "scopes": ["openid", "email", "api"],
+            "client_id": "${local.client_id}",
+            "client_secret": "${local.client_secret}",
+            "cookie_name_prefix":"${local.client_id}",
+            "scopes": [],
             "id_token": {
               "preamble": "Bearer",
               "header": "Authorization"
@@ -62,9 +61,12 @@ resource "kubernetes_config_map" "authservice_configmap" {
             },
             "logout": {
               "path": "/authservice_logout",
-              "redirect_uri": "${local.gitlab_host}/users/sign_out"
+              "redirect_uri": "${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/logout"
             },
             "skip_verify_peer_cert": true,
+            "group":"/${local.client_id}",
+            "error_uri":"${var.keycloak.url}/403"
+
           }
         }
       ]

@@ -35,8 +35,8 @@ module "cnpg" {
 }
 
 module "gitlab" {
-  source   = "./gitlab"
-  domain   = var.domain
+  source = "./gitlab"
+  domain = var.domain
   prefix = {
     gitlab   = var.prefix.gitlab
     registry = var.prefix.registry
@@ -45,37 +45,33 @@ module "gitlab" {
 }
 
 module "prometheus" {
-  source = "./prometheus"
-  domain = var.domain
-  prefix = var.prefix.grafana
+  source   = "./prometheus"
+  domain   = var.domain
+  prefix   = var.prefix.grafana
   keycloak = module.keycloak.info
 }
 
 module "argocd" {
-  source = "./argocd"
-  domain = var.domain
-  prefix = var.prefix.argocd
+  source   = "./argocd"
+  domain   = var.domain
+  prefix   = var.prefix.argocd
   keycloak = module.keycloak.info
 }
 
 module "airflow" {
-  source = "./airflow"
-  domain = var.domain
-  prefix = var.prefix.airflow
-  minio_creds = module.minio.creds
-  keycloak = module.keycloak.info
+  source       = "./airflow"
+  domain       = var.domain
+  prefix       = var.prefix.airflow
+  minio_creds  = module.minio.creds
+  keycloak     = module.keycloak.info
   airflow_repo = var.airflow_repo
 }
 
-# module "kubeflow" {
-#   source = "./kubeflow"
-#   domain = var.domain
-#   prefix = {
-#     kubeflow = var.prefix.kubeflow
-#     gitlab   = var.prefix.gitlab
-#   }
-#   password    = var.password
-#   email       = var.email
-#   minio_creds = local.minio_creds
-#   depends_on  = [module.istio, module.airflow]
-# }
+module "kubeflow" {
+  source      = "./kubeflow"
+  domain      = var.domain
+  prefix      = var.prefix.kubeflow
+  email       = var.email
+  minio_creds = module.minio.creds
+  keycloak    = module.keycloak.info
+}
