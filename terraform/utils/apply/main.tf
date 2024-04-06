@@ -31,7 +31,7 @@ resource "null_resource" "apply" {
   }
   provisioner "local-exec" {
     when    = create
-    command = "kubectl apply -f ${self.triggers.yaml}"
+    command = "kubectl apply -f ${self.triggers.yaml} --server-side=true"
   }
   provisioner "local-exec" {
     when    = destroy

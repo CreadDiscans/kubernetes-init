@@ -42,20 +42,14 @@ module "gitlab" {
     registry = var.prefix.registry
   }
   keycloak = module.keycloak.info
-  # depends_on = [module.cnpg]
 }
 
-# module "prometheus" {
-#   source = "./prometheus"
-#   domain = var.domain
-#   prefix = {
-#     grafana = var.prefix.grafana
-#     gitlab  = var.prefix.gitlab
-#   }
-#   oidc = var.grafane_oidc
-#   password   = var.password
-#   depends_on = [module.minio]
-# }
+module "prometheus" {
+  source = "./prometheus"
+  domain = var.domain
+  prefix = var.prefix.grafana
+  keycloak = module.keycloak.info
+}
 
 # module "argocd" {
 #   source = "./argocd"

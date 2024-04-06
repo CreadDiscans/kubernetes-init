@@ -31,18 +31,22 @@ resource "kubernetes_secret" "config" {
 [date_formats]
 default_timezone = UTC
 [server]
-root_url = https://${var.prefix.grafana}.${var.domain}
+root_url = https://${var.prefix}.${var.domain}
 [auth]
+signout_redirect_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/logout
 disable_login_form = true
-[auth.gitlab]
+[auth.generic_oauth]
 enabled = true
-client_id = '${var.oidc.client_id}'
-client_secret = '${var.oidc.client_secret}'
-auth_url = https://${var.prefix.gitlab}.${var.domain}/oauth/authorize
-token_url = https://${var.prefix.gitlab}.${var.domain}/oauth/token
-api_url = https://${var.prefix.gitlab}.${var.domain}/api/v4
-scopes = openid email profile api
-role_attribute_path: contains(groups[*], 'consoleAdmin') && 'Admin' || 'Viewer'
+name = Keycloak-OAuth
+allow_sign_up = true
+scopes = openid email profile offline_access
+client_id = '${local.client_id}'
+client_secret = '${local.client_secret}'
+auth_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/auth
+token_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/token
+api_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/userinfo
+role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
+tls_skip_verify_insecure = true
     EOF
   }
 }
@@ -56,7 +60,7 @@ module "manifests" {
 module "grafana" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.grafana
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 3000
   selector = {

@@ -1,21 +1,23 @@
+locals {
+  realm = "master"
+  client_id = "grafana"
+  client_secret = random_uuid.client_secret.result
+}
+
+resource "random_uuid" "client_secret" {}
+
 variable "domain" {
   type = string
 }
 
 variable "prefix" {
-  type = object({
-    grafana = string
-    gitlab = string
-  })
-}
-
-variable "password" {
   type = string
 }
 
-variable "oidc" {
+variable "keycloak" {
   type = object({
-    client_id = string
-    client_secret = string
+    url = string
+    username = string
+    password = string
   })
 }
