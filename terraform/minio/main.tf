@@ -56,7 +56,7 @@ resource "kubernetes_deployment" "minio_deploy" {
           resources {
             requests = {
               cpu    = "10m"
-              memory = "1Gi"
+              memory = "2Gi"
             }
             limits = {
               cpu    = "1"
