@@ -56,11 +56,11 @@ resource "kubernetes_deployment" "minio_deploy" {
           resources {
             requests = {
               cpu    = "10m"
-              memory = "1024Mi"
+              memory = "1Gi"
             }
             limits = {
-              cpu    = "500m"
-              memory = "2048Mi"
+              cpu    = "1"
+              memory = "4Gi"
             }
           }
           env {
