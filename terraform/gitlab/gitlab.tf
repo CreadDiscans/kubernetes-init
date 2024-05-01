@@ -66,11 +66,11 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           resources {
             requests = {
               cpu    = "100m"
-              memory = "512Mi"
+              memory = "4Gi"
             }
             limits = {
               cpu    = 1
-              memory = "4096Mi"
+              memory = "8Gi"
             }
           }
           startup_probe {
