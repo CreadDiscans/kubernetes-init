@@ -51,3 +51,12 @@ node-exporter CrashBackoff
     - node-exporter pod 재시작
     - default_runtime_name = "runc" 를 default_runtime_name = "nvidia" 로 교체
     - sudo service containerd restart
+
+# nvidia auto upgrade disable
+
+/etc/apt/apt.conf.d/50unattended-upgrades
+Unattended-Upgrade::Package-Blacklist {
+        "nvidia-";
+        "libnvidia-";
+        ...
+}
