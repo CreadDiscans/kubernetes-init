@@ -55,8 +55,10 @@ node-exporter CrashBackoff
 # nvidia auto upgrade disable
 
 /etc/apt/apt.conf.d/50unattended-upgrades
-Unattended-Upgrade::Package-Blacklist {
+
+    Unattended-Upgrade::Package-Blacklist {
         "nvidia-";
         "libnvidia-";
         ...
-}
+    }
+
