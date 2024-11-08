@@ -37,3 +37,17 @@ https://github.com/derailed/k9s/releases
 # Post Install
 
 [airflow/Readme.md]
+
+# Troubleshooting
+
+/run 용량 증가 : sudo mount -t tmpfs tmpfs /run -o remount,size=10G
+
+node-exporter CrashBackoff
+
+    - 해당 node ssh로 접속
+    - sudo vi /etc/containerd/config.toml
+    - default_runtime_name = "nvidia" 를 default_runtime_name = "runc" 로 교체
+    - sudo service containerd restart
+    - node-exporter pod 재시작
+    - default_runtime_name = "runc" 를 default_runtime_name = "nvidia" 로 교체
+    - sudo service containerd restart
