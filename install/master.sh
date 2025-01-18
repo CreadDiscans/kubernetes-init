@@ -6,8 +6,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl create secret generic kubeconfig --from-file=$HOME/.kube/config -n kube-system
 
 # calico cni
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/tigera-operator.yaml
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
 
 # node ssh key
 mkdir -p $HOME/.ssh
@@ -22,7 +22,7 @@ kubectl create secret generic node-ssh \
 kubectl create -f nvidia-device-plugin-daemonset.yaml
 
 # k9s
-wget https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz
+wget https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_Linux_amd64.tar.gz
 tar -zxvf k9s_Linux_amd64.tar.gz 
 sudo mv k9s /usr/bin/k9s
 rm k9s_Linux_amd64.tar.gz
