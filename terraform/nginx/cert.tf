@@ -1,6 +1,13 @@
+resource "kubernetes_namespace" "ns_cert_manager" {
+  metadata {
+    name = "cert-manager"
+  }
+}
+
 module "cert_manager" {
-  source = "../utils/apply"
-  yaml   = "${path.module}/yaml/cert-manager-v1.12.3.yaml"
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/cert-manager-v1.16.3.yaml"
+  depends_on = [kubernetes_namespace.ns_cert_manager]
 }
 
 resource "time_sleep" "wait_cert_manager" {

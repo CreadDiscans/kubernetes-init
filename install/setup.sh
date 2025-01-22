@@ -75,3 +75,14 @@ sudo mkdir -p /proc/sys/net/bridge
 sudo echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 sudo sysctl -p
+
+# fstab /run size 30G
+LINE="tmpfs /run tmpfs defaults,size=30G 0 0"
+# /etc/fstab 파일에 라인이 이미 존재하는지 확인
+if grep -Fxq "$LINE" /etc/fstab; then
+    echo "The line is already present in /etc/fstab."
+else
+    # 라인이 없다면 추가
+    echo "$LINE" | sudo tee -a /etc/fstab
+    echo "The line has been added to /etc/fstab."
+fi

@@ -10,15 +10,15 @@ resource "kubernetes_namespace" "ns" {
 
 module "ingress_nginx" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/ingress-nginx-v1.8.1.yaml"
+  yaml       = "${path.module}/yaml/ingress-nginx-v1.12.0.yaml"
   depends_on = [kubernetes_namespace.ns]
 }
 
-module "tcp_config" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/ingress-nginx-tcp.yaml"
-  depends_on = [kubernetes_namespace.ns]
-}
+# module "tcp_config" {
+#   source     = "../utils/apply"
+#   yaml       = "${path.module}/yaml/ingress-nginx-tcp.yaml"
+#   depends_on = [kubernetes_namespace.ns]
+# }
 
 module "arp_protocol" {
   source     = "../utils/update"
@@ -31,7 +31,7 @@ module "arp_protocol" {
 
 module "metallb" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/metallb-v0.13.10.yaml"
+  yaml       = "${path.module}/yaml/metallb-v0.14.9.yaml"
   depends_on = [module.arp_protocol]
 }
 
