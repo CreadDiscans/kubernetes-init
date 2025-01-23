@@ -4,11 +4,11 @@ module "nginx" {
   email        = var.email
 }
 
-# module "nfs" {
-#   source   = "./nfs"
-#   nfs_ip   = var.nfs_ip
-#   nfs_path = var.nfs_path
-# }
+module "nfs" {
+  source   = "./nfs"
+  nfs_ip   = var.nfs_ip
+  nfs_path = var.nfs_path
+}
 
 # module "istio" {
 #   source = "./istio"

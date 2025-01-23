@@ -9,15 +9,15 @@ variable "email" {
   default = "user@example.com"
 }
 
-# variable "nfs_ip" {
-#   type    = string
-#   default = "x.x.x.x"
-# }
+variable "nfs_ip" {
+  type    = string
+  default = "x.x.x.x"
+}
 
-# variable "nfs_path" {
-#   type    = string
-#   default = "/nfs"
-# }
+variable "nfs_path" {
+  type    = string
+  default = "/nfs"
+}
 
 # variable "domain" {
 #   type    = string
