@@ -47,16 +47,16 @@ variable "prefix" {
   }
 }
 
-# variable "admin" {
-#   type = object({
-#     username = string
-#     password = string
-#   })
-#   default = {
-#     username = "admin"
-#     password = "admin"
-#   }
-# }
+variable "admin" {
+  type = object({
+    username = string
+    password = string
+  })
+  default = {
+    username = "admin"
+    password = "admin"
+  }
+}
 
 # variable "airflow_repo" {
 #   type = string

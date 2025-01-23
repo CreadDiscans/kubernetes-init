@@ -35,23 +35,28 @@ resource "kubernetes_deployment" "mysql" {
         }
       }
       spec {
+        toleration {
+          key      = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+          effect   = "NoSchedule"
+        }
         container {
           name  = "mysql"
-          image = "mysql:8.0.26"
+          image = "mysql:8.4.4"
           env {
             name  = "MYSQL_ROOT_PASSWORD"
             value = local.db.password
           }
           env {
-            name = "MYSQL_DATABASE"
+            name  = "MYSQL_DATABASE"
             value = local.db.name
           }
           env {
-            name = "MYSQL_USER"
+            name  = "MYSQL_USER"
             value = local.db.user
           }
           env {
-            name = "MYSQL_PASSWORD"
+            name  = "MYSQL_PASSWORD"
             value = local.db.password
           }
           port {
@@ -75,7 +80,7 @@ resource "kubernetes_deployment" "mysql" {
 
 resource "kubernetes_service" "mysql_svc" {
   metadata {
-    name = "mysql-service"
+    name      = "mysql-service"
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   spec {

@@ -14,13 +14,13 @@ module "istio" {
   source = "./istio"
 }
 
-# module "keycloak" {
-#   source     = "./keycloak"
-#   domain     = var.domain
-#   prefix     = var.prefix.keycloak
-#   admin      = var.admin
-#   depends_on = [module.nfs, module.nginx]
-# }
+module "keycloak" {
+  source     = "./keycloak"
+  domain     = var.domain
+  prefix     = var.prefix.keycloak
+  admin      = var.admin
+  depends_on = [module.nfs, module.nginx]
+}
 
 # module "minio" {
 #   source   = "./minio"

@@ -8,10 +8,10 @@
 - cert-manager                      1.16.3
 - nfs-subdir-external-provisioner   4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
 - istio                             1.24.2      [https://github.com/istio/istio]
+- keycloak                          26.1.0      [https://www.keycloak.org/]
 
 
 gitlab-ce                           16.4.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
-keycloak                            22.0.3      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
 minio                               latest      [https://github.com/minio/minio]

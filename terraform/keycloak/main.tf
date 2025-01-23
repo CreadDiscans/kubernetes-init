@@ -26,29 +26,53 @@ resource "kubernetes_deployment" "keycloak_deploy" {
         }
       }
       spec {
+        toleration {
+          key      = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+          effect   = "NoSchedule"
+        }
         container {
           name  = "keycloak"
-          image = "quay.io/keycloak/keycloak:22.0.3"
+          image = "quay.io/keycloak/keycloak:26.1.0"
           args = [
             "start",
-            "--hostname=${var.prefix}.${var.domain}",
-            "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true",
-            "--db mysql",
-            "--db-url jdbc:mysql://mysql-service:3306/keycloak",
-            "--db-username ${local.db.user}",
-            "--db-password \"${local.db.password}\""
+            # "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true",
           ]
           env {
-            name  = "KEYCLOAK_ADMIN"
+            name  = "KC_HOSTNAME"
+            value = "https://${var.prefix}.${var.domain}"
+          }
+          env {
+            name  = "KC_HTTP_ENABLED"
+            value = true
+          }
+          env {
+            name  = "KC_DB"
+            value = "mysql"
+          }
+          env {
+            name  = "KC_DB_URL"
+            value = "jdbc:mysql://mysql-service:3306/keycloak"
+          }
+          env {
+            name  = "KC_DB_USERNAME"
+            value = local.db.user
+          }
+          env {
+            name  = "KC_DB_PASSWORD"
+            value = local.db.password
+          }
+          env {
+            name  = "KC_BOOTSTRAP_ADMIN_USERNAME"
             value = var.admin.username
           }
           env {
-            name  = "KEYCLOAK_ADMIN_PASSWORD"
+            name  = "KC_BOOTSTRAP_ADMIN_PASSWORD"
             value = var.admin.password
           }
           env {
-            name  = "KC_PROXY"
-            value = "edge"
+            name  = "KC_HEALTH_ENABLED"
+            value = true
           }
           port {
             name           = "http"
@@ -56,8 +80,8 @@ resource "kubernetes_deployment" "keycloak_deploy" {
           }
           readiness_probe {
             http_get {
-              path = "/realms/master"
-              port = 8080
+              path = "/health/ready"
+              port = 9000
             }
           }
         }
