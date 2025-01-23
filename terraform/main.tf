@@ -22,6 +22,20 @@ module "keycloak" {
   depends_on = [module.nfs, module.nginx]
 }
 
+module "prometheus" {
+  source   = "./prometheus"
+  domain   = var.domain
+  prefix   = var.prefix.grafana
+  keycloak = module.keycloak.info
+}
+
+# module "argocd" {
+#   source   = "./argocd"
+#   domain   = var.domain
+#   prefix   = var.prefix.argocd
+#   keycloak = module.keycloak.info
+# }
+
 # module "minio" {
 #   source   = "./minio"
 #   domain   = var.domain
@@ -41,20 +55,6 @@ module "keycloak" {
 #     gitlab   = var.prefix.gitlab
 #     registry = var.prefix.registry
 #   }
-#   keycloak = module.keycloak.info
-# }
-
-# module "prometheus" {
-#   source   = "./prometheus"
-#   domain   = var.domain
-#   prefix   = var.prefix.grafana
-#   keycloak = module.keycloak.info
-# }
-
-# module "argocd" {
-#   source   = "./argocd"
-#   domain   = var.domain
-#   prefix   = var.prefix.argocd
 #   keycloak = module.keycloak.info
 # }
 

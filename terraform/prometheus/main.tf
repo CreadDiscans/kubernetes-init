@@ -1,12 +1,16 @@
 resource "kubernetes_namespace" "ns" {
   metadata {
+    labels = {
+      "pod-security.kubernetes.io/warn": "privileged"
+      "pod-security.kubernetes.io/warn-version": "latest"
+    }
     name = "monitoring"
   }
 }
 
 module "setup" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/manifests-setup.yaml"
+  yaml       = "${path.module}/yaml/setup"
   depends_on = [kubernetes_namespace.ns]
 }
 
@@ -23,7 +27,7 @@ resource "kubernetes_secret" "config" {
       "app.kubernetes.io/component" = "grafana"
       "app.kubernetes.io/name"      = "grafana"
       "app.kubernetes.io/part-of"   = "kube-prometheus"
-      "app.kubernetes.io/version"   = "9.5.3"
+      "app.kubernetes.io/version"   = "11.2.0"
     }
   }
   data = {
@@ -53,7 +57,7 @@ tls_skip_verify_insecure = true
 
 module "manifests" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/manifests.yaml"
+  yaml       = "${path.module}/yaml/manifests"
   depends_on = [time_sleep.wait]
 }
 
@@ -68,5 +72,5 @@ module "grafana" {
     "app.kubernetes.io/name"      = "grafana"
     "app.kubernetes.io/part-of" : "kube-prometheus"
   }
-  depends_on = [kubernetes_deployment.grafana_deploy]
+  depends_on = [module.manifests]
 }
