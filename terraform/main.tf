@@ -10,9 +10,9 @@ module "nfs" {
   nfs_path = var.nfs_path
 }
 
-# module "istio" {
-#   source = "./istio"
-# }
+module "istio" {
+  source = "./istio"
+}
 
 # module "keycloak" {
 #   source     = "./keycloak"

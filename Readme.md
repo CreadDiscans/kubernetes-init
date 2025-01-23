@@ -7,11 +7,13 @@
 - ingress-nginx                     1.12.0
 - cert-manager                      1.16.3
 - nfs-subdir-external-provisioner   4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
+- istio                             1.24.2      [https://github.com/istio/istio]
+
+
 gitlab-ce                           16.4.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 keycloak                            22.0.3      [https://www.keycloak.org/]
 kube-prometheus                     main        [https://github.com/prometheus-operator/kube-prometheus]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
-istio                               1.19.0      [https://github.com/istio/istio]
 minio                               latest      [https://github.com/minio/minio]
 argocd                              2.8.4       [https://github.com/argoproj/argo-cd]
 authservice                         0.10        [https://github.com/CreadDiscans/authservice]
