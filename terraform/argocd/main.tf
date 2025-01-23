@@ -4,13 +4,6 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-data "kubernetes_secret" "cert" {
-  metadata {
-    name      = "xkeycloak-cert"
-    namespace = "keycloak"
-  }
-}
-
 resource "kubernetes_config_map" "config" {
   metadata {
     name      = "argocd-cm"
@@ -28,8 +21,6 @@ issuer: ${var.keycloak.url}/realms/${local.realm}
 clientID: ${local.client_id}
 clientSecret: $oidc.keycloak.clientSecret
 requestedScopes: ["openid", "profile", "email"]
-rootCA: |
-      ${replace(data.kubernetes_secret.cert.data["tls.crt"], "\n", "\n      ")}
     EOF
   }
 }

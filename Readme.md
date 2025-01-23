@@ -10,12 +10,11 @@
 - istio                             1.24.2      [https://github.com/istio/istio]
 - keycloak                          26.1.0      [https://www.keycloak.org/]
 - kube-prometheus                   0.14.0      [https://github.com/prometheus-operator/kube-prometheus]
-
+- argocd                            2.13.3      [https://github.com/argoproj/argo-cd]
 
 gitlab-ce                           16.4.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 cnpg                                1.20.2      [https://github.com/cloudnative-pg/cloudnative-pg]
 minio                               latest      [https://github.com/minio/minio]
-argocd                              2.8.4       [https://github.com/argoproj/argo-cd]
 authservice                         0.10        [https://github.com/CreadDiscans/authservice]
 spark                               1.1.27      [https://github.com/GoogleCloudPlatform/spark-on-k8s-operator]
 airflow                             2.7.1       [https://github.com/apache/airflow/]

@@ -29,12 +29,12 @@ module "prometheus" {
   keycloak = module.keycloak.info
 }
 
-# module "argocd" {
-#   source   = "./argocd"
-#   domain   = var.domain
-#   prefix   = var.prefix.argocd
-#   keycloak = module.keycloak.info
-# }
+module "argocd" {
+  source   = "./argocd"
+  domain   = var.domain
+  prefix   = var.prefix.argocd
+  keycloak = module.keycloak.info
+}
 
 # module "minio" {
 #   source   = "./minio"
