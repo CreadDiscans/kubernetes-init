@@ -68,13 +68,13 @@ airflowHome: /opt/airflow
 defaultAirflowRepository: apache/airflow
 
 # Default airflow tag to deploy
-defaultAirflowTag: "2.7.1"
+defaultAirflowTag: "2.10.4"
 
 # Default airflow digest. If specified, it takes precedence over tag
 defaultAirflowDigest: ~
 
 # Airflow version (Used to make some decisions based on Airflow Version being deployed)
-airflowVersion: "2.7.1"
+airflowVersion: "2.10.4"
 
 # Images
 images:
@@ -816,10 +816,10 @@ scheduler:
   resources:
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 1Gi
     requests:
       cpu: 250m
-      memory: 512Mi
+      memory: 1Gi
 
   # This setting tells kubernetes that its ok to evict
   # when it wants to scale a node down.
@@ -882,10 +882,10 @@ scheduler:
     resources:
       limits:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     # Detailed default security context for logGroomerSidecar for container level
     securityContexts:
       container: {}
@@ -1227,7 +1227,94 @@ webserver:
   # your image instead or specify a configmap containing the
   # webserver_config.py.
   webserverConfig: |
-    AUTH_ROLE_PUBLIC = 'Admin'
+    import os
+    import logging
+    import jwt
+    import base64
+    import json
+
+    from flask import redirect, session
+    from flask_appbuilder import expose
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+    from flask_appbuilder.security.views import AuthOAuthView
+
+    from airflow.www.security import AirflowSecurityManager
+
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    log = logging.getLogger(__name__)
+
+    MY_PROVIDER = 'keycloak'
+    CLIENT_ID = '${client_id}'
+    CLIENT_SECRET = '${client_secret}'
+    KEYCLOAK_BASE_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/'
+    KEYCLOAK_TOKEN_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/token'
+    KEYCLOAK_AUTH_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/auth'
+
+    AUTH_TYPE = AUTH_OAUTH
+    AUTH_USER_REGISTRATION = True
+    AUTH_USER_REGISTRATION_ROLE = "Public"
+    AUTH_ROLES_SYNC_AT_LOGIN = True
+    PERMANENT_SESSION_LIFETIME = 1800
+
+    AUTH_ROLES_MAPPING = {
+        "airflow_public": ["Public"],
+        "airflow_admin": ["Admin"],
+    }
+    OAUTH_PROVIDERS = [
+      {
+        'name': MY_PROVIDER,
+        'icon': 'fa-circle-o',
+        'token_key': 'access_token',
+        'remote_app': {
+          'client_id': CLIENT_ID,
+          'client_secret': CLIENT_SECRET,
+          'client_kwargs': {
+            'scope': 'email profile',
+          },
+          'api_base_url': KEYCLOAK_BASE_URL,
+          'request_token_url': None,
+          'access_token_url': KEYCLOAK_TOKEN_URL,
+          'authorize_url': KEYCLOAK_AUTH_URL,
+        }
+      }
+    ]
+    
+    class CustomAuthRemoteUserView(AuthOAuthView):
+      @expose("/logout/", methods=["GET", "POST"])
+      def logout(self):
+        """Delete access token before logging out."""
+        return super().logout()
+
+    class CustomSecurityManager(AirflowSecurityManager):
+      authoauthview = CustomAuthRemoteUserView
+      
+      def oauth_user_info(self, provider, response):
+        if provider == MY_PROVIDER:
+          token = response["access_token"]
+          payload = token.split('.')[1]
+          me = json.loads(base64.b64decode(payload.encode() + b'='*(-len(payload) % 4)).decode('utf-8'))
+
+          groups = me.get('groups') # unsafe
+          if '/airflow' in groups:
+            groups = ["airflow_admin"]
+          else:
+            groups = ["airflow_public"]
+
+          userinfo = {
+            "username": me.get("preferred_username"),
+            "email": me.get("email"),
+            "first_name": me.get("given_name"),
+            "last_name": me.get("family_name"),
+            "role_keys": groups,
+          }
+          log.info("user info: {0}".format(userinfo))
+          return userinfo
+        else:
+          return {}
+
+    SECURITY_MANAGER_CLASS = CustomSecurityManager
+    
+    APP_THEME = "simplex.css"
 
   webserverConfigConfigMapName: ~
 
@@ -1439,10 +1526,10 @@ triggerer:
     resources:
       limits:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     # Detailed default security context for logGroomerSidecar for container level
     securityContexts:
       container: {}
@@ -2313,6 +2400,8 @@ config:
     multi_namespace_mode: '{{ ternary "True" "False" .Values.multiNamespaceMode }}'
   triggerer:
     default_capacity: 1000
+  api:
+    auth_backends: 'airflow.api.auth.backend.basic_auth'
 # yamllint enable rule:line-length
 
 # Whether Airflow can launch workers and/or pods in multiple namespaces

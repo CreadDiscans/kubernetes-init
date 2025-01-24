@@ -13,7 +13,7 @@ metadata:
     tier: airflow
     component: create-user-job
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 ---
 # Source: airflow/templates/jobs/migrate-database-job-serviceaccount.yaml
@@ -30,7 +30,7 @@ metadata:
     tier: airflow
     component: run-airflow-migrations
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 ---
 # Source: airflow/templates/scheduler/scheduler-serviceaccount.yaml
@@ -46,7 +46,7 @@ metadata:
     tier: airflow
     component: scheduler
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 ---
@@ -63,7 +63,7 @@ metadata:
     tier: airflow
     component: statsd
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 ---
@@ -80,7 +80,7 @@ metadata:
     tier: airflow
     component: triggerer
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 ---
@@ -97,7 +97,7 @@ metadata:
     tier: airflow
     component: webserver
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 ---
@@ -114,7 +114,7 @@ metadata:
     tier: airflow
     component: worker
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 ---
@@ -130,12 +130,15 @@ metadata:
     tier: airflow
     component: config
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 data:
   # These are system-specified config overrides.
   airflow.cfg: |-
+    [api]
+    auth_backends = airflow.api.auth.backend.basic_auth
+    
     [celery]
     flower_url_prefix = 
     worker_concurrency = 16
@@ -172,14 +175,14 @@ data:
     namespace = airflow
     pod_template_file = /opt/airflow/pod_templates/pod_template_file.yaml
     worker_container_repository = apache/airflow
-    worker_container_tag = 2.7.1
+    worker_container_tag = 2.10.4
     
     [kubernetes_executor]
     multi_namespace_mode = False
     namespace = airflow
     pod_template_file = /opt/airflow/pod_templates/pod_template_file.yaml
     worker_container_repository = apache/airflow
-    worker_container_tag = 2.7.1
+    worker_container_tag = 2.10.4
     
     [logging]
     colored_console_log = False
@@ -210,9 +213,6 @@ data:
     [webserver]
     enable_proxy_fix = True
     rbac = True
-
-    [api]
-    auth_backends = airflow.api.auth.backend.basic_auth
     
   airflow_local_settings.py: |-
     
@@ -227,6 +227,8 @@ data:
         tier: airflow
         component: worker
         release: airflow
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       initContainers:
         
@@ -235,34 +237,54 @@ data:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65533
+          envFrom:  
+            []
           env:
             - name: GIT_SYNC_REV
               value: "HEAD"
+            - name: GITSYNC_REF
+              value: "v2-2-stable"
             - name: GIT_SYNC_BRANCH
               value: "main"
             - name: GIT_SYNC_REPO
               value: "${git_repo}"
+            - name: GITSYNC_REPO
+              value: "${git_repo}"
             - name: GIT_SYNC_DEPTH
+              value: "1"
+            - name: GITSYNC_DEPTH
               value: "1"
             - name: GIT_SYNC_ROOT
               value: "/git"
+            - name: GITSYNC_ROOT
+              value: "/git"
             - name: GIT_SYNC_DEST
+              value: "repo"
+            - name: GITSYNC_LINK
               value: "repo"
             - name: GIT_SYNC_ADD_USER
               value: "true"
+            - name: GITSYNC_ADD_USER
+              value: "true"
             - name: GIT_SYNC_WAIT
               value: "5"
+            - name: GITSYNC_PERIOD
+              value: "5s"
             - name: GIT_SYNC_MAX_SYNC_FAILURES
+              value: "0"
+            - name: GITSYNC_MAX_FAILURES
               value: "0"
             - name: GIT_SYNC_ONE_TIME
               value: "true"
+            - name: GITSYNC_ONE_TIME
+              value: "true"
           resources: 
-              limits:
-                cpu: 1000m
-                memory: 128Mi
-              requests:
-                cpu: 10m
-                memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -278,6 +300,8 @@ data:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -303,7 +327,7 @@ data:
             # Dynamically created secret envs
             
             # Extra env      
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -313,11 +337,11 @@ data:
           name: base
           resources:
             limits:
-              cpu: 1000m
-              memory: 2Gi
+              cpu: 100m
+              memory: 128Mi
             requests:
-              cpu: 10m
-              memory: 512Mi
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - mountPath: "/opt/airflow/logs"
               name: logs
@@ -348,8 +372,10 @@ data:
       serviceAccountName: airflow-worker
       volumes:
       - name: dags
-        emptyDir: {}
-      - emptyDir: {}
+        emptyDir:
+          {}
+      - emptyDir:
+          {}
         name: logs
       - configMap:
           name: airflow-config
@@ -367,7 +393,7 @@ metadata:
     tier: airflow
     component: config
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 data:
@@ -389,6 +415,7 @@ data:
     # specific language governing permissions and limitations
     # under the License.
     ---
+    # 
     mappings:
       # Map dot separated stats to labels
       - match: airflow.dagrun.dependency-check.*.*
@@ -472,7 +499,7 @@ metadata:
     tier: airflow
     component: config
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   namespace: airflow
 data:
@@ -482,30 +509,30 @@ data:
     import jwt
     import base64
     import json
-
+    
     from flask import redirect, session
     from flask_appbuilder import expose
     from flask_appbuilder.security.manager import AUTH_OAUTH
     from flask_appbuilder.security.views import AuthOAuthView
-
+    
     from airflow.www.security import AirflowSecurityManager
-
+    
     basedir = os.path.abspath(os.path.dirname(__file__))
     log = logging.getLogger(__name__)
-
+    
     MY_PROVIDER = 'keycloak'
     CLIENT_ID = '${client_id}'
     CLIENT_SECRET = '${client_secret}'
     KEYCLOAK_BASE_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/'
     KEYCLOAK_TOKEN_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/token'
     KEYCLOAK_AUTH_URL = '${keycloak_url}/realms/${realm}/protocol/openid-connect/auth'
-
+    
     AUTH_TYPE = AUTH_OAUTH
     AUTH_USER_REGISTRATION = True
     AUTH_USER_REGISTRATION_ROLE = "Public"
     AUTH_ROLES_SYNC_AT_LOGIN = True
     PERMANENT_SESSION_LIFETIME = 1800
-
+    
     AUTH_ROLES_MAPPING = {
         "airflow_public": ["Public"],
         "airflow_admin": ["Admin"],
@@ -530,11 +557,11 @@ data:
     ]
     
     class CustomAuthRemoteUserView(AuthOAuthView):
-      @expose("/logout/")
+      @expose("/logout/", methods=["GET", "POST"])
       def logout(self):
         """Delete access token before logging out."""
         return super().logout()
-
+    
     class CustomSecurityManager(AirflowSecurityManager):
       authoauthview = CustomAuthRemoteUserView
       
@@ -543,13 +570,13 @@ data:
           token = response["access_token"]
           payload = token.split('.')[1]
           me = json.loads(base64.b64decode(payload.encode() + b'='*(-len(payload) % 4)).decode('utf-8'))
-
+    
           groups = me.get('groups') # unsafe
           if '/airflow' in groups:
             groups = ["airflow_admin"]
           else:
             groups = ["airflow_public"]
-
+    
           userinfo = {
             "username": me.get("preferred_username"),
             "email": me.get("email"),
@@ -561,11 +588,10 @@ data:
           return userinfo
         else:
           return {}
-
+    
     SECURITY_MANAGER_CLASS = CustomSecurityManager
     
     APP_THEME = "simplex.css"
-
 ---
 # Source: airflow/templates/rbac/pod-launcher-role.yaml
 ################################
@@ -579,7 +605,7 @@ metadata:
   labels:
     tier: airflow
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 rules:
   - apiGroups:
@@ -625,7 +651,7 @@ metadata:
   labels:
     tier: airflow
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 rules:
   - apiGroups:
@@ -656,7 +682,7 @@ metadata:
   labels:
     tier: airflow
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -682,7 +708,7 @@ metadata:
   labels:
     tier: airflow
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -709,7 +735,7 @@ metadata:
     tier: airflow
     component: statsd
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   annotations:
     prometheus.io/scrape: "true"
@@ -743,7 +769,7 @@ metadata:
     tier: airflow
     component: triggerer
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 spec:
   clusterIP: None
@@ -762,7 +788,6 @@ spec:
 ################################
 ## Airflow Scheduler Deployment/StatefulSet
 #################################
-
 # Are we using a local executor?
 # Is persistence enabled on the _workers_?
 # This is important because in $local mode, the scheduler assumes the role of the worker
@@ -778,7 +803,7 @@ metadata:
     tier: airflow
     component: scheduler
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
     executor: KubernetesExecutor
 spec:
@@ -798,7 +823,7 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
+        checksum/airflow-config: c477a0e3656833cc1ee487affad371ddb6863089a9136b662fda61a4fecf9ad8
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -829,11 +854,11 @@ spec:
           resources:
             limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 1Gi
             requests:
-              cpu: 10m
-              memory: 512Mi
-          image: apache/airflow:2.7.1
+              cpu: 250m
+              memory: 1Gi
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -871,6 +896,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -898,41 +925,61 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65533
+          envFrom:  
+            []
           env:
             - name: GIT_SYNC_REV
               value: "HEAD"
+            - name: GITSYNC_REF
+              value: "v2-2-stable"
             - name: GIT_SYNC_BRANCH
               value: "main"
             - name: GIT_SYNC_REPO
               value: "${git_repo}"
+            - name: GITSYNC_REPO
+              value: "${git_repo}"
             - name: GIT_SYNC_DEPTH
+              value: "1"
+            - name: GITSYNC_DEPTH
               value: "1"
             - name: GIT_SYNC_ROOT
               value: "/git"
+            - name: GITSYNC_ROOT
+              value: "/git"
             - name: GIT_SYNC_DEST
+              value: "repo"
+            - name: GITSYNC_LINK
               value: "repo"
             - name: GIT_SYNC_ADD_USER
               value: "true"
+            - name: GITSYNC_ADD_USER
+              value: "true"
             - name: GIT_SYNC_WAIT
               value: "5"
+            - name: GITSYNC_PERIOD
+              value: "5s"
             - name: GIT_SYNC_MAX_SYNC_FAILURES
+              value: "0"
+            - name: GITSYNC_MAX_FAILURES
               value: "0"
             - name: GIT_SYNC_ONE_TIME
               value: "true"
+            - name: GITSYNC_ONE_TIME
+              value: "true"
           resources: 
-              limits:
-                cpu: 100m
-                memory: 128Mi
-              requests:
-                cpu: 10m
-                memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
       containers:
         # Always run the main scheduler container.
         - name: scheduler
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -956,6 +1003,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -1002,11 +1051,11 @@ spec:
                   airflow jobs check --job-type SchedulerJob --local
           resources:
             limits:
-              cpu: 1000m
-              memory: 2Gi
+              cpu: 500m
+              memory: 1Gi
             requests:
-              cpu: 10m
-              memory: 512Mi
+              cpu: 250m
+              memory: 1Gi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1034,32 +1083,50 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65533
+          envFrom:  
+            []
           env:
             - name: GIT_SYNC_REV
               value: "HEAD"
+            - name: GITSYNC_REF
+              value: "v2-2-stable"
             - name: GIT_SYNC_BRANCH
               value: "main"
             - name: GIT_SYNC_REPO
               value: "${git_repo}"
+            - name: GITSYNC_REPO
+              value: "${git_repo}"
             - name: GIT_SYNC_DEPTH
+              value: "1"
+            - name: GITSYNC_DEPTH
               value: "1"
             - name: GIT_SYNC_ROOT
               value: "/git"
+            - name: GITSYNC_ROOT
+              value: "/git"
             - name: GIT_SYNC_DEST
+              value: "repo"
+            - name: GITSYNC_LINK
               value: "repo"
             - name: GIT_SYNC_ADD_USER
               value: "true"
+            - name: GITSYNC_ADD_USER
+              value: "true"
             - name: GIT_SYNC_WAIT
               value: "5"
+            - name: GITSYNC_PERIOD
+              value: "5s"
             - name: GIT_SYNC_MAX_SYNC_FAILURES
               value: "0"
+            - name: GITSYNC_MAX_FAILURES
+              value: "0"
           resources: 
-              limits:
-                cpu: 100m
-                memory: 128Mi
-              requests:
-                cpu: 10m
-                memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -1067,11 +1134,11 @@ spec:
           resources:
             limits:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             requests:
-              cpu: 10m
-              memory: 128Mi
-          image: apache/airflow:2.7.1
+              cpu: 100m
+              memory: 256Mi
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1084,6 +1151,8 @@ spec:
           env:
             - name: AIRFLOW__LOG_RETENTION_DAYS
               value: "15"
+            - name: AIRFLOW_HOME
+              value: "/opt/airflow"
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
@@ -1099,9 +1168,11 @@ spec:
           configMap:
             name: airflow-webserver-config
         - name: dags
-          emptyDir: {}
+          emptyDir:
+            {}
         - name: logs
-          emptyDir: {}
+          emptyDir:
+            {}
 ---
 # Source: airflow/templates/statsd/statsd-deployment.yaml
 ################################
@@ -1116,7 +1187,7 @@ metadata:
     tier: airflow
     component: statsd
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 spec:
   replicas: 1
@@ -1160,7 +1231,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             requests:
-              cpu: 10m
+              cpu: 100m
               memory: 128Mi
           ports:
             - name: statsd-ingest
@@ -1204,7 +1275,7 @@ metadata:
     tier: airflow
     component: webserver
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 spec:
   replicas: 1
@@ -1235,8 +1306,8 @@ spec:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
         checksum/webserver-secret-key: 97ccb485bcb4d6b5d625617645f8cda75f82731afbd1fa58b643a3bd927c7026
-        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
-        checksum/webserver-config: ed8d8a39a39730e4799625f197b201016172b5bb1f92006498ce8983c255a9b1
+        checksum/airflow-config: c477a0e3656833cc1ee487affad371ddb6863089a9136b662fda61a4fecf9ad8
+        checksum/webserver-config: cf2e47efec902450142d5435a5bd06a93cedf855ae56ed264c07b358d50d1325
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
     spec:
@@ -1267,9 +1338,9 @@ spec:
               cpu: 1000m
               memory: 1024Mi
             requests:
-              cpu: 10m
+              cpu: 250m
               memory: 1024Mi
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1307,6 +1378,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -1330,7 +1403,7 @@ spec:
                   key: webserver-secret-key
       containers:
         - name: webserver
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1344,10 +1417,10 @@ spec:
           resources:
             limits:
               cpu: 1000m
-              memory: 4Gi
+              memory: 1024Mi
             requests:
-              cpu: 10m
-              memory: 1Gi
+              cpu: 250m
+              memory: 1024Mi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1407,6 +1480,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -1449,7 +1524,7 @@ metadata:
     tier: airflow
     component: triggerer
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
 spec:
   serviceName: airflow-triggerer
@@ -1468,7 +1543,7 @@ spec:
       annotations:
         checksum/metadata-secret: b2fe937560e9635aeb01fce9100c2f836c5880f81c802565ce95fbcc8a56da4c
         checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
-        checksum/airflow-config: cd983c37a12a8ccaa032d1b3e1c957f1026e8918898d2c10134b78249751214b
+        checksum/airflow-config: c477a0e3656833cc1ee487affad371ddb6863089a9136b662fda61a4fecf9ad8
         checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
         checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
@@ -1501,9 +1576,9 @@ spec:
               cpu: 250m
               memory: 512Mi
             requests:
-              cpu: 10m
+              cpu: 250m
               memory: 512Mi
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1541,6 +1616,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -1568,40 +1645,60 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65533
+          envFrom:  
+            []
           env:
             - name: GIT_SYNC_REV
               value: "HEAD"
+            - name: GITSYNC_REF
+              value: "v2-2-stable"
             - name: GIT_SYNC_BRANCH
               value: "main"
             - name: GIT_SYNC_REPO
               value: "${git_repo}"
+            - name: GITSYNC_REPO
+              value: "${git_repo}"
             - name: GIT_SYNC_DEPTH
+              value: "1"
+            - name: GITSYNC_DEPTH
               value: "1"
             - name: GIT_SYNC_ROOT
               value: "/git"
+            - name: GITSYNC_ROOT
+              value: "/git"
             - name: GIT_SYNC_DEST
+              value: "repo"
+            - name: GITSYNC_LINK
               value: "repo"
             - name: GIT_SYNC_ADD_USER
               value: "true"
+            - name: GITSYNC_ADD_USER
+              value: "true"
             - name: GIT_SYNC_WAIT
               value: "5"
+            - name: GITSYNC_PERIOD
+              value: "5s"
             - name: GIT_SYNC_MAX_SYNC_FAILURES
+              value: "0"
+            - name: GITSYNC_MAX_FAILURES
               value: "0"
             - name: GIT_SYNC_ONE_TIME
               value: "true"
+            - name: GITSYNC_ONE_TIME
+              value: "true"
           resources: 
-              limits:
-                cpu: 100m
-                memory: 128Mi
-              requests:
-                cpu: 10m
-                memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
       containers:
         - name: triggerer
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1617,7 +1714,7 @@ spec:
               cpu: 250m
               memory: 512Mi
             requests:
-              cpu: 10m
+              cpu: 250m
               memory: 512Mi
           volumeMounts:
             - name: logs
@@ -1650,6 +1747,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -1693,32 +1792,50 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65533
+          envFrom:  
+            []
           env:
             - name: GIT_SYNC_REV
               value: "HEAD"
+            - name: GITSYNC_REF
+              value: "v2-2-stable"
             - name: GIT_SYNC_BRANCH
               value: "main"
             - name: GIT_SYNC_REPO
               value: "${git_repo}"
+            - name: GITSYNC_REPO
+              value: "${git_repo}"
             - name: GIT_SYNC_DEPTH
+              value: "1"
+            - name: GITSYNC_DEPTH
               value: "1"
             - name: GIT_SYNC_ROOT
               value: "/git"
+            - name: GITSYNC_ROOT
+              value: "/git"
             - name: GIT_SYNC_DEST
+              value: "repo"
+            - name: GITSYNC_LINK
               value: "repo"
             - name: GIT_SYNC_ADD_USER
               value: "true"
+            - name: GITSYNC_ADD_USER
+              value: "true"
             - name: GIT_SYNC_WAIT
               value: "5"
+            - name: GITSYNC_PERIOD
+              value: "5s"
             - name: GIT_SYNC_MAX_SYNC_FAILURES
               value: "0"
+            - name: GITSYNC_MAX_FAILURES
+              value: "0"
           resources: 
-              limits:
-                cpu: 100m
-                memory: 128Mi
-              requests:
-                cpu: 10m
-                memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - name: dags
             mountPath: /git
@@ -1726,11 +1843,11 @@ spec:
           resources:
             limits:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             requests:
-              cpu: 10m
-              memory: 128Mi
-          image: apache/airflow:2.7.1
+              cpu: 100m
+              memory: 256Mi
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -1743,6 +1860,8 @@ spec:
           env:
             - name: AIRFLOW__LOG_RETENTION_DAYS
               value: "15"
+            - name: AIRFLOW_HOME
+              value: "/opt/airflow"
           volumeMounts:
             - name: logs
               mountPath: "/opt/airflow/logs"
@@ -1758,7 +1877,8 @@ spec:
           configMap:
             name: airflow-webserver-config
         - name: dags
-          emptyDir: {}
+          emptyDir:
+            {}
   volumeClaimTemplates:
     - metadata:
         name: logs
@@ -1903,6 +2023,31 @@ spec:
 ## Airflow Namespace ResourceQuota
 #################################
 ---
+# Source: airflow/templates/rpc-server/rpc-server-deployment.yaml
+################################
+## Airflow rpc-server Deployment
+#################################
+---
+# Source: airflow/templates/rpc-server/rpc-server-networkpolicy.yaml
+################################
+## Airflow rpc-server NetworkPolicy
+#################################
+---
+# Source: airflow/templates/rpc-server/rpc-server-poddisruptionbudget.yaml
+################################
+## Airflow rpc-server PodDisruptionBudget
+#################################
+---
+# Source: airflow/templates/rpc-server/rpc-server-service.yaml
+################################
+## Airflow rpc-server Service
+#################################
+---
+# Source: airflow/templates/rpc-server/rpc-server-serviceaccount.yaml
+######################################
+## Airflow rpc-server ServiceAccount
+######################################
+---
 # Source: airflow/templates/scheduler/scheduler-networkpolicy.yaml
 ################################
 ## Airflow Scheduler NetworkPolicy
@@ -2008,6 +2153,11 @@ spec:
 ## Airflow Worker Deployment
 #################################
 ---
+# Source: airflow/templates/workers/worker-hpa.yaml
+################################
+## Airflow Worker HPA
+#################################
+---
 # Source: airflow/templates/workers/worker-kedaautoscaler.yaml
 ################################
 ## Airflow Worker KEDA Scaler
@@ -2043,7 +2193,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "U0cxR1VsWTNiV1pWVkc1MVkwNUxVVEpMWXpaMGNYUjVhbFJLWldGTVV6RT0="
+  fernet-key: "WWtaaFJYZGxPWGd4Y1VKSWIyVmliRTA0ZW1abmJtcFNXRkZNYnpWeFNFUT0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
@@ -2091,7 +2241,7 @@ metadata:
     tier: airflow
     component: create-user-job
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   annotations:
     helm.sh/hook: post-install,post-upgrade
@@ -2121,7 +2271,7 @@ spec:
       serviceAccountName: airflow-create-user-job
       containers:
         - name: create-user
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -2160,6 +2310,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -2186,7 +2338,7 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 10m
+              cpu: 500m
               memory: 512Mi
           volumeMounts:
             - name: config
@@ -2215,7 +2367,7 @@ metadata:
     tier: airflow
     component: run-airflow-migrations
     release: airflow
-    chart: "airflow-1.11.0"
+    chart: "airflow-1.15.0"
     heritage: Helm
   annotations:
     helm.sh/hook: post-install,post-upgrade
@@ -2245,7 +2397,7 @@ spec:
       serviceAccountName: airflow-migrate-database-job
       containers:
         - name: run-airflow-migrations
-          image: apache/airflow:2.7.1
+          image: apache/airflow:2.10.4
           imagePullPolicy: IfNotPresent
           securityContext: 
             allowPrivilegeEscalation: false
@@ -2273,6 +2425,8 @@ spec:
                 secretKeyRef:
                   name: airflow-fernet-key
                   key: fernet-key
+            - name: AIRFLOW_HOME
+              value: /opt/airflow
             # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
@@ -2299,7 +2453,7 @@ spec:
               cpu: 500m
               memory: 512Mi
             requests:
-              cpu: 10m
+              cpu: 500m
               memory: 512Mi
           volumeMounts:
             - name: config

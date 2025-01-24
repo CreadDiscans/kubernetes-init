@@ -14,9 +14,10 @@
 - minio                             latest      [https://github.com/minio/minio]
 - cnpg                              1.25.0      [https://github.com/cloudnative-pg/cloudnative-pg]
 - gitlab-ce                         17.8.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
+- airflow                           2.10.4       [https://github.com/apache/airflow/]
+
 authservice                         0.10        [https://github.com/CreadDiscans/authservice]
 spark                               1.1.27      [https://github.com/GoogleCloudPlatform/spark-on-k8s-operator]
-airflow                             2.7.1       [https://github.com/apache/airflow/]
 
 # kubernetes 설치
 

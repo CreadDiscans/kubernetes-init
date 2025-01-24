@@ -58,14 +58,14 @@ module "gitlab" {
   keycloak = module.keycloak.info
 }
 
-# module "airflow" {
-#   source       = "./airflow"
-#   domain       = var.domain
-#   prefix       = var.prefix.airflow
-#   minio_creds  = module.minio.creds
-#   keycloak     = module.keycloak.info
-#   airflow_repo = var.airflow_repo
-# }
+module "airflow" {
+  source       = "./airflow"
+  domain       = var.domain
+  prefix       = var.prefix.airflow
+  minio_creds  = module.minio.creds
+  keycloak     = module.keycloak.info
+  airflow_repo = var.airflow_repo
+}
 
 # module "kubeflow" {
 #   source      = "./kubeflow"

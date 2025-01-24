@@ -58,6 +58,6 @@ variable "admin" {
   }
 }
 
-# variable "airflow_repo" {
-#   type = string
-# }
+variable "airflow_repo" {
+  type = string
+}
