@@ -48,15 +48,15 @@ module "cnpg" {
   minio_creds = module.minio.creds
 }
 
-# module "gitlab" {
-#   source = "./gitlab"
-#   domain = var.domain
-#   prefix = {
-#     gitlab   = var.prefix.gitlab
-#     registry = var.prefix.registry
-#   }
-#   keycloak = module.keycloak.info
-# }
+module "gitlab" {
+  source = "./gitlab"
+  domain = var.domain
+  prefix = {
+    gitlab   = var.prefix.gitlab
+    registry = var.prefix.registry
+  }
+  keycloak = module.keycloak.info
+}
 
 # module "airflow" {
 #   source       = "./airflow"

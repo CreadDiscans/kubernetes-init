@@ -105,7 +105,7 @@ source = "/etc/gitlab-runner/config.toml"
 destination = "/etc/gitlab-runner-getter/config.toml"
 
 def get_token():
-    
+    print('start get_token')
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
@@ -130,11 +130,13 @@ def get_token():
     driver.find_element(By.CLASS_NAME, 'js-sign-in-button').click()
     print('login')
     driver.get(f'{host}/admin/runners')
+    print('open runner page')
     time.sleep(2)
     driver.get(f'{host}/admin/runners/new')
+    print('open runner new page')
     while True:
         try:
-            checkbox = driver.find_element(By.ID,'35')
+            checkbox = driver.find_element(By.ID,'37')
             break
         except KeyboardInterrupt:
             return
@@ -143,27 +145,14 @@ def get_token():
     driver.execute_script("arguments[0].click();", checkbox)
     driver.find_element(By.CLASS_NAME, 'js-no-auto-disable').click()
     time.sleep(1)
-    path = '/admin/'+driver.current_url.split('/admin/')[1]
-    register_url = host + path
     print('created new runner')
-    
-    driver.get(register_url)
     while True:
-        section = driver.find_elements(By.TAG_NAME, 'section')
-        if len(section) == 3:
+        section = driver.find_elements(By.TAG_NAME, 'code')
+        if len(section) == 2:
             break
-    print('find section')
+    print('find token')
     section = section[0]
-    while True:
-        try:
-            command = section.find_element(By.CLASS_NAME, 'gl-display-flex').text
-            break
-        except KeyboardInterrupt:
-            return
-        except:
-            pass
-    print('find command')
-    token = command.split('--token')[1].strip()
+    token = section.text
     driver.close()
     return token
 
@@ -204,6 +193,10 @@ resource "kubernetes_deployment" "runner" {
         init_container {
           name  = "gitlab-runner-token-getter"
           image = "creaddiscans/selenium_script:0.1"
+          env {
+            name = "PYTHONUNBUFFERED"
+            value = 1
+          }
           volume_mount {
             name       = "config"
             mount_path = "/etc/gitlab-runner/config.toml"
@@ -220,7 +213,7 @@ resource "kubernetes_deployment" "runner" {
           }
         }
         container {
-          image             = "gitlab/gitlab-runner:v16.4.1"
+          image             = "gitlab/gitlab-runner:latest"
           image_pull_policy = "Always"
           name              = "gitlab-runner"
           resources {
