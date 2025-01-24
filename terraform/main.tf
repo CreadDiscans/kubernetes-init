@@ -36,17 +36,17 @@ module "argocd" {
   keycloak = module.keycloak.info
 }
 
-# module "minio" {
-#   source   = "./minio"
-#   domain   = var.domain
-#   prefix   = var.prefix.minio
-#   keycloak = module.keycloak.info
-# }
+module "minio" {
+  source   = "./minio"
+  domain   = var.domain
+  prefix   = var.prefix.minio
+  keycloak = module.keycloak.info
+}
 
-# module "cnpg" {
-#   source      = "./cnpg"
-#   minio_creds = module.minio.creds
-# }
+module "cnpg" {
+  source      = "./cnpg"
+  minio_creds = module.minio.creds
+}
 
 # module "gitlab" {
 #   source = "./gitlab"

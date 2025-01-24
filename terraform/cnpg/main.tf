@@ -9,7 +9,7 @@ resource "kubernetes_namespace" "ns" {
 
 module "operator" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/cnpg-1.20.2.yaml"
+  yaml       = "${path.module}/yaml/cnpg-1.25.0.yaml"
   depends_on = [kubernetes_namespace.ns]
 }
 
