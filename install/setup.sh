@@ -1,3 +1,6 @@
+sudo apt update
+sudo apt upgrade -y
+
 # 방화벽 off
 sudo ufw disable
 
