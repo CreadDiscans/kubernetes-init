@@ -178,13 +178,14 @@ metadata:
 ---
 apiVersion: v1
 data:
-  viewer-spec.yaml: |-
+  viewer-spec.yaml: |
     # Note: the volumes-web-app allows expanding strings using ${VAR_NAME}
     # You may use any environment variable. This lets us e.g. specify images that can be modified using kustomize's image transformer.
     # Additionally, 'PVC_NAME', 'NAME' and 'NAMESPACE' are defined
     # Name of the pvc is set by the volumes web app
     pvc: $NAME
-    podTemplate:
+    podSpec:
+      serviceAccountName: default-editor
       containers:
         - name: main
           image: $VOLUME_VIEWER_IMAGE
@@ -207,9 +208,17 @@ data:
           # viewer-volume is provided automatically by the volumes web app
           volumeMounts:
             - name: viewer-volume
-              mountPath: /data
-          workingDir: /data
-          serviceAccountName: default-editor
+              mountPath: /srv
+          workingDir: /srv
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: viewer-volume
+          persistentVolumeClaim:
+            claimName: $NAME
     networking:
       targetPort: 8080
       basePrefix: "/pvcviewers"
@@ -221,7 +230,7 @@ metadata:
   labels:
     app: volumes-web-app
     kustomize.component: volumes-web-app
-  name: volumes-web-app-viewer-spec-ck6bhh4bdm
+  name: volumes-web-app-viewer-spec-gm954c98h6
   namespace: kubeflow
 ---
 apiVersion: v1
@@ -275,8 +284,8 @@ spec:
         - name: APP_SECURE_COOKIES
           value: "true"
         - name: VOLUME_VIEWER_IMAGE
-          value: filebrowser/filebrowser:latest
-        image: docker.io/kubeflownotebookswg/volumes-web-app:v1.8.0-rc.0
+          value: filebrowser/filebrowser:v2.25.0
+        image: docker.io/kubeflownotebookswg/volumes-web-app:v1.9.2
         name: volumes-web-app
         ports:
         - containerPort: 5000
@@ -284,13 +293,10 @@ spec:
         - mountPath: /etc/config/viewer-spec.yaml
           name: viewer-spec
           subPath: viewer-spec.yaml
-        resources:
-          requests:
-            cpu: "0m"
       serviceAccountName: volumes-web-app-service-account
       volumes:
       - configMap:
-          name: volumes-web-app-viewer-spec-ck6bhh4bdm
+          name: volumes-web-app-viewer-spec-gm954c98h6
         name: viewer-spec
 ---
 apiVersion: networking.istio.io/v1alpha3

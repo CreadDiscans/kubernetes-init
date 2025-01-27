@@ -252,15 +252,16 @@ data:
       ################################################################
       image:
         # the default container image
-        value: kubeflownotebookswg/jupyter-scipy:v1.8.0-rc.0
+        value: kubeflownotebookswg/jupyter-scipy:v1.9.2
 
         # the list of available container images in the dropdown
         options:
-        - kubeflownotebookswg/jupyter-scipy:v1.8.0-rc.0
-        - kubeflownotebookswg/jupyter-pytorch-full:v1.8.0-rc.0
-        - kubeflownotebookswg/jupyter-pytorch-cuda-full:v1.8.0-rc.0
-        - kubeflownotebookswg/jupyter-tensorflow-full:v1.8.0-rc.0
-        - kubeflownotebookswg/jupyter-tensorflow-cuda-full:v1.8.0-rc.0
+        - kubeflownotebookswg/jupyter-scipy:v1.9.2
+        - kubeflownotebookswg/jupyter-pytorch-full:v1.9.2
+        - kubeflownotebookswg/jupyter-pytorch-cuda-full:v1.9.2
+        - kubeflownotebookswg/jupyter-pytorch-gaudi-full:v1.9.2
+        - kubeflownotebookswg/jupyter-tensorflow-full:v1.9.2
+        - kubeflownotebookswg/jupyter-tensorflow-cuda-full:v1.9.2
 
       ################################################################
       # VSCode-like Container Images (Group 1)
@@ -275,12 +276,11 @@ data:
       ################################################################
       imageGroupOne:
         # the default container image
-        value: creaddiscans/codeserver-python:v1.8.0
+        value: kubeflownotebookswg/codeserver-python:v1.9.2
 
         # the list of available container images in the dropdown
         options:
-        - creaddiscans/codeserver-python:v1.8.0
-        - kubeflownotebookswg/codeserver-python:v1.8.0-rc.0
+        - kubeflownotebookswg/codeserver-python:v1.9.2
 
       ################################################################
       # RStudio-like Container Images (Group 2)
@@ -297,11 +297,11 @@ data:
       ################################################################
       imageGroupTwo:
         # the default container image
-        value: kubeflownotebookswg/rstudio-tidyverse:v1.8.0-rc.0
+        value: kubeflownotebookswg/rstudio-tidyverse:v1.9.2
 
         # the list of available container images in the dropdown
         options:
-        - kubeflownotebookswg/rstudio-tidyverse:v1.8.0-rc.0
+        - kubeflownotebookswg/rstudio-tidyverse:v1.9.2
 
       ################################################################
       # CPU Resources
@@ -345,12 +345,13 @@ data:
           # the list of available vendors in the dropdown
           #  `limitsKey` - what will be set as the actual limit
           #  `uiName` - what will be displayed in the dropdown UI
-          # vendors: []
           vendors:
-           - limitsKey: "nvidia.com/gpu"
-             uiName: "NVIDIA"
-          #  - limitsKey: "amd.com/gpu"
-          #    uiName: "AMD"
+          - limitsKey: "nvidia.com/gpu"
+            uiName: "NVIDIA"
+          - limitsKey: "amd.com/gpu"
+            uiName: "AMD"
+          - limitsKey: "habana.ai/gaudi"
+            uiName: "Intel Gaudi"
 
           # the default value of the limit
           # (possible values: "none", "1", "2", "4", "8")
@@ -418,20 +419,20 @@ data:
         value: ""
 
         # the list of available affinity configs in the dropdown
-        # options: []
-        # options:
-        #  - configKey: "GTX750Ti-2G"
-        #    displayName: "GTX750Ti-2G"
+        options: []
+        #options:
+        #  - configKey: "dedicated_node_per_notebook"
+        #    displayName: "Dedicated Node Per Notebook"
         #    affinity:
         #      # Require a Node with label `lifecycle=kubeflow-notebook`
         #      nodeAffinity:
         #        requiredDuringSchedulingIgnoredDuringExecution:
         #          nodeSelectorTerms:
         #            - matchExpressions:
-        #                - key: "nvidia.com/gpu.product"
+        #                - key: "lifecycle"
         #                  operator: "In"
         #                  values:
-        #                    - "NVIDIA-GeForce-GTX-750-Ti"
+        #                    - "kubeflow-notebook"
         #
         #      # Require a Node WITHOUT an existing Pod having `notebook-name` label
         #      podAntiAffinity:
@@ -526,25 +527,8 @@ metadata:
   labels:
     app: jupyter-web-app
     kustomize.component: jupyter-web-app
-  name: jupyter-web-app-config-h4bh7454m6
+  name: jupyter-web-app-config-tk56dhd26b
   namespace: kubeflow
-# ---
-# apiVersion: "kubeflow.org/v1alpha1"
-# kind: PodDefault
-# metadata:
-#   name: add-docker-socket
-# spec:
-#   selector:
-#     matchLabels:
-#       add-docker-socket: "true"
-#   desc: "add docker socket"
-#   volumeMounts:
-#   - mountPath: /var/run/docker.sock
-#     name: docker-sock
-#   volumes:
-#   - name: docker-sock
-#     hostPath:
-#       path: /var/run/docker.sock
 ---
 apiVersion: v1
 data:
@@ -810,7 +794,7 @@ spec:
           value: ""
         - name: APP_SECURE_COOKIES
           value: "true"
-        image: docker.io/kubeflownotebookswg/jupyter-web-app:v1.8.0
+        image: docker.io/kubeflownotebookswg/jupyter-web-app:v1.9.2
         name: jupyter-web-app
         ports:
         - containerPort: 5000
@@ -822,7 +806,7 @@ spec:
       serviceAccountName: jupyter-web-app-service-account
       volumes:
       - configMap:
-          name: jupyter-web-app-config-h4bh7454m6
+          name: jupyter-web-app-config-tk56dhd26b
         name: config-volume
       - configMap:
           name: jupyter-web-app-logos

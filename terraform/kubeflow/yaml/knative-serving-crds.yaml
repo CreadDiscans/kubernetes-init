@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/component: networking
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: certificates.networking.internal.knative.dev
 spec:
@@ -166,7 +166,7 @@ metadata:
   labels:
     app.kubernetes.io/component: networking
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: clusterdomainclaims.networking.internal.knative.dev
 spec:
@@ -222,7 +222,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     duck.knative.dev/podspecable: "true"
     knative.dev/crd-install: "true"
   name: configurations.serving.knative.dev
@@ -537,6 +537,25 @@ spec:
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                grpc:
+                                  description: GRPC specifies an action involving
+                                    a GRPC port.
+                                  properties:
+                                    port:
+                                      description: Port number of the gRPC service.
+                                        Number must be in the range 1 to 65535.
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      description: "Service is the name of the service
+                                        to place in the gRPC HealthCheckRequest (see
+                                        https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                        \n If this is not specified, the default behavior
+                                        is defined by gRPC."
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.
@@ -554,7 +573,10 @@ spec:
                                           header to be used in HTTP probes
                                         properties:
                                           name:
-                                            description: The header field name
+                                            description: The header field name. This
+                                              will be canonicalized upon output, so
+                                              case-variant names will be understood
+                                              as the same header.
                                             type: string
                                           value:
                                             description: The header field value
@@ -693,6 +715,25 @@ spec:
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                grpc:
+                                  description: GRPC specifies an action involving
+                                    a GRPC port.
+                                  properties:
+                                    port:
+                                      description: Port number of the gRPC service.
+                                        Number must be in the range 1 to 65535.
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      description: "Service is the name of the service
+                                        to place in the gRPC HealthCheckRequest (see
+                                        https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                        \n If this is not specified, the default behavior
+                                        is defined by gRPC."
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.
@@ -710,7 +751,10 @@ spec:
                                           header to be used in HTTP probes
                                         properties:
                                           name:
-                                            description: The header field name
+                                            description: The header field name. This
+                                              will be canonicalized upon output, so
+                                              case-variant names will be understood
+                                              as the same header.
                                             type: string
                                           value:
                                             description: The header field value
@@ -782,6 +826,30 @@ spec:
                               description: 'Compute Resources required by this container.
                                 Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                               properties:
+                                claims:
+                                  description: "Claims lists the names of resources,
+                                    defined in spec.resourceClaims, that are used
+                                    by this container. \n This is an alpha field and
+                                    requires enabling the DynamicResourceAllocation
+                                    feature gate. \n This field is immutable. It can
+                                    only be set for containers."
+                                  items:
+                                    description: ResourceClaim references one entry
+                                      in PodSpec.ResourceClaims.
+                                    properties:
+                                      name:
+                                        description: Name must match the name of one
+                                          entry in pod.spec.resourceClaims of the
+                                          Pod where this field is used. It makes that
+                                          resource available inside a container.
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
                                 limits:
                                   additionalProperties:
                                     anyOf:
@@ -803,7 +871,8 @@ spec:
                                     of compute resources required. If Requests is
                                     omitted for a container, it defaults to Limits
                                     if that is explicitly specified, otherwise to
-                                    an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                                    an implementation-defined value. Requests cannot
+                                    exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                                   type: object
                               type: object
                             securityContext:
@@ -1067,6 +1136,10 @@ spec:
                         description: 'ServiceAccountName is the name of the ServiceAccount
                           to use to run this pod. More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/'
                         type: string
+                      shareProcessNamespace:
+                        description: This is accessible behind a feature flag - kubernetes.podspec-shareproccessnamespace
+                        type: boolean
+                        x-kubernetes-preserve-unknown-fields: true
                       timeoutSeconds:
                         description: TimeoutSeconds is the maximum duration in seconds
                           that the request instance is allowed to respond to a request.
@@ -1625,7 +1698,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: domainmappings.serving.knative.dev
 spec:
@@ -1735,161 +1808,8 @@ spec:
                     description: CACerts is the Certification Authority (CA) certificates
                       in PEM format according to https://www.rfc-editor.org/rfc/rfc7468.
                     type: string
-                  name:
-                    description: Name is the name of the address.
-                    type: string
-                  url:
-                    type: string
-                type: object
-              annotations:
-                additionalProperties:
-                  type: string
-                description: Annotations is additional Status fields for the Resource
-                  to save some additional State as well as convey more information
-                  to the user. This is roughly akin to Annotations on any k8s resource,
-                  just the reconciler conveying richer information outwards.
-                type: object
-              conditions:
-                description: Conditions the latest available observations of a resource's
-                  current state.
-                items:
-                  description: 'Condition defines a readiness condition for a Knative
-                    resource. See: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties'
-                  properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the last time the condition
-                        transitioned from one status to another. We use VolatileTime
-                        in place of metav1.Time to exclude this from creating equality.Semantic
-                        differences (all other things held constant).
-                      type: string
-                    message:
-                      description: A human readable message indicating details about
-                        the transition.
-                      type: string
-                    reason:
-                      description: The reason for the condition's last transition.
-                      type: string
-                    severity:
-                      description: Severity with which to treat failures of this type
-                        of condition. When this is not specified, it defaults to Error.
-                      type: string
-                    status:
-                      description: Status of the condition, one of True, False, Unknown.
-                      type: string
-                    type:
-                      description: Type of condition.
-                      type: string
-                  required:
-                  - status
-                  - type
-                  type: object
-                type: array
-              observedGeneration:
-                description: ObservedGeneration is the 'Generation' of the Service
-                  that was last processed by the controller.
-                format: int64
-                type: integer
-              url:
-                description: URL is the URL of this DomainMapping.
-                type: string
-            type: object
-        type: object
-    served: true
-    storage: false
-    subresources:
-      status: {}
-  - additionalPrinterColumns:
-    - jsonPath: .status.url
-      name: URL
-      type: string
-    - jsonPath: .status.conditions[?(@.type=='Ready')].status
-      name: Ready
-      type: string
-    - jsonPath: .status.conditions[?(@.type=='Ready')].reason
-      name: Reason
-      type: string
-    name: v1alpha1
-    schema:
-      openAPIV3Schema:
-        description: DomainMapping is a mapping from a custom hostname to an Addressable.
-        properties:
-          apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-            type: string
-          kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-            type: string
-          metadata:
-            type: object
-          spec:
-            description: 'Spec is the desired state of the DomainMapping. More info:
-              https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
-            properties:
-              ref:
-                description: "Ref specifies the target of the Domain Mapping. \n The
-                  object identified by the Ref must be an Addressable with a URL of
-                  the form `{name}.{namespace}.{domain}` where `{domain}` is the cluster
-                  domain, and `{name}` and `{namespace}` are the name and namespace
-                  of a Kubernetes Service. \n This contract is satisfied by Knative
-                  types such as Knative Services and Knative Routes, and by Kubernetes
-                  Services."
-                properties:
-                  address:
-                    description: Address points to a specific Address Name.
-                    type: string
-                  apiVersion:
-                    description: API version of the referent.
-                    type: string
-                  group:
-                    description: 'Group of the API, without the version of the group.
-                      This can be used as an alternative to the APIVersion, and then
-                      resolved using ResolveGroup. Note: This API is EXPERIMENTAL
-                      and might break anytime. For more details: https://github.com/knative/eventing/issues/5086'
-                    type: string
-                  kind:
-                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                    type: string
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
-                    type: string
-                  namespace:
-                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-                      This is optional field, it gets defaulted to the object holding
-                      it if left out.'
-                    type: string
-                required:
-                - kind
-                - name
-                type: object
-              tls:
-                description: TLS allows the DomainMapping to terminate TLS traffic
-                  with an existing secret.
-                properties:
-                  secretName:
-                    description: SecretName is the name of the existing secret used
-                      to terminate TLS traffic.
-                    type: string
-                required:
-                - secretName
-                type: object
-            required:
-            - ref
-            type: object
-          status:
-            description: 'Status is the current state of the DomainMapping. More info:
-              https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
-            properties:
-              address:
-                description: Address holds the information needed for a DomainMapping
-                  to be the target of an event.
-                properties:
-                  CACerts:
-                    description: CACerts is the Certification Authority (CA) certificates
-                      in PEM format according to https://www.rfc-editor.org/rfc/rfc7468.
+                  audience:
+                    description: Audience is the OIDC audience for this address.
                     type: string
                   name:
                     description: Name is the name of the address.
@@ -1960,7 +1880,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: images.caching.internal.knative.dev
 spec:
@@ -2093,7 +2013,7 @@ metadata:
   labels:
     app.kubernetes.io/component: networking
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: ingresses.networking.internal.knative.dev
 spec:
@@ -2445,7 +2365,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: metrics.autoscaling.internal.knative.dev
 spec:
@@ -2570,7 +2490,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: podautoscalers.autoscaling.internal.knative.dev
 spec:
@@ -2743,7 +2663,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: revisions.serving.knative.dev
 spec:
@@ -3024,6 +2944,23 @@ spec:
                             to 3. Minimum value is 1.
                           format: int32
                           type: integer
+                        grpc:
+                          description: GRPC specifies an action involving a GRPC port.
+                          properties:
+                            port:
+                              description: Port number of the gRPC service. Number
+                                must be in the range 1 to 65535.
+                              format: int32
+                              type: integer
+                            service:
+                              description: "Service is the name of the service to
+                                place in the gRPC HealthCheckRequest (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                \n If this is not specified, the default behavior
+                                is defined by gRPC."
+                              type: string
+                          required:
+                          - port
+                          type: object
                         httpGet:
                           description: HTTPGet specifies the http request to perform.
                           properties:
@@ -3040,7 +2977,9 @@ spec:
                                   to be used in HTTP probes
                                 properties:
                                   name:
-                                    description: The header field name
+                                    description: The header field name. This will
+                                      be canonicalized upon output, so case-variant
+                                      names will be understood as the same header.
                                     type: string
                                   value:
                                     description: The header field value
@@ -3175,6 +3114,23 @@ spec:
                             to 3. Minimum value is 1.
                           format: int32
                           type: integer
+                        grpc:
+                          description: GRPC specifies an action involving a GRPC port.
+                          properties:
+                            port:
+                              description: Port number of the gRPC service. Number
+                                must be in the range 1 to 65535.
+                              format: int32
+                              type: integer
+                            service:
+                              description: "Service is the name of the service to
+                                place in the gRPC HealthCheckRequest (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                \n If this is not specified, the default behavior
+                                is defined by gRPC."
+                              type: string
+                          required:
+                          - port
+                          type: object
                         httpGet:
                           description: HTTPGet specifies the http request to perform.
                           properties:
@@ -3191,7 +3147,9 @@ spec:
                                   to be used in HTTP probes
                                 properties:
                                   name:
-                                    description: The header field name
+                                    description: The header field name. This will
+                                      be canonicalized upon output, so case-variant
+                                      names will be understood as the same header.
                                     type: string
                                   value:
                                     description: The header field value
@@ -3262,6 +3220,28 @@ spec:
                       description: 'Compute Resources required by this container.
                         Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                       properties:
+                        claims:
+                          description: "Claims lists the names of resources, defined
+                            in spec.resourceClaims, that are used by this container.
+                            \n This is an alpha field and requires enabling the DynamicResourceAllocation
+                            feature gate. \n This field is immutable. It can only
+                            be set for containers."
+                          items:
+                            description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                            properties:
+                              name:
+                                description: Name must match the name of one entry
+                                  in pod.spec.resourceClaims of the Pod where this
+                                  field is used. It makes that resource available
+                                  inside a container.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
                         limits:
                           additionalProperties:
                             anyOf:
@@ -3282,8 +3262,8 @@ spec:
                           description: 'Requests describes the minimum amount of compute
                             resources required. If Requests is omitted for a container,
                             it defaults to Limits if that is explicitly specified,
-                            otherwise to an implementation-defined value. More info:
-                            https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                            otherwise to an implementation-defined value. Requests
+                            cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                           type: object
                       type: object
                     securityContext:
@@ -3529,6 +3509,10 @@ spec:
                 description: 'ServiceAccountName is the name of the ServiceAccount
                   to use to run this pod. More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/'
                 type: string
+              shareProcessNamespace:
+                description: This is accessible behind a feature flag - kubernetes.podspec-shareproccessnamespace
+                type: boolean
+                x-kubernetes-preserve-unknown-fields: true
               timeoutSeconds:
                 description: TimeoutSeconds is the maximum duration in seconds that
                   the request instance is allowed to respond to a request. If unspecified,
@@ -4077,7 +4061,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     duck.knative.dev/addressable: "true"
     knative.dev/crd-install: "true"
   name: routes.serving.knative.dev
@@ -4193,6 +4177,9 @@ spec:
                   CACerts:
                     description: CACerts is the Certification Authority (CA) certificates
                       in PEM format according to https://www.rfc-editor.org/rfc/rfc7468.
+                    type: string
+                  audience:
+                    description: Audience is the OIDC audience for this address.
                     type: string
                   name:
                     description: Name is the name of the address.
@@ -4318,7 +4305,7 @@ metadata:
   labels:
     app.kubernetes.io/component: networking
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     knative.dev/crd-install: "true"
   name: serverlessservices.networking.internal.knative.dev
 spec:
@@ -4505,7 +4492,7 @@ kind: CustomResourceDefinition
 metadata:
   labels:
     app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.10.2
+    app.kubernetes.io/version: 1.12.4
     duck.knative.dev/addressable: "true"
     duck.knative.dev/podspecable: "true"
     knative.dev/crd-install: "true"
@@ -4834,6 +4821,25 @@ spec:
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                grpc:
+                                  description: GRPC specifies an action involving
+                                    a GRPC port.
+                                  properties:
+                                    port:
+                                      description: Port number of the gRPC service.
+                                        Number must be in the range 1 to 65535.
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      description: "Service is the name of the service
+                                        to place in the gRPC HealthCheckRequest (see
+                                        https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                        \n If this is not specified, the default behavior
+                                        is defined by gRPC."
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.
@@ -4851,7 +4857,10 @@ spec:
                                           header to be used in HTTP probes
                                         properties:
                                           name:
-                                            description: The header field name
+                                            description: The header field name. This
+                                              will be canonicalized upon output, so
+                                              case-variant names will be understood
+                                              as the same header.
                                             type: string
                                           value:
                                             description: The header field value
@@ -4990,6 +4999,25 @@ spec:
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                grpc:
+                                  description: GRPC specifies an action involving
+                                    a GRPC port.
+                                  properties:
+                                    port:
+                                      description: Port number of the gRPC service.
+                                        Number must be in the range 1 to 65535.
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      description: "Service is the name of the service
+                                        to place in the gRPC HealthCheckRequest (see
+                                        https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+                                        \n If this is not specified, the default behavior
+                                        is defined by gRPC."
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.
@@ -5007,7 +5035,10 @@ spec:
                                           header to be used in HTTP probes
                                         properties:
                                           name:
-                                            description: The header field name
+                                            description: The header field name. This
+                                              will be canonicalized upon output, so
+                                              case-variant names will be understood
+                                              as the same header.
                                             type: string
                                           value:
                                             description: The header field value
@@ -5079,6 +5110,30 @@ spec:
                               description: 'Compute Resources required by this container.
                                 Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                               properties:
+                                claims:
+                                  description: "Claims lists the names of resources,
+                                    defined in spec.resourceClaims, that are used
+                                    by this container. \n This is an alpha field and
+                                    requires enabling the DynamicResourceAllocation
+                                    feature gate. \n This field is immutable. It can
+                                    only be set for containers."
+                                  items:
+                                    description: ResourceClaim references one entry
+                                      in PodSpec.ResourceClaims.
+                                    properties:
+                                      name:
+                                        description: Name must match the name of one
+                                          entry in pod.spec.resourceClaims of the
+                                          Pod where this field is used. It makes that
+                                          resource available inside a container.
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
                                 limits:
                                   additionalProperties:
                                     anyOf:
@@ -5100,7 +5155,8 @@ spec:
                                     of compute resources required. If Requests is
                                     omitted for a container, it defaults to Limits
                                     if that is explicitly specified, otherwise to
-                                    an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                                    an implementation-defined value. Requests cannot
+                                    exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                                   type: object
                               type: object
                             securityContext:
@@ -5364,6 +5420,10 @@ spec:
                         description: 'ServiceAccountName is the name of the ServiceAccount
                           to use to run this pod. More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/'
                         type: string
+                      shareProcessNamespace:
+                        description: This is accessible behind a feature flag - kubernetes.podspec-shareproccessnamespace
+                        type: boolean
+                        x-kubernetes-preserve-unknown-fields: true
                       timeoutSeconds:
                         description: TimeoutSeconds is the maximum duration in seconds
                           that the request instance is allowed to respond to a request.
@@ -5910,6 +5970,9 @@ spec:
                   CACerts:
                     description: CACerts is the Certification Authority (CA) certificates
                       in PEM format according to https://www.rfc-editor.org/rfc/rfc7468.
+                    type: string
+                  audience:
+                    description: Audience is the OIDC audience for this address.
                     type: string
                   name:
                     description: Name is the name of the address.

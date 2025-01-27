@@ -67,11 +67,11 @@ module "airflow" {
   airflow_repo = var.airflow_repo
 }
 
-# module "kubeflow" {
-#   source      = "./kubeflow"
-#   domain      = var.domain
-#   prefix      = var.prefix.kubeflow
-#   email       = var.email
-#   minio_creds = module.minio.creds
-#   keycloak    = module.keycloak.info
-# }
+module "kubeflow" {
+  source      = "./kubeflow"
+  domain      = var.domain
+  prefix      = var.prefix.kubeflow
+  email       = var.email
+  minio_creds = module.minio.creds
+  keycloak    = module.keycloak.info
+}

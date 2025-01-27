@@ -305,11 +305,12 @@ subjects:
 apiVersion: v1
 data:
   ISTIO_GATEWAY: kubeflow/kubeflow-gateway
+  ISTIO_HOST: '*'
   RWO_PVC_SCHEDULING: "True"
   TENSORBOARD_IMAGE: tensorflow/tensorflow:2.5.1
 kind: ConfigMap
 metadata:
-  name: tensorboard-controller-config-b98cb9gk9k
+  name: tensorboard-controller-config-7hd244gf2d
   namespace: kubeflow
 ---
 apiVersion: v1
@@ -365,8 +366,8 @@ spec:
         - /manager
         envFrom:
         - configMapRef:
-            name: tensorboard-controller-config-b98cb9gk9k
-        image: docker.io/kubeflownotebookswg/tensorboard-controller:v1.8.0-rc.0
+            name: tensorboard-controller-config-7hd244gf2d
+        image: docker.io/kubeflownotebookswg/tensorboard-controller:v1.9.2
         livenessProbe:
           httpGet:
             path: /healthz

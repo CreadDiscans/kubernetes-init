@@ -980,7 +980,9 @@ spec:
                               type: string
                           required:
                           - name
+                          - image
                           type: object
+                        minItems: 1
                         type: array
                       dnsConfig:
                         properties:
@@ -4109,7 +4111,9 @@ spec:
                               type: string
                           required:
                           - name
+                          - image
                           type: object
+                        minItems: 1
                         type: array
                       dnsConfig:
                         properties:
@@ -7238,7 +7242,9 @@ spec:
                               type: string
                           required:
                           - name
+                          - image
                           type: object
+                        minItems: 1
                         type: array
                       dnsConfig:
                         properties:
@@ -9611,13 +9617,14 @@ data:
   ENABLE_CULLING: "false"
   IDLENESS_CHECK_PERIOD: "1"
   ISTIO_GATEWAY: kubeflow/kubeflow-gateway
+  ISTIO_HOST: '*'
   USE_ISTIO: "true"
 kind: ConfigMap
 metadata:
   labels:
     app: notebook-controller
     kustomize.component: notebook-controller
-  name: notebook-controller-config-dm5b6dd458
+  name: notebook-controller-config-fhm9f7tdt5
   namespace: kubeflow
 ---
 apiVersion: v1
@@ -9662,33 +9669,38 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: USE_ISTIO
-              name: notebook-controller-config-dm5b6dd458
+              name: notebook-controller-config-fhm9f7tdt5
         - name: ISTIO_GATEWAY
           valueFrom:
             configMapKeyRef:
               key: ISTIO_GATEWAY
-              name: notebook-controller-config-dm5b6dd458
+              name: notebook-controller-config-fhm9f7tdt5
+        - name: ISTIO_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: ISTIO_HOST
+              name: notebook-controller-config-fhm9f7tdt5
         - name: CLUSTER_DOMAIN
           valueFrom:
             configMapKeyRef:
               key: CLUSTER_DOMAIN
-              name: notebook-controller-config-dm5b6dd458
+              name: notebook-controller-config-fhm9f7tdt5
         - name: ENABLE_CULLING
           valueFrom:
             configMapKeyRef:
               key: ENABLE_CULLING
-              name: notebook-controller-config-dm5b6dd458
+              name: notebook-controller-config-fhm9f7tdt5
         - name: CULL_IDLE_TIME
           valueFrom:
             configMapKeyRef:
               key: CULL_IDLE_TIME
-              name: notebook-controller-config-dm5b6dd458
+              name: notebook-controller-config-fhm9f7tdt5
         - name: IDLENESS_CHECK_PERIOD
           valueFrom:
             configMapKeyRef:
               key: IDLENESS_CHECK_PERIOD
-              name: notebook-controller-config-dm5b6dd458
-        image: docker.io/kubeflownotebookswg/notebook-controller:v1.8.0-rc.0
+              name: notebook-controller-config-fhm9f7tdt5
+        image: docker.io/kubeflownotebookswg/notebook-controller:v1.9.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

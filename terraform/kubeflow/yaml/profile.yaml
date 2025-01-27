@@ -431,6 +431,9 @@ metadata:
 apiVersion: v1
 data:
   ADMIN: ""
+  ISTIO_INGRESS_GATEWAY_PRINCIPAL: cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+  KFP_UI_PRINCIPAL: cluster.local/ns/kubeflow/sa/ml-pipeline-ui
+  NOTEBOOK_CONTROLLER_PRINCIPAL: cluster.local/ns/kubeflow/sa/notebook-controller-service-account
   USERID_HEADER: kubeflow-userid
   USERID_PREFIX: ""
   WORKLOAD_IDENTITY: ""
@@ -438,7 +441,7 @@ kind: ConfigMap
 metadata:
   labels:
     kustomize.component: profiles
-  name: profiles-config-46c7tgh6fd
+  name: profiles-config-5h9m86f79f
   namespace: kubeflow
 ---
 apiVersion: v1
@@ -484,8 +487,8 @@ spec:
         - $(USERID_PREFIX)
         envFrom:
         - configMapRef:
-            name: profiles-config-46c7tgh6fd
-        image: docker.io/kubeflownotebookswg/kfam:v1.8.0-rc.0
+            name: profiles-config-5h9m86f79f
+        image: docker.io/kubeflownotebookswg/kfam:v1.9.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -508,8 +511,8 @@ spec:
         - $(WORKLOAD_IDENTITY)
         envFrom:
         - configMapRef:
-            name: profiles-config-46c7tgh6fd
-        image: docker.io/kubeflownotebookswg/profile-controller:v1.8.0-rc.0
+            name: profiles-config-5h9m86f79f
+        image: docker.io/kubeflownotebookswg/profile-controller:v1.9.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

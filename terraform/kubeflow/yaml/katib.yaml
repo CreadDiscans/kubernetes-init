@@ -403,40 +403,40 @@ data:
     runtime:
       metricsCollectors:
         - kind: StdOut
-          image: docker.io/kubeflowkatib/file-metrics-collector:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/file-metrics-collector:v0.17.0
         - kind: File
-          image: docker.io/kubeflowkatib/file-metrics-collector:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/file-metrics-collector:v0.17.0
         - kind: TensorFlowEvent
-          image: docker.io/kubeflowkatib/tfevent-metrics-collector:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/tfevent-metrics-collector:v0.17.0
           resources:
             limits:
               memory: 1Gi
       suggestions:
         - algorithmName: random
-          image: docker.io/kubeflowkatib/suggestion-hyperopt:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-hyperopt:v0.17.0
         - algorithmName: tpe
-          image: docker.io/kubeflowkatib/suggestion-hyperopt:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-hyperopt:v0.17.0
         - algorithmName: grid
-          image: docker.io/kubeflowkatib/suggestion-optuna:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-optuna:v0.17.0
         - algorithmName: hyperband
-          image: docker.io/kubeflowkatib/suggestion-hyperband:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-hyperband:v0.17.0
         - algorithmName: bayesianoptimization
-          image: docker.io/kubeflowkatib/suggestion-skopt:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-skopt:v0.17.0
         - algorithmName: cmaes
-          image: docker.io/kubeflowkatib/suggestion-goptuna:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-goptuna:v0.17.0
         - algorithmName: sobol
-          image: docker.io/kubeflowkatib/suggestion-goptuna:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-goptuna:v0.17.0
         - algorithmName: multivariate-tpe
-          image: docker.io/kubeflowkatib/suggestion-optuna:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-optuna:v0.17.0
         - algorithmName: enas
-          image: docker.io/kubeflowkatib/suggestion-enas:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-enas:v0.17.0
           resources:
             limits:
-              memory: 200Mi
+              memory: 400Mi
         - algorithmName: darts
-          image: docker.io/kubeflowkatib/suggestion-darts:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-darts:v0.17.0
         - algorithmName: pbt
-          image: docker.io/kubeflowkatib/suggestion-pbt:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/suggestion-pbt:v0.17.0
           persistentVolumeClaimSpec:
             accessModes:
               - ReadWriteMany
@@ -445,7 +445,7 @@ data:
                 storage: 5Gi
       earlyStoppings:
         - algorithmName: medianstop
-          image: docker.io/kubeflowkatib/earlystopping-medianstop:v0.16.0-rc.1
+          image: docker.io/kubeflowkatib/earlystopping-medianstop:v0.17.0
 kind: ConfigMap
 metadata:
   name: katib-config
@@ -461,14 +461,14 @@ data:
         spec:
           containers:
             - name: training-container
-              image: docker.io/kubeflowkatib/mxnet-mnist:v0.16.0-rc.1
+              image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.17.0
               command:
                 - "python3"
-                - "/opt/mxnet-mnist/mnist.py"
-                - "--batch-size=64"
+                - "/opt/pytorch-mnist/mnist.py"
+                - "--epochs=1"
+                - "--batch-size=16"
                 - "--lr=${trialParameters.learningRate}"
-                - "--num-layers=${trialParameters.numberLayers}"
-                - "--optimizer=${trialParameters.optimizer}"
+                - "--momentum=${trialParameters.momentum}"
           restartPolicy: Never
   enasCPUTemplate: |-
     apiVersion: batch/v1
@@ -478,7 +478,7 @@ data:
         spec:
           containers:
             - name: training-container
-              image: docker.io/kubeflowkatib/enas-cnn-cifar10-cpu:v0.16.0-rc.1
+              image: docker.io/kubeflowkatib/enas-cnn-cifar10-cpu:v0.17.0
               command:
                 - python3
                 - -u
@@ -499,7 +499,7 @@ data:
             spec:
               containers:
                 - name: pytorch
-                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.16.0-rc.1
+                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.17.0
                   command:
                     - "python3"
                     - "/opt/pytorch-mnist/mnist.py"
@@ -513,7 +513,7 @@ data:
             spec:
               containers:
                 - name: pytorch
-                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.16.0-rc.1
+                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.17.0
                   command:
                     - "python3"
                     - "/opt/pytorch-mnist/mnist.py"
@@ -655,7 +655,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: docker.io/kubeflowkatib/katib-controller:v0.16.0-rc.1
+        image: docker.io/kubeflowkatib/katib-controller:v0.17.0
         livenessProbe:
           httpGet:
             path: /healthz
@@ -712,16 +712,6 @@ spec:
       labels:
         katib.kubeflow.org/component: db-manager
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                - key: "kubernetes.io/gpu"
-                  operator: "In"
-                  values:
-                  - none
       containers:
       - command:
         - ./katib-db-manager
@@ -733,7 +723,7 @@ spec:
             secretKeyRef:
               key: MYSQL_ROOT_PASSWORD
               name: katib-mysql-secrets
-        image: docker.io/kubeflowkatib/katib-db-manager:v0.16.0-rc.1
+        image: docker.io/kubeflowkatib/katib-db-manager:v0.17.0
         livenessProbe:
           failureThreshold: 5
           grpc:
@@ -766,16 +756,6 @@ spec:
       labels:
         katib.kubeflow.org/component: mysql
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                - key: "kubernetes.io/gpu"
-                  operator: "In"
-                  values:
-                  - none
       containers:
       - args:
         - --datadir
@@ -849,16 +829,6 @@ spec:
       labels:
         katib.kubeflow.org/component: ui
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                - key: "kubernetes.io/gpu"
-                  operator: "In"
-                  values:
-                  - none
       containers:
       - args:
         - --port=8080
@@ -871,7 +841,7 @@ spec:
               fieldPath: metadata.namespace
         - name: APP_DISABLE_AUTH
           value: "false"
-        image: docker.io/kubeflowkatib/katib-ui:v0.16.0-rc.1
+        image: docker.io/kubeflowkatib/katib-ui:v0.17.0
         name: katib-ui
         ports:
         - containerPort: 8080
