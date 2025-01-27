@@ -846,7 +846,8 @@ scheduler:
   extraVolumeMounts: []
 
   # Select certain nodes for airflow scheduler pods.
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   affinity: {}
   # default scheduler affinity is:
   #  podAntiAffinity:
@@ -857,7 +858,10 @@ scheduler:
   #            component: scheduler
   #        topologyKey: kubernetes.io/hostname
   #      weight: 100
-  tolerations: []
+  tolerations: 
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: Exists
+    effect: NoSchedule
   topologySpreadConstraints: []
 
   priorityClassName: ~
@@ -984,9 +988,13 @@ createUserJob:
   extraVolumes: []
   extraVolumeMounts: []
 
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   affinity: {}
-  tolerations: []
+  tolerations: 
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
   topologySpreadConstraints: []
   # In case you need to disable the helm hooks that create the jobs after install.
   # Disable this if you are using ArgoCD for example
@@ -1080,9 +1088,13 @@ migrateDatabaseJob:
   extraVolumes: []
   extraVolumeMounts: []
 
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   affinity: {}
-  tolerations: []
+  tolerations: 
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
   topologySpreadConstraints: []
   # In case you need to disable the helm hooks that create the jobs after install.
   # Disable this if you are using ArgoCD for example
@@ -1349,7 +1361,8 @@ webserver:
     loadBalancerSourceRanges: []
 
   # Select certain nodes for airflow webserver pods.
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   priorityClassName: ~
   affinity: {}
   # default webserver affinity is:
@@ -1361,7 +1374,10 @@ webserver:
   #            component: webserver
   #        topologyKey: kubernetes.io/hostname
   #      weight: 100
-  tolerations: []
+  tolerations: 
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
   topologySpreadConstraints: []
 
   # annotations for webserver deployment
@@ -1490,7 +1506,8 @@ triggerer:
   extraVolumeMounts: []
 
   # Select certain nodes for airflow triggerer pods.
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   affinity: {}
   # default triggerer affinity is:
   #  podAntiAffinity:
@@ -1501,7 +1518,10 @@ triggerer:
   #            component: triggerer
   #        topologyKey: kubernetes.io/hostname
   #      weight: 100
-  tolerations: []
+  tolerations: 
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
   topologySpreadConstraints: []
 
   priorityClassName: ~
@@ -1902,9 +1922,13 @@ statsd:
     extraAnnotations: {}
 
   # Select certain nodes for StatsD pods.
-  nodeSelector: {}
+  nodeSelector: 
+    kubernetes.io/hostname: master
   affinity: {}
-  tolerations: []
+  tolerations: 
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
   topologySpreadConstraints: []
 
   priorityClassName: ~

@@ -829,7 +829,7 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -840,7 +840,9 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 100
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       restartPolicy: Always
@@ -1204,11 +1206,13 @@ spec:
         release: airflow
     spec:
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         {}
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       serviceAccountName: airflow-statsd
@@ -1313,7 +1317,7 @@ spec:
     spec:
       serviceAccountName: airflow-webserver
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -1324,7 +1328,9 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 100
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       restartPolicy: Always
@@ -1549,7 +1555,7 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -1560,7 +1566,9 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 100
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       terminationGracePeriodSeconds: 60
@@ -2193,7 +2201,7 @@ metadata:
     "helm.sh/hook-weight": "0"
 type: Opaque
 data:
-  fernet-key: "WWtaaFJYZGxPWGd4Y1VKSWIyVmliRTA0ZW1abmJtcFNXRkZNYnpWeFNFUT0="
+  fernet-key: "YUdSdlUwbHNVMFF6VlVGQ1NrSkpkbGxqTldacGFXaHFiR1ZWZW1Zeldsbz0="
 ---
 # Source: airflow/templates/secrets/redis-secrets.yaml
 # We will create these secrets (if necessary) _even if_ we aren't
@@ -2261,11 +2269,13 @@ spec:
         fsGroup: 0
       restartPolicy: OnFailure
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         {}
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       serviceAccountName: airflow-create-user-job
@@ -2387,11 +2397,13 @@ spec:
         fsGroup: 0
       restartPolicy: OnFailure
       nodeSelector:
-        {}
+        kubernetes.io/hostname: master
       affinity:
         {}
       tolerations:
-        []
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       topologySpreadConstraints:
         []
       serviceAccountName: airflow-migrate-database-job
