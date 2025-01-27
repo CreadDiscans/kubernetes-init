@@ -190,6 +190,14 @@ resource "kubernetes_deployment" "runner" {
       }
       spec {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
+        node_selector = {
+          "kubernetes.io/hostname": "master"
+        }
+        toleration {
+          effect = "NoSchedule"
+          key = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+        }
         init_container {
           name  = "gitlab-runner-token-getter"
           image = "creaddiscans/selenium_script:0.1"

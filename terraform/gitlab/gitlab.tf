@@ -60,6 +60,14 @@ resource "kubernetes_deployment" "gitlab_deploy" {
         }
       }
       spec {
+        node_selector = {
+          "kubernetes.io/hostname": "master"
+        }
+        toleration {
+          effect = "NoSchedule"
+          key = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+        }
         container {
           image = "gitlab/gitlab-ce:17.8.1-ce.0"
           name  = "gitlab"
