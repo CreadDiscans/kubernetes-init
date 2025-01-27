@@ -42,6 +42,34 @@ resource "kubernetes_deployment" "minio_deploy" {
         }
       }
       spec {
+        affinity {
+          node_affinity {
+            preferred_during_scheduling_ignored_during_execution {
+              weight = 100
+              preference {
+                match_expressions {
+                  key      = "node-role.kubernetes.io/control-plane"
+                  operator = "Exists"
+                }
+              }
+            }
+          }
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_labels = {
+                  app = "minio"
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+        }
+        toleration {
+          effect   = "NoSchedule"
+          key      = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+        }
         container {
           image             = "minio/minio:latest"
           image_pull_policy = "IfNotPresent"
