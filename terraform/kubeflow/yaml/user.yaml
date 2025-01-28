@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-  profile-name: kubeflow-user-example-com
-  user: user@example.com
+  profile-name: kubeflow-user
+  user: ${email}
 kind: ConfigMap
 metadata:
   name: default-install-config-9h2h2b6hbk
@@ -9,8 +9,8 @@ metadata:
 apiVersion: kubeflow.org/v1beta1
 kind: Profile
 metadata:
-  name: kubeflow-user-example-com
+  name: kubeflow-user
 spec:
   owner:
     kind: User
-    name: user@example.com
+    name: ${email}

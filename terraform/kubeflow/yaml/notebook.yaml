@@ -9661,6 +9661,12 @@ spec:
         app: notebook-controller
         kustomize.component: notebook-controller
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - command:
         - /manager

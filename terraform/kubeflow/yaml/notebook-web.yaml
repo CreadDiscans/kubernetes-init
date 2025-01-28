@@ -782,6 +782,12 @@ spec:
         app: jupyter-web-app
         kustomize.component: jupyter-web-app
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - env:
         - name: APP_PREFIX

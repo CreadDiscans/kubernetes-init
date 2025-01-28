@@ -246,29 +246,29 @@ metadata:
     kustomize.component: centraldashboard
   name: centraldashboard-parameters
   namespace: kubeflow
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: centraldashboard
-    app.kubernetes.io/component: centraldashboard
-    app.kubernetes.io/name: centraldashboard
-    kustomize.component: centraldashboard
-  name: centraldashboard
-  namespace: kubeflow
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8082
-  selector:
-    app: centraldashboard
-    app.kubernetes.io/component: centraldashboard
-    app.kubernetes.io/name: centraldashboard
-    kustomize.component: centraldashboard
-  sessionAffinity: None
-  type: ClusterIP
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     app: centraldashboard
+#     app.kubernetes.io/component: centraldashboard
+#     app.kubernetes.io/name: centraldashboard
+#     kustomize.component: centraldashboard
+#   name: centraldashboard
+#   namespace: kubeflow
+# spec:
+#   ports:
+#   - port: 80
+#     protocol: TCP
+#     targetPort: 8082
+#   selector:
+#     app: centraldashboard
+#     app.kubernetes.io/component: centraldashboard
+#     app.kubernetes.io/name: centraldashboard
+#     kustomize.component: centraldashboard
+#   sessionAffinity: None
+#   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -298,6 +298,12 @@ spec:
         app.kubernetes.io/name: centraldashboard
         kustomize.component: centraldashboard
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - env:
         - name: LOGOUT_URL
@@ -330,33 +336,33 @@ spec:
           protocol: TCP
       serviceAccountName: centraldashboard
 ---
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  labels:
-    app: centraldashboard
-    app.kubernetes.io/component: centraldashboard
-    app.kubernetes.io/name: centraldashboard
-    kustomize.component: centraldashboard
-  name: centraldashboard
-  namespace: kubeflow
-spec:
-  gateways:
-  - kubeflow-gateway
-  hosts:
-  - '*'
-  http:
-  - match:
-    - uri:
-        prefix: /
-    rewrite:
-      uri: /
-    route:
-    - destination:
-        host: centraldashboard.kubeflow.svc.cluster.local
-        port:
-          number: 80
----
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   labels:
+#     app: centraldashboard
+#     app.kubernetes.io/component: centraldashboard
+#     app.kubernetes.io/name: centraldashboard
+#     kustomize.component: centraldashboard
+#   name: centraldashboard
+#   namespace: kubeflow
+# spec:
+#   gateways:
+#   - kubeflow-gateway
+#   hosts:
+#   - '*'
+#   http:
+#   - match:
+#     - uri:
+#         prefix: /
+#     rewrite:
+#       uri: /
+#     route:
+#     - destination:
+#         host: centraldashboard.kubeflow.svc.cluster.local
+#         port:
+#           number: 80
+# ---
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:

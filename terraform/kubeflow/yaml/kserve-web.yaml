@@ -147,6 +147,12 @@ spec:
         app.kubernetes.io/name: kserve
         kustomize.component: kserve-models-web-app
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - envFrom:
         - configMapRef:

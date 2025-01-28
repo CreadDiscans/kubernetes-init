@@ -645,6 +645,12 @@ spec:
         katib.kubeflow.org/component: controller
         katib.kubeflow.org/metrics-collector-injection: disabled
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - args:
         - --katib-config=/katib-config.yaml
@@ -712,6 +718,12 @@ spec:
       labels:
         katib.kubeflow.org/component: db-manager
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - command:
         - ./katib-db-manager
@@ -756,6 +768,12 @@ spec:
       labels:
         katib.kubeflow.org/component: mysql
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - args:
         - --datadir
@@ -829,6 +847,12 @@ spec:
       labels:
         katib.kubeflow.org/component: ui
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
       - args:
         - --port=8080
