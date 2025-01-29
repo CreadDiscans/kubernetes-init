@@ -75,3 +75,10 @@ module "kubeflow" {
   minio_creds = module.minio.creds
   keycloak    = module.keycloak.info
 }
+
+module "milvus" {
+  source = "./milvus"
+  domain = var.domain
+  prefix = var.prefix.milvus
+  minio_creds = module.minio.creds
+}

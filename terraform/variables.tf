@@ -34,6 +34,7 @@ variable "prefix" {
     argocd   = string
     airflow  = string
     kubeflow = string
+    milvus   = string
   })
   default = {
     keycloak = "keycloak"
@@ -44,6 +45,7 @@ variable "prefix" {
     argocd   = "argocd"
     airflow  = "airflow"
     kubeflow = "kubeflow"
+    milvus   = "milvus"
   }
 }
 

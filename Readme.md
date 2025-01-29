@@ -16,6 +16,7 @@
 - gitlab-ce                         17.8.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 - airflow                           2.10.4      [https://github.com/apache/airflow/]
 - kubeflow                          1.9.1       [https://github.com/kubeflow/manifests]
+- milvus-operator                   1.2.0       [https://github.com/zilliztech/milvus-operator]
 
 # kubernetes 설치
 
