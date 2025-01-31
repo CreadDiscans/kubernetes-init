@@ -14,11 +14,11 @@ module "ingress_nginx" {
   depends_on = [kubernetes_namespace.ns]
 }
 
-# module "tcp_config" {
-#   source     = "../utils/apply"
-#   yaml       = "${path.module}/yaml/ingress-nginx-tcp.yaml"
-#   depends_on = [kubernetes_namespace.ns]
-# }
+module "tcp_config" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/ingress-nginx-tcp.yaml"
+  depends_on = [kubernetes_namespace.ns]
+}
 
 module "arp_protocol" {
   source     = "../utils/update"
