@@ -97,7 +97,7 @@ module "service" {
   domain    = var.domain
   prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
-  port      = 8002
+  port      = 8082
   gateway   = "kubeflow-gateway"
   selector = {
     "app" = "centraldashboard"
