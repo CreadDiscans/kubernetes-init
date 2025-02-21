@@ -1,7 +1,15 @@
-module "nginx" {
-  source       = "./nginx"
+module "metallb" {
+  source       = "./metallb"
   external_ips = var.external_ips
-  email        = var.email
+}
+
+module "nginx" {
+  source = "./nginx"
+}
+
+module "certmanager" {
+  source = "./certmanager"
+  email  = var.email
 }
 
 module "nfs" {
@@ -77,8 +85,8 @@ module "kubeflow" {
 }
 
 module "milvus" {
-  source = "./milvus"
-  domain = var.domain
-  prefix = var.prefix.milvus
+  source      = "./milvus"
+  domain      = var.domain
+  prefix      = var.prefix.milvus
   minio_creds = module.minio.creds
 }
