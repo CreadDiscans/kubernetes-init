@@ -78,6 +78,12 @@ module "auth" {
   ]
 }
 
+module "sysflow" {
+  source   = "./sysflow"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
 # module "airflow" {
 #   source       = "./airflow"
 #   domain       = var.domain
