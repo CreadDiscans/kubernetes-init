@@ -36,8 +36,8 @@ module "rook-storgeclass" {
 # }
 
 module "keycloak" {
-  source     = "./keycloak"
-  domain     = var.domain
+  source = "./keycloak"
+  domain = var.domain
 }
 
 module "prometheus" {
@@ -59,9 +59,23 @@ module "minio" {
 }
 
 module "gitlab" {
-  source = "./gitlab"
-  domain = var.domain
+  source   = "./gitlab"
+  domain   = var.domain
   keycloak = module.keycloak.info
+}
+
+module "kubeflow" {
+  source   = "./kubeflow"
+  domain   = var.domain
+  email    = var.email
+  keycloak = module.keycloak.info
+}
+
+module "auth" {
+  source = "./auth"
+  auths = [
+    module.kubeflow.auth
+  ]
 }
 
 # module "airflow" {
@@ -74,17 +88,10 @@ module "gitlab" {
 # }
 
 
-# module "kubeflow" {
-#   source      = "./kubeflow"
-#   domain      = var.domain
-#   email       = var.email
-#   keycloak    = module.keycloak.info
+# module "vitess" {
+#   source    = "./vitess"
+#   keyspaces = var.keyspaces
 # }
-
-module "vitess" {
-  source    = "./vitess"
-  keyspaces = var.keyspaces
-}
 
 # module "cnpg" {
 #   source      = "./cnpg"

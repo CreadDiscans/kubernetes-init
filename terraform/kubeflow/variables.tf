@@ -18,3 +18,7 @@ variable "keycloak" {
     password = string
   })
 }
+
+output "auth" {
+  value = module.oidc.auth
+}

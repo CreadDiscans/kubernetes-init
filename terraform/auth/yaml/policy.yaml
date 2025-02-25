@@ -1,0 +1,40 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ext-authz
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  action: CUSTOM
+  provider:
+    name: authservice-grpc
+  rules:
+  - to:
+    - operation:
+        notPaths: [
+          "/static/*",
+          "/styles/*", 
+          "/images/*", 
+          "/assets/*", 
+          "/public/*",
+          "/favicon.ico",
+          "/manifest.json",
+        ]
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: authz-svc
+  namespace: istio-system
+spec:
+  hosts:
+  - authservice.istio-system.svc.cluster.local # not used
+  ports:
+  - number: 10003
+    name: grpc-ext
+    protocol: grpc
+  resolution: STATIC
+  endpoints:
+  - address: 127.0.0.1
