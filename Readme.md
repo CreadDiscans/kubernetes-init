@@ -2,12 +2,13 @@
 
 - Ubuntu                            24.04
 - kubernetes                        1.32
-- calico                            3.29.1
-- metallb                           0.14.9
-- ingress-nginx                     1.12.0
-- cert-manager                      1.16.3
-- nfs-subdir-external-provisioner   4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
+- calico                            3.29.1      [https://github.com/projectcalico/calico]
+- metallb                           0.14.9      [https://github.com/metallb/metallb]
+- ingress-nginx                     1.12.0      [https://github.com/kubernetes/ingress-nginx]
+- cert-manager                      1.16.3      [https://github.com/cert-manager/cert-manager]
 - istio                             1.24.2      [https://github.com/istio/istio]
+- rook                              1.16.3      [https://github.com/rook/rook]
+- nfs-subdir-external-provisioner   4.0.18      [https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner]
 - keycloak                          26.1.0      [https://www.keycloak.org/]
 - kube-prometheus                   0.14.0      [https://github.com/prometheus-operator/kube-prometheus]
 - argocd                            2.13.3      [https://github.com/argoproj/argo-cd]

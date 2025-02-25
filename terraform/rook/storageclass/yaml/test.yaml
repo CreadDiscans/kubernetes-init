@@ -1,0 +1,49 @@
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: ubuntu-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 2Gi
+#   storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: rook-cephfs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:latest
+        command: ["/bin/bash", "-c", "tail -f /dev/null"]
+        volumeMounts:
+        - name: storage
+          mountPath: /data  # 컨테이너 내부 경로
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc

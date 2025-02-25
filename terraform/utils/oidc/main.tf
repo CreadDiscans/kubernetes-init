@@ -1,149 +1,76 @@
+resource "keycloak_openid_client" "openid_client" {
+  realm_id                        = var.realm
+  client_id                       = var.client_id
+  name                            = var.client_id
+  enabled                         = true
+  access_type                     = "CONFIDENTIAL"
+  client_secret                   = local.client_secret
+  direct_access_grants_enabled    = true
+  standard_flow_enabled           = true
+  valid_redirect_uris             = [for uri in var.redirect_uri : (uri == "default" ? "https://${var.prefix}.${var.domain}/authservice_callback" : uri)]
+  valid_post_logout_redirect_uris = var.post_logout_redirect_uris
+  base_url                        = ""
+  root_url                        = ""
+  access_token_lifespan           = 86400
+}
 
-resource "kubernetes_config_map" "oidc_script" {
-  metadata {
-    name      = "oidc-script"
-    namespace = var.namespace
-  }
-  data = {
-    "script.py" = <<EOF
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-import time
-import os
-
-host = "${var.gitlab_host}"
-username = "root"
-password = "${var.password}"
-name = "${var.name}"
-redirect_uri = "${var.redirect_uri}"
-
-def get_token():
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument("--single-process")
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--window-size=1920,1000')
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.20 Safari/537.36")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    driver.get(host)
-    print('open gitlab', host)
-    while True:
-        try:
-            driver.find_element(By.ID, 'user_login')
-            break
-        except KeyboardInterrupt:
-            return
-        except Exception as ex:
-            pass
-    driver.find_element(By.ID, 'user_login').send_keys(username)
-    driver.find_element(By.ID, 'user_password').send_keys(password)
-    driver.find_element(By.CLASS_NAME, 'js-sign-in-button').click()
-    print('login')
-    driver.get(host+'/admin/applications/new')
-    driver.find_element(By.ID, 'doorkeeper_application_name').send_keys(name)
-    driver.find_element(By.ID, 'doorkeeper_application_redirect_uri').send_keys(redirect_uri)
-    driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_trusted'))
-    driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_api'))
-    driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_openid'))
-    driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_profile'))
-    driver.execute_script("arguments[0].click();", driver.find_element(By.ID, 'doorkeeper_application_scopes_email'))
-    driver.find_element(By.CSS_SELECTOR, '[data-testid=save-application-button]').click()
-    time.sleep(5)
-    client_id = driver.find_element(By.ID, 'application_id').get_attribute('value')
-    while True:
-      try:
-        client_secret = driver.find_element(By.ID, '__BVID__194').get_attribute('value')
-        break
-      except:
-        print('error get secret, retrying')
-        time.sleep(10)
-
-    return client_id, client_secret
-
-if __name__ == '__main__':
-  print('start')
-  client_id, client_secret = get_token()
-  os.system(f'kubectl create secret generic ${local.secret_name} --from-literal=client_id={client_id} --from-literal=client_secret={client_secret}')
-    EOF
+resource "keycloak_group" "group" {
+  realm_id = var.realm
+  name     = var.client_id
+  attributes = {
+    policy = var.policy
   }
 }
 
-resource "kubernetes_service_account" "oidc_sa" {
-  metadata {
-    name      = "oidc-service-account"
-    namespace = var.namespace
-  }
+resource "keycloak_openid_client_scope" "auth" {
+  realm_id               = var.realm
+  name                   = "${var.client_id}-auth"
+  description            = "for ${var.client_id}"
+  include_in_token_scope = true
 }
 
-resource "kubernetes_role" "oidc_role" {
-  metadata {
-    name      = "oidc-role"
-    namespace = var.namespace
-  }
-  rule {
-    api_groups = ["*"]
-    resources  = ["secrets"]
-    verbs      = ["get", "list", "watch", "create", "update"]
-  }
+resource "keycloak_openid_group_membership_protocol_mapper" "auth_mapper" {
+  realm_id        = var.realm
+  client_scope_id = keycloak_openid_client_scope.auth.id
+  name            = "groups"
+  claim_name      = "groups"
 }
 
-resource "kubernetes_role_binding" "oidc_role_binding" {
-  metadata {
-    name      = "oidc-role-binding"
-    namespace = var.namespace
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = kubernetes_role.oidc_role.metadata.0.name
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.oidc_sa.metadata.0.name
-    namespace = var.namespace
-  }
+resource "keycloak_openid_audience_protocol_mapper" "audience_mapper" {
+  realm_id  = var.realm
+  client_scope_id = keycloak_openid_client_scope.auth.id
+  name      = "audience-mapper"
+  included_client_audience = var.client_id
 }
 
-resource "kubernetes_job" "oidc_job" {
-  metadata {
-    name      = "oidc-job"
-    namespace = var.namespace
-  }
-  spec {
-    template {
-      metadata {}
-      spec {
-        service_account_name = kubernetes_service_account.oidc_sa.metadata.0.name
-        container {
-          name  = "gitlab-oidc"
-          image = "creaddiscans/selenium_script:0.2"
-          volume_mount {
-            name       = "script"
-            mount_path = "/app"
-          }
-        }
-        volume {
-          name = "script"
-          config_map {
-            name = kubernetes_config_map.oidc_script.metadata.0.name
-          }
-        }
-      }
-    }
-  }
-  timeouts {
-    create = "10m"
-    update = "10m"
-  }
-  wait_for_completion = true
+resource "keycloak_openid_user_realm_role_protocol_mapper" "realm_role_mapper" {
+  realm_id = var.realm
+  client_scope_id = keycloak_openid_client_scope.auth.id
+  name = "realm-role-mapper"
+  claim_name = "role"
+  multivalued = true
 }
 
+resource "keycloak_openid_user_attribute_protocol_mapper" "auth_mapper" {
+  count                = var.policy == "" ? 0 : 1
+  realm_id             = var.realm
+  client_scope_id      = keycloak_openid_client_scope.auth.id
+  name                 = "${var.client_id}-policy-mapper"
+  user_attribute       = "policy"
+  claim_name           = "policy"
+  add_to_id_token      = true
+  claim_value_type     = "String"
+  multivalued          = true
+  aggregate_attributes = true
+}
 
-resource "time_sleep" "wait" {
-  create_duration = "30s"
-  depends_on      = [kubernetes_job.oidc_job]
+resource "keycloak_openid_client_default_scopes" "default_scopes" {
+  realm_id  = var.realm
+  client_id = keycloak_openid_client.openid_client.id
+  default_scopes = [
+    "email",
+    "profile",
+    "${var.client_id}-auth"
+  ]
+  depends_on = [keycloak_openid_group_membership_protocol_mapper.auth_mapper]
 }

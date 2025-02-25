@@ -9,6 +9,24 @@ variable "email" {
   default = "user@example.com"
 }
 
+variable "osd" {
+  type = list(object({
+    device        = string
+    osdsPerDevice = string
+  }))
+  default = [
+    {
+      device        = "/dev/ubuntu-vg/ceph-lv",
+      osdsPerDevice = "1"
+    }
+  ]
+}
+
+variable "single_node" {
+  type    = bool
+  default = true
+}
+
 variable "nfs_ip" {
   type    = string
   default = "x.x.x.x"
@@ -24,31 +42,6 @@ variable "domain" {
   default = "example.com"
 }
 
-variable "prefix" {
-  type = object({
-    keycloak = string
-    gitlab   = string
-    registry = string
-    minio    = string
-    grafana  = string
-    argocd   = string
-    airflow  = string
-    kubeflow = string
-    milvus   = string
-  })
-  default = {
-    keycloak = "keycloak"
-    gitlab   = "gitlab"
-    registry = "registry"
-    minio    = "minio"
-    grafana  = "grafana"
-    argocd   = "argocd"
-    airflow  = "airflow"
-    kubeflow = "kubeflow"
-    milvus   = "milvus"
-  }
-}
-
 variable "admin" {
   type = object({
     username = string
@@ -60,6 +53,6 @@ variable "admin" {
   }
 }
 
-variable "airflow_repo" {
-  type = string
-}
+# variable "airflow_repo" {
+#   type = string
+# }
