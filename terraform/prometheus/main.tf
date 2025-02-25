@@ -35,9 +35,9 @@ resource "kubernetes_secret" "config" {
 [date_formats]
 default_timezone = UTC
 [server]
-root_url = https://${var.prefix}.${var.domain}
+root_url = https://${local.prefix}.${var.domain}
 [auth]
-signout_redirect_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/logout
+signout_redirect_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/logout
 disable_login_form = true
 [auth.generic_oauth]
 enabled = true
@@ -45,10 +45,10 @@ name = Keycloak-OAuth
 allow_sign_up = true
 scopes = openid email profile offline_access
 client_id = '${local.client_id}'
-client_secret = '${local.client_secret}'
-auth_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/auth
-token_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/token
-api_url = ${var.keycloak.url}/realms/${local.realm}/protocol/openid-connect/userinfo
+client_secret = '${module.oidc.auth.client_secret}'
+auth_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/auth
+token_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/token
+api_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/userinfo
 role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
 tls_skip_verify_insecure = true
     EOF
@@ -64,7 +64,7 @@ module "manifests" {
 module "grafana" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 3000
   selector = {
@@ -73,4 +73,13 @@ module "grafana" {
     "app.kubernetes.io/part-of" : "kube-prometheus"
   }
   depends_on = [module.manifests]
+}
+
+module "oidc" {
+  source = "../utils/oidc"
+  keycloak = var.keycloak
+  client_id = local.client_id
+  prefix = local.prefix
+  domain = var.domain
+  redirect_uri = ["https://${local.prefix}.${var.domain}/login/generic_oauth"]
 }

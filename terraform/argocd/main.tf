@@ -14,10 +14,10 @@ resource "kubernetes_config_map" "config" {
     }
   }
   data = {
-    url           = "https://${var.prefix}.${var.domain}"
+    url           = "https://${local.prefix}.${var.domain}"
     "oidc.config" = <<EOF
 name: Keycloak
-issuer: ${var.keycloak.url}/realms/${local.realm}
+issuer: ${var.keycloak.url}/realms/${module.oidc.auth.realm}
 clientID: ${local.client_id}
 clientSecret: $oidc.keycloak.clientSecret
 requestedScopes: ["openid", "profile", "email"]
@@ -35,7 +35,7 @@ resource "kubernetes_secret" "secret" {
     }
   }
   data = {
-    "oidc.keycloak.clientSecret" = "${local.client_secret}"
+    "oidc.keycloak.clientSecret" = "${module.oidc.auth.client_secret}"
   }
   type = "Opaque"
 }
@@ -65,11 +65,22 @@ module "install" {
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {
     "app.kubernetes.io/name" = "argocd-server"
   }
   depends_on = [module.install]
+}
+
+module "oidc" {
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = local.prefix
+  domain    = var.domain
+  redirect_uri = [
+    "https://${local.prefix}.${var.domain}/auth/callback"
+  ]
 }

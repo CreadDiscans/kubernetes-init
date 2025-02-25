@@ -12,11 +12,11 @@
 - keycloak                          26.1.0      [https://www.keycloak.org/]
 - kube-prometheus                   0.14.0      [https://github.com/prometheus-operator/kube-prometheus]
 - argocd                            2.13.3      [https://github.com/argoproj/argo-cd]
-- minio                             latest      [https://github.com/minio/minio]
-- cnpg                              1.25.0      [https://github.com/cloudnative-pg/cloudnative-pg]
+- minio-operator                    7.0.0       [https://github.com/minio/operator]
 - gitlab-ce                         17.8.1-ce.0 [https://gitlab.com/rluna-gitlab/gitlab-ce]
 - airflow                           2.10.4      [https://github.com/apache/airflow/]
 - kubeflow                          1.9.1       [https://github.com/kubeflow/manifests]
+- cnpg                              1.25.0      [https://github.com/cloudnative-pg/cloudnative-pg]
 - milvus-operator                   1.2.0       [https://github.com/zilliztech/milvus-operator]
 
 # kubernetes 설치

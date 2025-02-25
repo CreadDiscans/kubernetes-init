@@ -40,46 +40,29 @@ module "keycloak" {
   domain     = var.domain
 }
 
-module "vitess" {
-  source    = "./vitess"
-  keyspaces = var.keyspaces
+module "prometheus" {
+  source   = "./prometheus"
+  domain   = var.domain
+  keycloak = module.keycloak.info
 }
 
-# module "prometheus" {
-#   source   = "./prometheus"
-#   domain   = var.domain
-#   prefix   = var.prefix.grafana
-#   keycloak = module.keycloak.info
-# }
+module "argocd" {
+  source   = "./argocd"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
 
-# module "argocd" {
-#   source   = "./argocd"
-#   domain   = var.domain
-#   prefix   = var.prefix.argocd
-#   keycloak = module.keycloak.info
-# }
+module "minio" {
+  source   = "./minio"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
 
-# module "minio" {
-#   source   = "./minio"
-#   domain   = var.domain
-#   prefix   = var.prefix.minio
-#   keycloak = module.keycloak.info
-# }
-
-# module "cnpg" {
-#   source      = "./cnpg"
-#   minio_creds = module.minio.creds
-# }
-
-# module "gitlab" {
-#   source = "./gitlab"
-#   domain = var.domain
-#   prefix = {
-#     gitlab   = var.prefix.gitlab
-#     registry = var.prefix.registry
-#   }
-#   keycloak = module.keycloak.info
-# }
+module "gitlab" {
+  source = "./gitlab"
+  domain = var.domain
+  keycloak = module.keycloak.info
+}
 
 # module "airflow" {
 #   source       = "./airflow"
@@ -90,13 +73,22 @@ module "vitess" {
 #   airflow_repo = var.airflow_repo
 # }
 
+
 # module "kubeflow" {
 #   source      = "./kubeflow"
 #   domain      = var.domain
-#   prefix      = var.prefix.kubeflow
 #   email       = var.email
-#   minio_creds = module.minio.creds
 #   keycloak    = module.keycloak.info
+# }
+
+module "vitess" {
+  source    = "./vitess"
+  keyspaces = var.keyspaces
+}
+
+# module "cnpg" {
+#   source      = "./cnpg"
+#   minio_creds = module.minio.creds
 # }
 
 # module "milvus" {

@@ -1,8 +1,15 @@
 locals {
-  password = random_password.password.result
-  realm = "master"
+  prefix = {
+    gitlab   = "gitlab"
+    registry = "registry"
+  }
   client_id = "gitlab"
-  client_secret = random_uuid.client_secret.result
+  password  = random_password.password.result
+  db = {
+    dbname   = "gitlab"
+    user     = "gitlab"
+    password = random_password.password.result
+  }
 }
 
 resource "random_password" "password" {
@@ -11,27 +18,14 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "random_uuid" "client_secret" {}
-
-variable "prefix" {
-  type = object({
-    gitlab = string
-    registry = string
-  })
-}
-
 variable "domain" {
   type = string
 }
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })
-}
-
-output "url" {
-  value = "https://${var.prefix.gitlab}.${var.domain}"
 }

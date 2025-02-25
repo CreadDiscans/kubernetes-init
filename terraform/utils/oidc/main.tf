@@ -27,6 +27,7 @@ resource "keycloak_openid_client_scope" "auth" {
   name                   = "${var.client_id}-auth"
   description            = "for ${var.client_id}"
   include_in_token_scope = true
+  depends_on             = [keycloak_openid_client.openid_client]
 }
 
 resource "keycloak_openid_group_membership_protocol_mapper" "auth_mapper" {
@@ -37,18 +38,18 @@ resource "keycloak_openid_group_membership_protocol_mapper" "auth_mapper" {
 }
 
 resource "keycloak_openid_audience_protocol_mapper" "audience_mapper" {
-  realm_id  = var.realm
-  client_scope_id = keycloak_openid_client_scope.auth.id
-  name      = "audience-mapper"
+  realm_id                 = var.realm
+  client_scope_id          = keycloak_openid_client_scope.auth.id
+  name                     = "audience-mapper"
   included_client_audience = var.client_id
 }
 
 resource "keycloak_openid_user_realm_role_protocol_mapper" "realm_role_mapper" {
-  realm_id = var.realm
+  realm_id        = var.realm
   client_scope_id = keycloak_openid_client_scope.auth.id
-  name = "realm-role-mapper"
-  claim_name = "role"
-  multivalued = true
+  name            = "realm-role-mapper"
+  claim_name      = "role"
+  multivalued     = true
 }
 
 resource "keycloak_openid_user_attribute_protocol_mapper" "auth_mapper" {

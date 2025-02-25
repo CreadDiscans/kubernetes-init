@@ -95,7 +95,7 @@ module "centraldashboard" {
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8082
   gateway   = "kubeflow-gateway"
@@ -189,18 +189,6 @@ resource "null_resource" "wait" {
   depends_on = [module.user]
 }
 
-resource "kubernetes_secret" "minio_creds" {
-  metadata {
-    name      = "minio-secret"
-    namespace = "kubeflow-user"
-  }
-  data = {
-    AWS_ACCESS_KEY_ID     = var.minio_creds.username
-    AWS_SECRET_ACCESS_KEY = var.minio_creds.password
-  }
-  depends_on = [null_resource.wait]
-}
-
 data "kubernetes_secret" "kubeconfig" {
   metadata {
     name      = "kubeconfig"
@@ -222,4 +210,16 @@ module "user_policy" {
   source     = "../utils/apply"
   yaml       = "${path.module}/yaml/user-policy.yaml"
   depends_on = [null_resource.wait]
+}
+
+module "oidc" {
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = local.prefix
+  domain    = var.domain
+  redirect_uri = [
+    "https://${local.prefix}.${var.domain}/oauth/callback",
+    "https://${local.prefix}.${var.domain}/authservice_callback"
+  ]
 }

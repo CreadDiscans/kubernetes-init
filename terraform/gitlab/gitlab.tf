@@ -4,13 +4,6 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-data "kubernetes_secret" "db" {
-  metadata {
-    name      = "gitlab-db-secret"
-    namespace = "cnpg-system"
-  }
-}
-
 resource "kubernetes_persistent_volume_claim" "deploy_pvc" {
   metadata {
     name      = "gitlab-pvc"
@@ -20,17 +13,15 @@ resource "kubernetes_persistent_volume_claim" "deploy_pvc" {
     access_modes = ["ReadWriteMany"]
     resources {
       requests = {
-        storage = "1Gi"
+        storage = "50Gi"
       }
     }
-    storage_class_name = "nfs-volume"
   }
 }
 
-
 resource "kubernetes_secret" "secret" {
   metadata {
-    name = "gitlab-secret"
+    name      = "gitlab-secret"
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   data = {
@@ -38,7 +29,7 @@ resource "kubernetes_secret" "secret" {
   }
 }
 
-resource "kubernetes_deployment" "gitlab_deploy" {
+resource "kubernetes_stateful_set" "gitlab_deploy" {
   metadata {
     name      = "gitlab-deploy"
     namespace = kubernetes_namespace.ns.metadata.0.name
@@ -47,7 +38,8 @@ resource "kubernetes_deployment" "gitlab_deploy" {
     }
   }
   spec {
-    replicas = 1
+    service_name = "gitlab"
+    replicas     = 1
     selector {
       match_labels = {
         app = "gitlab"
@@ -60,14 +52,6 @@ resource "kubernetes_deployment" "gitlab_deploy" {
         }
       }
       spec {
-        node_selector = {
-          "kubernetes.io/hostname": "master"
-        }
-        toleration {
-          effect = "NoSchedule"
-          key = "node-role.kubernetes.io/control-plane"
-          operator = "Exists"
-        }
         container {
           image = "gitlab/gitlab-ce:17.8.1-ce.0"
           name  = "gitlab"
@@ -87,7 +71,7 @@ resource "kubernetes_deployment" "gitlab_deploy" {
               port = 80
             }
             failure_threshold = 1000
-            period_seconds = 10
+            period_seconds    = 10
           }
           env {
             name  = "TZ"
@@ -105,8 +89,8 @@ resource "kubernetes_deployment" "gitlab_deploy" {
           env {
             name  = "GITLAB_OMNIBUS_CONFIG"
             value = <<-EOF
-            external_url 'https://${var.prefix.gitlab}.${var.domain}'
-            registry_external_url 'https://${var.prefix.registry}.${var.domain}'
+            external_url 'https://${local.prefix.gitlab}.${var.domain}'
+            registry_external_url 'https://${local.prefix.registry}.${var.domain}'
             nginx['listen_port'] = 80
             nginx['listen_https'] = false
             registry['enable'] = true
@@ -115,10 +99,10 @@ resource "kubernetes_deployment" "gitlab_deploy" {
             registry_nginx['ssl_verify_client'] = "off"
             prometheus_monitoring['enable'] = false
             postgresql['enable'] = false
-            gitlab_rails['db_database'] = "gitlab"
-            gitlab_rails['db_username'] = "${data.kubernetes_secret.db.data.username}"
-            gitlab_rails['db_password'] = "${data.kubernetes_secret.db.data.password}"
-            gitlab_rails['db_host'] = "cluster-cnpg-rw.cnpg-system"
+            gitlab_rails['db_database'] = "${local.db.dbname}"
+            gitlab_rails['db_username'] = "${local.db.user}"
+            gitlab_rails['db_password'] = "${local.db.password}"
+            gitlab_rails['db_host'] = "${kubernetes_service.postgresql_service.metadata.0.name}"
             gitlab_rails['db_port'] = 5432
             gitlab_rails['omniauth_block_auto_created_users'] = false
             gitlab_rails['omniauth_providers'] = [
@@ -129,22 +113,22 @@ resource "kubernetes_deployment" "gitlab_deploy" {
                   name: "openid_connect",
                   scope: ["openid", "profile", "email"],
                   response_type: "code",
-                  issuer:  "${var.keycloak.url}/realms/${local.realm}",
+                  issuer:  "${var.keycloak.url}/realms/${module.oidc.auth.realm}",
                   client_auth_method: "query",
                   discovery: true,
                   uid_field: "preferred_username",
                   pkce: true,
                   client_options: {
-                    identifier: "${local.client_id}",
-                    secret: "${local.client_secret}",
-                    redirect_uri: "https://${var.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
+                    identifier: "${module.oidc.auth.client_id}",
+                    secret: "${module.oidc.auth.client_secret}",
+                    redirect_uri: "https://${local.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
                   }
                 }
               }
             ]
-            # redis['enable'] = false
-            # gitlab_rails['redis_host'] = 'redis-sentinel-sentinel.redis'
-            # gitlab_rails['redis_port'] = 26379
+            redis['enable'] = false
+            gitlab_rails['redis_host'] = '${kubernetes_service.redis_service.metadata.0.name}'
+            gitlab_rails['redis_port'] = 6379
             EOF
           }
           volume_mount {
@@ -166,7 +150,6 @@ resource "kubernetes_deployment" "gitlab_deploy" {
         }
       }
     }
-    progress_deadline_seconds = 6000
   }
   timeouts {
     create = "60m"
@@ -177,13 +160,10 @@ resource "kubernetes_deployment" "gitlab_deploy" {
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.gitlab
+  prefix    = local.prefix.gitlab
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
-  selector = {
-    app = "gitlab"
-  }
-  depends_on = [kubernetes_deployment.gitlab_deploy]
+  selector = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
 }
 
 resource "kubernetes_service" "service_ssh" {
@@ -192,9 +172,7 @@ resource "kubernetes_service" "service_ssh" {
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   spec {
-    selector = {
-      app = "gitlab"
-    }
+    selector = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
     port {
       name        = "22-tcp"
       port        = 22
@@ -202,17 +180,24 @@ resource "kubernetes_service" "service_ssh" {
     }
     type = "NodePort"
   }
-  depends_on = [kubernetes_deployment.gitlab_deploy]
 }
 
 module "service_registry" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix.registry
+  prefix    = local.prefix.registry
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 5005
-  selector = {
-    app = "gitlab"
-  }
-  depends_on = [kubernetes_deployment.gitlab_deploy]
+  selector = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
+}
+
+module "oidc" {
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = local.prefix.gitlab
+  domain    = var.domain
+  redirect_uri = [
+    "https://${local.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
+  ]
 }

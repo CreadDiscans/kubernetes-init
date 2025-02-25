@@ -1,9 +1,8 @@
 locals {
   username = "minioadmin"
   password = random_password.password.result
-  realm = "master"
+  prefix = "minio"
   client_id = "minio"
-  client_secret = random_uuid.client_secret.result
 }
 
 resource "random_password" "password" {
@@ -12,13 +11,7 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "random_uuid" "client_secret" {}
-
 variable "domain" {
-  type = string
-}
-
-variable "prefix" {
   type = string
 }
 
@@ -32,7 +25,7 @@ variable "keycloak" {
 
 output "creds" {
   value = {
-    url = "http://${var.prefix}-api-service.minio-storage"
+    url = "https://${local.prefix}-api.${var.domain}"
     username = local.username
     password = local.password
   }

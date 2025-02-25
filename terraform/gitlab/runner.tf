@@ -50,7 +50,7 @@ resource "kubernetes_config_map" "runner_config" {
         [[runners]]
         tls-ca-file = "/etc/gitlab-runner/certs/tls.crt"
         name = "kubernetes-runner"
-        url = "https://${var.prefix.gitlab}.${var.domain}"
+        url = "https://${local.prefix.gitlab}.${var.domain}"
         token = "$TOKEN"
         executor = "kubernetes"
         [runners.kubernetes]
@@ -98,7 +98,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 
-host = "https://${var.prefix.gitlab}.${var.domain}"
+host = "https://${local.prefix.gitlab}.${var.domain}"
 username = "root"
 password = "${local.password}"
 source = "/etc/gitlab-runner/config.toml"
@@ -267,12 +267,12 @@ resource "kubernetes_deployment" "runner" {
         volume {
           name = "gitlab-cert"
           secret {
-            secret_name = "${var.prefix.gitlab}-cert"
+            secret_name = "${local.prefix.gitlab}-cert"
           }
         }
         restart_policy = "Always"
       }
     }
   }
-  depends_on = [kubernetes_deployment.gitlab_deploy]
+  depends_on = [kubernetes_stateful_set.gitlab_deploy]
 }

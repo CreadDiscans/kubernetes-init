@@ -19,24 +19,6 @@ spec:
 apiVersion: "kubeflow.org/v1alpha1"
 kind: PodDefault
 metadata:
-  name: add-minio-secret
-  namespace: kubeflow-user
-spec:
-  selector:
-    matchLabels:
-      add-minio-socket: "true"
-  desc: "add minio secret"
-  volumeMounts:
-  - mountPath: /secret/minio
-    name: secret-volume
-  volumes:
-  - name: secret-volume
-    secret:
-      secretName: minio-secret
----
-apiVersion: "kubeflow.org/v1alpha1"
-kind: PodDefault
-metadata:
   name: add-admin-permission
   namespace: kubeflow-user
 spec:
