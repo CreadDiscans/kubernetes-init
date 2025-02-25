@@ -62,28 +62,28 @@ resource "kubernetes_deployment" "keycloak_deploy" {
           }
           env {
             name  = "KC_DB_URL"
-            value = "jdbc:${var.db_url}"
+            value = "jdbc:mysql://${kubernetes_service.mysql_svc.metadata.0.name}:3306/${local.db.name}"
           }
           env {
             name = "KC_DB_USERNAME"
+            value = local.db.user
+          }
+          env {
+            name  = "KC_DB_PASSWORD"
+            value = local.db.password
+          }
+          env {
+            name  = "KC_BOOTSTRAP_ADMIN_USERNAME"
+            value = local.username
+          }
+          env {
+            name  = "KC_BOOTSTRAP_ADMIN_PASSWORD"
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.secret.metadata.0.name
                 key  = "password"
               }
             }
-          }
-          env {
-            name  = "KC_DB_PASSWORD"
-            value = var.keyspace.dbname
-          }
-          env {
-            name  = "KC_BOOTSTRAP_ADMIN_USERNAME"
-            value = var.keyspace.username
-          }
-          env {
-            name  = "KC_BOOTSTRAP_ADMIN_PASSWORD"
-            value = var.keyspace.password
           }
           env {
             name  = "KC_HEALTH_ENABLED"
