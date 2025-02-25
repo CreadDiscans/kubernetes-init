@@ -4,6 +4,16 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+resource "kubernetes_secret" "secret" {
+  metadata {
+    name      = "keycloak-secret"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    password = local.password
+  }
+}
+
 resource "kubernetes_deployment" "keycloak_deploy" {
   metadata {
     name      = "keycloak-deploy"
@@ -40,7 +50,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
           ]
           env {
             name  = "KC_HOSTNAME"
-            value = "https://${var.prefix}.${var.domain}"
+            value = "https://${local.prefix}.${var.domain}"
           }
           env {
             name  = "KC_HTTP_ENABLED"
@@ -52,23 +62,28 @@ resource "kubernetes_deployment" "keycloak_deploy" {
           }
           env {
             name  = "KC_DB_URL"
-            value = "jdbc:mysql://mysql-service:3306/keycloak"
+            value = "jdbc:${var.db_url}"
           }
           env {
-            name  = "KC_DB_USERNAME"
-            value = local.db.user
+            name = "KC_DB_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.secret.metadata.0.name
+                key  = "password"
+              }
+            }
           }
           env {
             name  = "KC_DB_PASSWORD"
-            value = local.db.password
+            value = var.keyspace.dbname
           }
           env {
             name  = "KC_BOOTSTRAP_ADMIN_USERNAME"
-            value = var.admin.username
+            value = var.keyspace.username
           }
           env {
             name  = "KC_BOOTSTRAP_ADMIN_PASSWORD"
-            value = var.admin.password
+            value = var.keyspace.password
           }
           env {
             name  = "KC_HEALTH_ENABLED"
@@ -93,10 +108,8 @@ resource "kubernetes_deployment" "keycloak_deploy" {
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
-  selector = {
-    app = kubernetes_deployment.keycloak_deploy.metadata.0.labels.app
-  }
+  selector = kubernetes_deployment.keycloak_deploy.metadata.0.labels
 }

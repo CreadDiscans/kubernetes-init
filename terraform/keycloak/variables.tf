@@ -1,9 +1,7 @@
 locals {
-  db = {
-    name = "keycloak"
-    user = "keycloak"
-    password = random_password.password.result
-  }
+  prefix   = "keycloak"
+  username = "admin"
+  password = random_password.password.result
 }
 
 resource "random_password" "password" {
@@ -12,25 +10,26 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-variable "domain" {
+variable "db_url" {
   type = string
 }
 
-variable "prefix" {
-  type = string
-}
-
-variable "admin" {
+variable "keyspace" {
   type = object({
+    dbname = string
     username = string
     password = string
   })
 }
 
+variable "domain" {
+  type = string
+}
+
 output "info" {
-    value = {
-        url = "https://${var.prefix}.${var.domain}"
-        username = var.admin.username
-        password = var.admin.password
-    }
+  value = {
+    url      = "https://${local.prefix}.${var.domain}"
+    username = local.username
+    password = local.password
+  }
 }

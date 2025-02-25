@@ -35,12 +35,16 @@ module "rook-storgeclass" {
 #   nfs_path = var.nfs_path
 # }
 
+module "vitess" {
+  source    = "./vitess"
+  keyspaces = var.keyspaces
+}
+
 # module "keycloak" {
 #   source     = "./keycloak"
 #   domain     = var.domain
-#   prefix     = var.prefix.keycloak
-#   admin      = var.admin
-#   depends_on = [module.nfs, module.nginx]
+#   keyspace   = element([for item in var.keyspaces : item if item.keyspace == "keycloak"], 0)
+#   db_url = module.vitess.endpoint.url
 # }
 
 # module "prometheus" {
