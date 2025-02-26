@@ -969,12 +969,6 @@ spec:
         control-plane: kserve-controller-manager
         controller-tools.k8s.io: "1.0"
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - --metrics-addr=127.0.0.1:8080

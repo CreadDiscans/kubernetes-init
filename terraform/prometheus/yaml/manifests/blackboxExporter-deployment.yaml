@@ -26,10 +26,6 @@ spec:
         app.kubernetes.io/version: 0.25.0
     spec:
       automountServiceAccountToken: true
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - args:
         - --config.file=/etc/blackbox_exporter/config.yml

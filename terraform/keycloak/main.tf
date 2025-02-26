@@ -36,11 +36,6 @@ resource "kubernetes_deployment" "keycloak_deploy" {
         }
       }
       spec {
-        toleration {
-          key      = "node-role.kubernetes.io/control-plane"
-          operator = "Exists"
-          effect   = "NoSchedule"
-        }
         container {
           name  = "keycloak"
           image = "quay.io/keycloak/keycloak:26.1.0"

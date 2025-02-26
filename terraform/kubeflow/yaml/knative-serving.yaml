@@ -1937,12 +1937,6 @@ spec:
         app.kubernetes.io/version: 1.12.4
         role: activator
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: GOGC
@@ -2049,12 +2043,6 @@ spec:
                   app: autoscaler
               topologyKey: kubernetes.io/hostname
             weight: 100
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: POD_NAME
@@ -2147,12 +2135,6 @@ spec:
                   app: controller
               topologyKey: kubernetes.io/hostname
             weight: 100
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: POD_NAME
@@ -2234,12 +2216,6 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.12.3
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: SYSTEM_NAMESPACE
@@ -2321,12 +2297,6 @@ spec:
         app.kubernetes.io/version: 1.12.3
         role: net-istio-webhook
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: SYSTEM_NAMESPACE
@@ -2422,12 +2392,6 @@ spec:
                   app: webhook
               topologyKey: kubernetes.io/hostname
             weight: 100
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: POD_NAME

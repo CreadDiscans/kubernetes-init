@@ -13,21 +13,10 @@ spec:
         port: "10003"
         
   components:
-    pilot:
-      enabled: true
-      k8s:
-        tolerations:
-        - key: "node-role.kubernetes.io/control-plane"
-          operator: Exists
-          effect: NoSchedule
     ingressGateways:
     - name: istio-ingressgateway
       enabled: true
       k8s:
-        tolerations:
-        - key: "node-role.kubernetes.io/control-plane"
-          operator: Exists
-          effect: NoSchedule
         service:
           type: "NodePort"
   values:

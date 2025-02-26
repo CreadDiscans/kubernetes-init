@@ -19,12 +19,6 @@ spec:
   storage:
     size: 1Gi
 
-  affinity:
-    tolerations:
-    - key: "node-role.kubernetes.io/control-plane"
-      operator: Exists
-      effect: NoSchedule
-
   backup:
     barmanObjectStore:
       destinationPath: s3://cnpg/${current} # 값 변경 후 사용할 것

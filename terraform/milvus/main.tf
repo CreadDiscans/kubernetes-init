@@ -55,11 +55,6 @@ resource "kubernetes_deployment" "attu_deploy" {
         node_selector = {
           "kubernetes.io/hostname": "master"
         }
-        toleration {
-          effect = "NoSchedule"
-          key = "node-role.kubernetes.io/control-plane"
-          operator = "Exists"
-        }
         container {
           name              = "attu"
           image             = "zilliz/attu:v2.5"

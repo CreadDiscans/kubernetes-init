@@ -26,10 +26,6 @@ spec:
         app.kubernetes.io/version: 2.13.0
     spec:
       automountServiceAccountToken: true
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - args:
         - --host=127.0.0.1

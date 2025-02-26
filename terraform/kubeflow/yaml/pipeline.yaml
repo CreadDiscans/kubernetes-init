@@ -2454,12 +2454,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - --db_driver=$(DBCONFIG_DRIVER)
@@ -2568,12 +2562,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - command:
         - python
@@ -2637,12 +2625,6 @@ spec:
         application-crd-id: kubeflow-pipelines
         component: metadata-envoy
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - image: gcr.io/ml-pipeline/metadata-envoy:2.3.0
         name: container
@@ -2672,12 +2654,6 @@ spec:
         application-crd-id: kubeflow-pipelines
         component: metadata-grpc-server
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - --grpc_port=8080
@@ -2760,12 +2736,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: NAMESPACE_TO_WATCH
@@ -2795,12 +2765,6 @@ spec:
         app: minio
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - server
@@ -2860,12 +2824,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: KUBEFLOW_USERID_HEADER
@@ -3040,12 +2998,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: NAMESPACE
@@ -3103,12 +3055,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: NAMESPACE
@@ -3152,12 +3098,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: VIEWER_TENSORBOARD_POD_TEMPLATE_SPEC_PATH
@@ -3266,12 +3206,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - env:
         - name: NAMESPACE
@@ -3310,12 +3244,6 @@ spec:
         app.kubernetes.io/name: kubeflow-pipelines
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - image: gcr.io/ml-pipeline/visualization-server:2.3.0
         imagePullPolicy: IfNotPresent
@@ -3374,12 +3302,6 @@ spec:
         app: mysql
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - --datadir
@@ -3427,12 +3349,6 @@ spec:
         app: workflow-controller
         application-crd-id: kubeflow-pipelines
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - args:
         - --configmap
@@ -3505,12 +3421,6 @@ spec:
         application-crd-id: kubeflow-pipelines
         kustomize.component: metacontroller
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - command:
         - /usr/bin/metacontroller

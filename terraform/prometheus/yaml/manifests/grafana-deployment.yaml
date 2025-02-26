@@ -28,10 +28,6 @@ spec:
         app.kubernetes.io/version: 11.2.0
     spec:
       automountServiceAccountToken: false
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - env: []
         image: grafana/grafana:11.2.0

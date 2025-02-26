@@ -35,11 +35,6 @@ resource "kubernetes_deployment" "mysql" {
         }
       }
       spec {
-        toleration {
-          key      = "node-role.kubernetes.io/control-plane"
-          operator = "Exists"
-          effect   = "NoSchedule"
-        }
         container {
           name  = "mysql"
           image = "mysql:8.4.4"

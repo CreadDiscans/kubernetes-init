@@ -18,10 +18,6 @@ spec:
       port: web
   enableFeatures: []
   externalLabels: {}
-  tolerations:
-  - key: "node-role.kubernetes.io/control-plane"
-    operator: Exists
-    effect: NoSchedule
   image: quay.io/prometheus/prometheus:v2.54.1
   nodeSelector:
     kubernetes.io/os: linux

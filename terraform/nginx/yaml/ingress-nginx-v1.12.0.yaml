@@ -416,10 +416,6 @@ spec:
         app.kubernetes.io/part-of: ingress-nginx
         app.kubernetes.io/version: 1.12.0
     spec:
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - args:
         - /nginx-ingress-controller
@@ -534,10 +530,6 @@ spec:
         app.kubernetes.io/version: 1.12.0
       name: ingress-nginx-admission-create
     spec:
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - args:
         - create
@@ -590,10 +582,6 @@ spec:
         app.kubernetes.io/version: 1.12.0
       name: ingress-nginx-admission-patch
     spec:
-      tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: Exists
-        effect: NoSchedule
       containers:
       - args:
         - patch

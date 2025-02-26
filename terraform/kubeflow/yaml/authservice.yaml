@@ -19,12 +19,6 @@ spec:
         - name: authservice-config 
           configMap:
             name: authservice
-      nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
       containers:
       - name: authservice 
         # image: creaddiscans/authservice:1.0.14
