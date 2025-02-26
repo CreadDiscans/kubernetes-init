@@ -16,6 +16,10 @@ module "istio" {
   source = "./istio"
 }
 
+module "reloader" {
+  source = "./reloader"
+}
+
 module "rook" {
   source      = "./rook/core"
   osd         = var.osd
@@ -71,17 +75,18 @@ module "kubeflow" {
   keycloak = module.keycloak.info
 }
 
-module "auth" {
-  source = "./auth"
-  auths = [
-    module.kubeflow.auth
-  ]
-}
-
 module "sysflow" {
   source   = "./sysflow"
   domain   = var.domain
   keycloak = module.keycloak.info
+}
+
+module "auth" {
+  source = "./auth"
+  auths = [
+    module.kubeflow.auth,
+    module.sysflow.auth
+  ]
 }
 
 # module "airflow" {

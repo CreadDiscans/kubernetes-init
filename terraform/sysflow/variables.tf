@@ -1,5 +1,5 @@
 locals {
-    prefix = "geodev"
+    prefix = "geodev2"
     client_id = "sysflow"
 }
 
@@ -13,4 +13,8 @@ variable "keycloak" {
     username = string
     password = string
   })
+}
+
+output "auth" {
+  value = module.oidc.auth
 }
