@@ -1,6 +1,6 @@
 locals {
-    prefix = "geodev"
-    client_id = "sysflow"
+  prefix    = "sysflow"
+  client_id = "sysflow"
 }
 
 variable "domain" {
@@ -9,10 +9,21 @@ variable "domain" {
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })
+}
+
+variable "grafana" {
+  type = object({
+    url  = string
+    path = string
+  })
+}
+
+variable "kubeflow_url" {
+  type = string
 }
 
 output "auth" {

@@ -76,9 +76,14 @@ module "kubeflow" {
 }
 
 module "sysflow" {
-  source   = "./sysflow"
-  domain   = var.domain
-  keycloak = module.keycloak.info
+  source = "./sysflow"
+  domain = var.domain
+  grafana = {
+    url  = module.prometheus.url
+    path = "/d/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods"
+  }
+  kubeflow_url = module.kubeflow.url
+  keycloak     = module.keycloak.info
 }
 
 module "auth" {

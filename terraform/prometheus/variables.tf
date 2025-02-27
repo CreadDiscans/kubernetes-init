@@ -1,5 +1,5 @@
 locals {
-  prefix = "grafana"
+  prefix    = "grafana"
   client_id = "grafana"
 }
 
@@ -9,8 +9,12 @@ variable "domain" {
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })
+}
+
+output "url" {
+  value = "https://${local.prefix}.${var.domain}"
 }

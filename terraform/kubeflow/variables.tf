@@ -1,5 +1,5 @@
 locals {
-  prefix = "kubeflow"
+  prefix    = "kubeflow"
   client_id = "kubeflow"
 }
 
@@ -13,7 +13,7 @@ variable "email" {
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })
@@ -21,4 +21,8 @@ variable "keycloak" {
 
 output "auth" {
   value = module.oidc.auth
+}
+
+output "url" {
+  value = "https://${local.prefix}.${var.domain}"
 }
