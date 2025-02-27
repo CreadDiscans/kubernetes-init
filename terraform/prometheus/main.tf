@@ -39,6 +39,7 @@ root_url = https://${local.prefix}.${var.domain}
 [auth]
 signout_redirect_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/logout
 disable_login_form = true
+oauth_allow_insecure_email_lookup = true
 [auth.generic_oauth]
 enabled = true
 name = Keycloak-OAuth
