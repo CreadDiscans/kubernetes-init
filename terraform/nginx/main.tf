@@ -21,8 +21,7 @@ resource "kubernetes_config_map" "cm" {
     }
   }
   data = {
-    "proxy-body-size"           = "100g"
-    "allow-snippet-annotations" = "true"
+    "proxy-body-size" = "100g"
   }
 }
 

@@ -51,8 +51,6 @@ token_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid
 api_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/userinfo
 role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
 tls_skip_verify_insecure = true
-[auth.anonymous]
-enabled = true
 [security]
 allow_embedding = true
     EOF
