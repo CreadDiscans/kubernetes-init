@@ -1,5 +1,5 @@
 locals {
-    prefix = "geodev2"
+    prefix = "geodev"
     client_id = "sysflow"
 }
 
