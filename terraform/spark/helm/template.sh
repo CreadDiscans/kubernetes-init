@@ -1,1 +1,0 @@
-helm template k8s-spark spark-operator/spark-operator -n spark-operator --set sparkJobNamespace=spark-apps > spark/yaml/spark-operator.yaml

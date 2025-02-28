@@ -1,0 +1,2 @@
+# helm repo add spark-operator https://kubeflow.github.io/spark-operator
+helm template k8s-spark spark-operator/spark-operator -n spark-operator --set spark.jobNamespaces={spark-apps} > yaml/spark-operator.yaml

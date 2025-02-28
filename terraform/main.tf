@@ -86,36 +86,66 @@ module "sysflow" {
   keycloak     = module.keycloak.info
 }
 
+module "airflow" {
+  source       = "./airflow"
+  domain       = var.domain
+  minio_creds  = module.minio.creds
+  keycloak     = module.keycloak.info
+  airflow_repo = "${module.gitlab.gitlab_url}${var.airflow_repo}"
+}
+
+module "milvus" {
+  source      = "./milvus"
+  domain      = var.domain
+  keycloak    = module.keycloak.info
+  minio_creds = module.minio.creds
+}
+
+module "spark" {
+  source   = "./spark"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
+module "jenkins" {
+  source   = "./jenkins"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
+module "presto" {
+  source   = "./presto"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
+module "opencost" {
+  source   = "./opencost"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
+module "superset" {
+  source   = "./superset"
+  domain   = var.domain
+  keycloak = module.keycloak.info
+}
+
 module "auth" {
   source = "./auth"
   auths = [
-    module.kubeflow.auth
+    module.kubeflow.auth,
+    module.milvus.auth,
+    module.spark.auth,
+    module.presto.auth,
+    module.opencost.auth
   ]
 }
 
-# module "airflow" {
-#   source       = "./airflow"
-#   domain       = var.domain
-#   prefix       = var.prefix.airflow
-#   minio_creds  = module.minio.creds
-#   keycloak     = module.keycloak.info
-#   airflow_repo = var.airflow_repo
-# }
+module "cnpg" {
+  source = "./cnpg"
+}
 
-
-# module "vitess" {
-#   source    = "./vitess"
-#   keyspaces = var.keyspaces
-# }
-
-# module "cnpg" {
-#   source      = "./cnpg"
-#   minio_creds = module.minio.creds
-# }
-
-# module "milvus" {
-#   source      = "./milvus"
-#   domain      = var.domain
-#   prefix      = var.prefix.milvus
-#   minio_creds = module.minio.creds
-# }
+module "vitess" {
+  source = "./vitess"
+}

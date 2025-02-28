@@ -16,8 +16,9 @@ spec:
   config: 
     common:
       security:
-        authorizationEnabled: true
+        authorizationEnabled: false
     minio:
+      useSSL: true
       bucketName: milvus
   dependencies: 
     storage:

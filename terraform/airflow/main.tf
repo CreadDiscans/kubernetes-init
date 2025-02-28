@@ -14,23 +14,6 @@ resource "kubernetes_secret" "webserver_secret" {
   }
 }
 
-data "kubernetes_secret" "db" {
-  metadata {
-    name      = "airflow-db-secret"
-    namespace = "cnpg-system"
-  }
-}
-
-resource "kubernetes_secret" "cnpg_db" {
-  metadata {
-    name      = "cnpg-db"
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  data = {
-    connection = "postgresql://${data.kubernetes_secret.db.data.username}:${data.kubernetes_secret.db.data.password}@cluster-cnpg-rw.cnpg-system:5432/${data.kubernetes_secret.db.data.db_name}"
-  }
-}
-
 data "kubernetes_secret" "gitlab_secret" {
   metadata {
     name      = "gitlab-secret"
@@ -38,29 +21,42 @@ data "kubernetes_secret" "gitlab_secret" {
   }
 }
 
+module "oidc" {
+  source       = "../utils/oidc"
+  keycloak     = var.keycloak
+  client_id    = local.client_id
+  prefix       = local.prefix
+  domain       = var.domain
+  redirect_uri = ["https://${local.prefix}.${var.domain}/oauth-authorized/keycloak"]
+}
+
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
   args = {
-    git_repo      = "https://root:${urlencode(data.kubernetes_secret.gitlab_secret.data.GITLAB_ROOT_PASSWORD)}@${var.airflow_repo}"
+    git_repo      = "https://root:${urlencode(data.kubernetes_secret.gitlab_secret.data.GITLAB_ROOT_PASSWORD)}@${replace(var.airflow_repo, "https://", "")}"
     connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${var.minio_creds.url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
-    client_id     = local.client_id
-    client_secret = local.client_secret
-    keycloak_url  = var.keycloak.url
-    realm         = local.realm
+    client_id     = module.oidc.auth.client_id
+    client_secret = module.oidc.auth.client_secret
+    keycloak_url  = module.oidc.auth.keycloak.url
+    realm         = module.oidc.auth.realm
   }
 }
 
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {
     tier      = "airflow"
     component = "webserver"
     release   = "airflow"
+  }
+  annotations = {
+    "sysflow/favicon" = "/static/pin_32.png"
+    "sysflow/doc"     = "https://airflow.apache.org/docs/apache-airflow/stable/index.html"
   }
   depends_on = [module.airflow]
 }

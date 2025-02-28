@@ -12,23 +12,23 @@ module "operator" {
 
 resource "kubernetes_secret" "minio_creds" {
   metadata {
-    name = "minio-secret"
+    name      = "minio-secret"
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   data = {
-    accesskey: var.minio_creds.username
-    secretkey: var.minio_creds.password
+    accesskey : var.minio_creds.username
+    secretkey : var.minio_creds.password
   }
 }
 
-module "milvus" {
-  source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/milvus.yaml"
-  args = {
-    minio_endpoint = replace(var.minio_creds.url, "http://", "")
-  }
-  depends_on = [module.operator, kubernetes_secret.minio_creds]
-}
+# module "milvus" {
+#   source = "../utils/apply"
+#   yaml   = "${path.module}/yaml/milvus.yaml"
+#   args = {
+#     minio_endpoint = "${replace(var.minio_creds.url, "https://", "")}:443"
+#   }
+#   depends_on = [module.operator, kubernetes_secret.minio_creds]
+# }
 
 resource "kubernetes_deployment" "attu_deploy" {
   metadata {
@@ -49,11 +49,14 @@ resource "kubernetes_deployment" "attu_deploy" {
       metadata {
         labels = {
           app = "attu"
+          "sidecar.istio.io/inject" : "true"
         }
       }
       spec {
-        node_selector = {
-          "kubernetes.io/hostname": "master"
+        toleration {
+          effect   = "NoSchedule"
+          key      = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
         }
         container {
           name              = "attu"
@@ -72,17 +75,29 @@ resource "kubernetes_deployment" "attu_deploy" {
       }
     }
   }
-  depends_on = [module.milvus]
 }
 
 module "service" {
   source    = "../utils/service"
   domain    = var.domain
   port      = 3000
-  prefix    = var.prefix
+  prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
+  gateway   = "milvus-gateway"
   selector = {
     "app" = "attu"
   }
+  annotations = {
+    "sysflow/favicon" = "https://raw.githubusercontent.com/zilliztech/attu/refs/heads/main/client/public/attu.svg"
+    "sysflow/doc"     = "https://milvus.io/docs/manage_databases.md"
+  }
   depends_on = [kubernetes_deployment.attu_deploy]
+}
+
+module "oidc" {
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = local.prefix
+  domain    = var.domain
 }

@@ -21,6 +21,8 @@ spec:
           "/public/*",
           "/favicon.ico",
           "/manifest.json",
+          "/ui/assets/favicon.ico",
+          "/favicon.7eff484d.ico"
         ]
 ---
 apiVersion: networking.istio.io/v1beta1

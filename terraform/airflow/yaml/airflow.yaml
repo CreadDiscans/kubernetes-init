@@ -306,17 +306,17 @@ data:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -898,17 +898,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -1005,17 +1005,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -1047,7 +1047,7 @@ spec:
                   airflow jobs check --job-type SchedulerJob --local
           resources:
             limits:
-              cpu: 500m
+              cpu: 2
               memory: 1Gi
             requests:
               cpu: 250m
@@ -1372,17 +1372,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -1404,11 +1404,11 @@ spec:
             - airflow connections add s3_conn --conn-json '${connection}' & airflow webserver
           resources:
             limits:
-              cpu: 1000m
-              memory: 1024Mi
+              cpu: 4
+              memory: 4Gi
             requests:
               cpu: 250m
-              memory: 1024Mi
+              memory: 1Gi
           volumeMounts:
             - name: config
               mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
@@ -1474,17 +1474,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -1557,8 +1557,8 @@ spec:
         - name: wait-for-airflow-migrations
           resources:
             limits:
-              cpu: 250m
-              memory: 512Mi
+              cpu: 1
+              memory: 2Gi
             requests:
               cpu: 250m
               memory: 512Mi
@@ -1606,17 +1606,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -1737,17 +1737,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -2296,17 +2296,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:
@@ -2407,17 +2407,17 @@ spec:
             - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW_CONN_AIRFLOW_DB
               valueFrom:
                 secretKeyRef:
-                  name: cnpg-db
+                  name: postgres-secret
                   key: connection
             - name: AIRFLOW__WEBSERVER__SECRET_KEY
               valueFrom:

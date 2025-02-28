@@ -1,6 +1,5 @@
 locals {
-  prefix        = "spark"
-  client_id     = "spark"
+  prefix = "jenkins"
 }
 
 variable "domain" {
@@ -13,8 +12,4 @@ variable "keycloak" {
     username = string
     password = string
   })
-}
-
-output "auth" {
-  value = module.oidc.auth
 }

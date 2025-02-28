@@ -42,15 +42,7 @@ variable "domain" {
   default = "example.com"
 }
 
-variable "keyspaces" {
-  type = list(object({
-    dbname = string
-    username = string
-    password = string
-  }))
-  default = []
+variable "airflow_repo" {
+  type    = string
+  default = "/system/airflow.git"
 }
-
-# variable "airflow_repo" {
-#   type = string
-# }

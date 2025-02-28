@@ -12,7 +12,7 @@ resource "kubernetes_namespace" "ns_apps" {
 
 module "crds" {
   source = "../utils/apply"
-  yaml   = "${path.module}/yaml/spark-crds.yaml"
+  yaml   = "${path.module}/yaml/crds"
 }
 
 module "operator" {
@@ -27,16 +27,19 @@ module "history" {
   depends_on = [module.operator]
 }
 
-module "history_service" {
+module "service" {
   source    = "../utils/service"
-  mode      = var.mode
   domain    = var.domain
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns_apps.metadata.0.name
   port      = 18080
-  gateway   = true
+  gateway   = "spark-gateway"
   selector = {
     app = "spark-history-server"
+  }
+  annotations = {
+    "sysflow/favicon" = "/static/spark-logo-77x50px-hd.png"
+    "sysflow/doc"     = "https://spark.apache.org/docs/3.5.4/api/python/getting_started/index.html"
   }
   depends_on = [module.history]
 }
@@ -44,4 +47,12 @@ module "history_service" {
 module "monitor" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/monitor.yaml"
+}
+
+module "oidc" {
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = local.prefix
+  domain    = var.domain
 }

@@ -1,18 +1,11 @@
 locals {
-  prefix = "milvus"
-  client_id = "milvus"
+  realm     = "master"
+  client_id = "presto"
+  prefix    = "presto"
 }
 
 variable "domain" {
   type = string
-}
-
-variable "minio_creds" {
-  type = object({
-    url = string
-    username = string
-    password = string
-  })
 }
 
 variable "keycloak" {

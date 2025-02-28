@@ -18,6 +18,13 @@
 - kubeflow                          1.9.1       [https://github.com/kubeflow/manifests]
 - cnpg                              1.25.0      [https://github.com/cloudnative-pg/cloudnative-pg]
 - milvus-operator                   1.2.0       [https://github.com/zilliztech/milvus-operator]
+- spark-operator                    2.1.0       [https://github.com/kubeflow/spark-operator]
+- jenkins                           5.8.10      [https://github.com/jenkinsci/helm-charts]
+- authservice                       1.0.4       [https://github.com/CreadDiscans/authservice]
+- presto                            0.3.0       [https://prestodb.github.io/presto-helm-charts]
+- superset                          0.14.0      [https://github.com/apache/superset]
+- opencost                          1.43.2      [https://github.com/opencost/opencost-helm-chart]
+- sysflow                           1.0.13      
 
 # kubernetes 설치
 
@@ -36,8 +43,6 @@ https://github.com/derailed/k9s/releases
 [airflow/Readme.md]
 
 # Troubleshooting
-
-/run 용량 증가 : sudo mount -t tmpfs tmpfs /run -o remount,size=10G
 
 node-exporter CrashBackoff
 

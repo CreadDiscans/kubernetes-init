@@ -29,3 +29,7 @@ variable "keycloak" {
     password = string
   })
 }
+
+output "gitlab_url" {
+  value = "https://${local.prefix.gitlab}.${var.domain}"
+}
