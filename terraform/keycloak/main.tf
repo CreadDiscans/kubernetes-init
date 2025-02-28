@@ -108,7 +108,7 @@ module "service" {
   port      = 8080
   selector  = kubernetes_deployment.keycloak_deploy.metadata.0.labels
   annotations = {
-    "sysflow/favicon" = "/resources/j2oxu/admin/keycloak.v2/favicon.svg"
+    "sysflow/favicon" = "https://www.keycloak.org/resources/favicon.ico"
     "sysflow/doc"     = "https://www.keycloak.org/documentation"
   }
 }
