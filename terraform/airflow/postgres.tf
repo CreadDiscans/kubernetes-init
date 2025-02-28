@@ -19,7 +19,7 @@ resource "kubernetes_secret" "postgres_secret" {
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   data = {
-    connection = "postgresql://airflow:${random_password.password.result}@postgres-service:5432/airflow"
+    connection = "postgresql://airflow:${local.password}@postgres-service:5432/airflow"
   }
 }
 
@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "postgres" {
           }
           env {
             name  = "POSTGRES_PASSWORD"
-            value = random_password.password.result
+            value = local.password
           }
           volume_mount {
             name       = "data"

@@ -41,6 +41,13 @@ module "airflow" {
     keycloak_url  = module.oidc.auth.keycloak.url
     realm         = module.oidc.auth.realm
   }
+  depends_on = [kubernetes_deployment.postgres]
+}
+
+module "role" {
+  source     = "../utils/apply"
+  yaml       = "${path.module}/yaml/spark-role.yaml"
+  depends_on = [module.airflow]
 }
 
 module "service" {
