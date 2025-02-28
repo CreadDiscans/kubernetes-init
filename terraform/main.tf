@@ -89,8 +89,7 @@ module "sysflow" {
 module "auth" {
   source = "./auth"
   auths = [
-    module.kubeflow.auth,
-    module.sysflow.auth
+    module.kubeflow.auth
   ]
 }
 

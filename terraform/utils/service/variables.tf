@@ -26,3 +26,8 @@ variable "gateway" {
   type    = string
   default = ""
 }
+
+variable "annotations" {
+  type    = map(string)
+  default = {}
+}

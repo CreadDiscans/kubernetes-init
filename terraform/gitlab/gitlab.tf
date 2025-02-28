@@ -163,7 +163,11 @@ module "service" {
   prefix    = local.prefix.gitlab
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
-  selector = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
+  selector  = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
+  annotations = {
+    "sysflow/favicon" = "/assets/favicon-72a2cad5025aa931d6ea56c3201d1f18e68a8cd39788c7c80d5b2b82aa5143ef.png"
+    "sysflow/doc"     = "https://docs.gitlab.com/user/get_started/"
+  }
 }
 
 resource "kubernetes_service" "service_ssh" {
@@ -188,7 +192,7 @@ module "service_registry" {
   prefix    = local.prefix.registry
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 5005
-  selector = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
+  selector  = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
 }
 
 module "oidc" {

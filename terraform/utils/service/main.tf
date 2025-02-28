@@ -22,13 +22,13 @@ resource "kubernetes_service" "service" {
 resource "kubernetes_ingress_v1" "ingress" {
   metadata {
     name = "${var.prefix}-ingress"
-    annotations = {
+    annotations = merge({
       "ingress.kubernetes.io/ssl-redirect"            = "true"
       "kubernetes.io/ingress.class"                   = "nginx"
       "kubernetes.io/tls-acme"                        = "true"
       "cert-manager.io/cluster-issuer"                = local.clusterissuer
       "nginx.ingress.kubernetes.io/proxy-buffer-size" = "128k"
-    }
+    }, var.annotations)
     namespace = var.gateway != "" ? "istio-system" : var.namespace
   }
   spec {

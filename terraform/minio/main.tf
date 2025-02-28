@@ -35,16 +35,18 @@ resource "kubernetes_ingress_v1" "web_ingress" {
     name      = "minio-ingress"
     namespace = kubernetes_namespace.ns_tenant.metadata.0.name
     annotations = {
-      "cert-manager.io/cluster-issuer"               = "letsencrypt-prod"
-      "kubernetes.io/ingress.class"                  = "nginx"
-      "nginx.ingress.kubernetes.io/proxy-ssl-verify" = "off"
-      "nginx.ingress.kubernetes.io/backend-protocol" = "HTTPS"
-      "nginx.ingress.kubernetes.io/rewrite-target"   = "/"
-      "nginx.ingress.kubernetes.io/proxy-body-size"  = "0"
-      "nginx.ingress.kubernetes.io/affinity" : "cookie"
-      "nginx.ingress.kubernetes.io/session-cookie-hash" : "sha1"
-      "nginx.ingress.kubernetes.io/session-cookie-name" : "route"
-      "nginx.ingress.kubernetes.io/session-cookie-max-age" : "172800"
+      "cert-manager.io/cluster-issuer"                     = "letsencrypt-prod"
+      "kubernetes.io/ingress.class"                        = "nginx"
+      "nginx.ingress.kubernetes.io/proxy-ssl-verify"       = "off"
+      "nginx.ingress.kubernetes.io/backend-protocol"       = "HTTPS"
+      "nginx.ingress.kubernetes.io/rewrite-target"         = "/"
+      "nginx.ingress.kubernetes.io/proxy-body-size"        = "0"
+      "nginx.ingress.kubernetes.io/affinity"               = "cookie"
+      "nginx.ingress.kubernetes.io/session-cookie-hash"    = "sha1"
+      "nginx.ingress.kubernetes.io/session-cookie-name"    = "route"
+      "nginx.ingress.kubernetes.io/session-cookie-max-age" = "172800"
+      "sysflow/favicon"                                    = "/favicon-32x32.png"
+      "sysflow/doc"                                        = "https://min.io/docs/minio/kubernetes/upstream/administration/minio-console.html"
     }
   }
   spec {
@@ -114,11 +116,11 @@ resource "kubernetes_ingress_v1" "api_ingress" {
 }
 
 module "oidc" {
-  source    = "../utils/oidc"
-  keycloak  = var.keycloak
-  client_id = local.client_id
-  prefix    = local.prefix
-  domain    = var.domain
-  policy    = "consoleAdmin"
+  source       = "../utils/oidc"
+  keycloak     = var.keycloak
+  client_id    = local.client_id
+  prefix       = local.prefix
+  domain       = var.domain
+  policy       = "consoleAdmin"
   redirect_uri = ["https://${local.prefix}.${var.domain}/oauth_callback"]
 }

@@ -102,6 +102,10 @@ module "service" {
   selector = {
     "app" = "centraldashboard"
   }
+  annotations = {
+    "sysflow/favicon" = "/assets/favicon.ico"
+    "sysflow/doc"     = "https://www.kubeflow.org/docs/started/"
+  }
   depends_on = [module.centraldashboard]
 }
 

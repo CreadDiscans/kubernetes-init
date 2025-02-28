@@ -60,7 +60,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
             value = "jdbc:mysql://${kubernetes_service.mysql_svc.metadata.0.name}:3306/${local.db.name}"
           }
           env {
-            name = "KC_DB_USERNAME"
+            name  = "KC_DB_USERNAME"
             value = local.db.user
           }
           env {
@@ -72,7 +72,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
             value = local.username
           }
           env {
-            name  = "KC_BOOTSTRAP_ADMIN_PASSWORD"
+            name = "KC_BOOTSTRAP_ADMIN_PASSWORD"
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.secret.metadata.0.name
@@ -106,5 +106,9 @@ module "service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
-  selector = kubernetes_deployment.keycloak_deploy.metadata.0.labels
+  selector  = kubernetes_deployment.keycloak_deploy.metadata.0.labels
+  annotations = {
+    "sysflow/favicon" = "/resources/j2oxu/admin/keycloak.v2/favicon.svg"
+    "sysflow/doc"     = "https://www.keycloak.org/documentation"
+  }
 }

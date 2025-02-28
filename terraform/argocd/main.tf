@@ -38,6 +38,9 @@ resource "kubernetes_secret" "secret" {
     "oidc.keycloak.clientSecret" = "${module.oidc.auth.client_secret}"
   }
   type = "Opaque"
+  lifecycle {
+    ignore_changes = [data]
+  }
 }
 
 resource "kubernetes_config_map" "rbac_config" {
@@ -68,6 +71,10 @@ module "service" {
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
+  annotations = {
+    "sysflow/favicon" = "/assets/favicon/favicon-32x32.png"
+    "sysflow/doc"     = "https://argo-cd.readthedocs.io/en/stable/"
+  }
   selector = {
     "app.kubernetes.io/name" = "argocd-server"
   }

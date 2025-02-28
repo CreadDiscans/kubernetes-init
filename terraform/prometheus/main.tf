@@ -1,8 +1,8 @@
 resource "kubernetes_namespace" "ns" {
   metadata {
     labels = {
-      "pod-security.kubernetes.io/warn": "privileged"
-      "pod-security.kubernetes.io/warn-version": "latest"
+      "pod-security.kubernetes.io/warn" : "privileged"
+      "pod-security.kubernetes.io/warn-version" : "latest"
     }
     name = "monitoring"
   }
@@ -75,14 +75,18 @@ module "grafana" {
     "app.kubernetes.io/name"      = "grafana"
     "app.kubernetes.io/part-of" : "kube-prometheus"
   }
+  annotations = {
+    "sysflow/favicon" = "/public/img/grafana_icon.svg"
+    "sysflow/doc"     = "https://grafana.com/docs/grafana/latest/dashboards/"
+  }
   depends_on = [module.manifests]
 }
 
 module "oidc" {
-  source = "../utils/oidc"
-  keycloak = var.keycloak
-  client_id = local.client_id
-  prefix = local.prefix
-  domain = var.domain
+  source       = "../utils/oidc"
+  keycloak     = var.keycloak
+  client_id    = local.client_id
+  prefix       = local.prefix
+  domain       = var.domain
   redirect_uri = ["https://${local.prefix}.${var.domain}/login/generic_oauth"]
 }
