@@ -148,8 +148,3 @@ module "cnpg" {
 module "vitess" {
   source = "./vitess"
 }
-
-module "redash" {
-  source = "./redash"
-  domain = var.domain
-}
