@@ -10,16 +10,16 @@ module "operator" {
   depends_on = [kubernetes_namespace.ns]
 }
 
-resource "kubernetes_secret" "minio_creds" {
-  metadata {
-    name      = "minio-secret"
-    namespace = kubernetes_namespace.ns.metadata.0.name
-  }
-  data = {
-    accesskey : var.minio_creds.username
-    secretkey : var.minio_creds.password
-  }
-}
+# resource "kubernetes_secret" "minio_creds" {
+#   metadata {
+#     name      = "minio-secret"
+#     namespace = kubernetes_namespace.ns.metadata.0.name
+#   }
+#   data = {
+#     accesskey : var.minio_creds.username
+#     secretkey : var.minio_creds.password
+#   }
+# }
 
 # module "milvus" {
 #   source = "../utils/apply"

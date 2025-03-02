@@ -98,7 +98,6 @@ module "milvus" {
   source      = "./milvus"
   domain      = var.domain
   keycloak    = module.keycloak.info
-  minio_creds = module.minio.creds
 }
 
 module "spark" {
@@ -148,4 +147,9 @@ module "cnpg" {
 
 module "vitess" {
   source = "./vitess"
+}
+
+module "redash" {
+  source = "./redash"
+  domain = var.domain
 }
