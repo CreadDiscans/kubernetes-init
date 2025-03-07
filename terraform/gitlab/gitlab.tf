@@ -61,7 +61,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
               memory = "4Gi"
             }
             limits = {
-              cpu    = 1
+              cpu    = 2
               memory = "8Gi"
             }
           }
