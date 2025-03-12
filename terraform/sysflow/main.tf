@@ -42,6 +42,10 @@ resource "kubernetes_secret" "secret" {
     KEYCLOAK_CLIENT_SECRET = module.oidc.auth.client_secret
     KEYCLOAK_USERNAME      = var.keycloak.username
     KEYCLOAK_PASSWORD      = var.keycloak.password
+    DEFAULT_QUOTA_CPU      = "1"
+    DEFAULT_QUOTA_MEMORY   = "8Gi"
+    DEFAULT_QUOTA_GPU      = "0"
+    DEFAULT_QUOTA_STORAGE  = "100Gi"
   }
 }
 
@@ -59,6 +63,20 @@ resource "kubernetes_cluster_role" "cluster_role" {
   rule {
     api_groups = ["kubeflow.org"]
     resources  = ["profiles"]
+    verbs = [
+      "create",
+      "delete",
+      "deletecollection",
+      "get",
+      "list",
+      "patch",
+      "update",
+      "watch",
+    ]
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["limitranges"]
     verbs = [
       "create",
       "delete",
@@ -122,7 +140,7 @@ resource "kubernetes_deployment" "deploy" {
         service_account_name = kubernetes_service_account.sa.metadata.0.name
         container {
           name  = "sysflow"
-          image = "creaddiscans/sysflow:1.0.14"
+          image = "creaddiscans/sysflow:1.1.2"
           port {
             container_port = 80
           }
@@ -134,7 +152,7 @@ resource "kubernetes_deployment" "deploy" {
         }
         container {
           name    = "operator"
-          image   = "creaddiscans/sysflow:1.0.14"
+          image   = "creaddiscans/sysflow:1.1.2"
           command = ["bash", "-c", "python3 manage.py operator --settings=config.prod.settings"]
           env_from {
             secret_ref {

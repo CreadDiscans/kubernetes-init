@@ -2095,7 +2095,7 @@ metadata:
 apiVersion: v1
 data:
   DEFAULTPIPELINERUNNERSERVICEACCOUNT: default-editor
-  MULTIUSER: "true"
+  MULTIUSER: "false"
   VISUALIZATIONSERVICE_NAME: ml-pipeline-visualizationserver
   VISUALIZATIONSERVICE_PORT: "8888"
 kind: ConfigMap
