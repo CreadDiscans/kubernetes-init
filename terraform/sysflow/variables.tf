@@ -1,6 +1,15 @@
 locals {
   prefix    = "sysflow"
   client_id = "sysflow"
+
+  db_user = "sysflow"
+  db_name = "sysflow"
+  db_password = random_password.db_password.result
+}
+
+resource "random_password" "db_password" {
+  length = 16
+  special = false
 }
 
 variable "domain" {

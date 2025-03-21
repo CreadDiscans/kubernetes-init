@@ -19,6 +19,14 @@ module "oidc" {
   ]
 }
 
+module "postgres" {
+  source    = "../utils/postgres"
+  name      = local.db_name
+  user      = local.db_user
+  password  = local.db_password
+  namespace = kubernetes_namespace.ns.metadata.0.name
+}
+
 resource "random_password" "secret_key" {
   length           = 50
   special          = true
@@ -46,6 +54,11 @@ resource "kubernetes_secret" "secret" {
     DEFAULT_QUOTA_MEMORY   = "8Gi"
     DEFAULT_QUOTA_GPU      = "0"
     DEFAULT_QUOTA_STORAGE  = "100Gi"
+    DB_NAME                = local.db_name
+    DB_USER                = local.db_user
+    DB_PASSWORD            = local.db_password
+    DB_HOST                = module.postgres.host
+    DB_PORT                = module.postgres.port
   }
 }
 
@@ -115,6 +128,22 @@ resource "kubernetes_cluster_role_binding" "bind" {
   }
 }
 
+resource "kubernetes_persistent_volume_claim" "sysflow_pvc" {
+  metadata {
+    name      = "sysflow-pvc"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    resources {
+      requests = {
+        storage = "10Gi"
+      }
+    }
+  }
+}
+
 resource "kubernetes_deployment" "deploy" {
   metadata {
     name      = "sysflow-deploy"
@@ -140,7 +169,7 @@ resource "kubernetes_deployment" "deploy" {
         service_account_name = kubernetes_service_account.sa.metadata.0.name
         container {
           name  = "sysflow"
-          image = "creaddiscans/sysflow:1.1.2"
+          image = "creaddiscans/sysflow:1.2.1"
           port {
             container_port = 80
           }
@@ -149,15 +178,25 @@ resource "kubernetes_deployment" "deploy" {
               name = kubernetes_secret.secret.metadata.0.name
             }
           }
+          volume_mount {
+            name       = "media"
+            mount_path = "/app/media"
+          }
         }
         container {
           name    = "operator"
-          image   = "creaddiscans/sysflow:1.1.2"
+          image   = "creaddiscans/sysflow:1.2.1"
           command = ["bash", "-c", "python3 manage.py operator --settings=config.prod.settings"]
           env_from {
             secret_ref {
               name = kubernetes_secret.secret.metadata.0.name
             }
+          }
+        }
+        volume {
+          name = "media"
+          persistent_volume_claim {
+            claim_name = kubernetes_persistent_volume_claim.sysflow_pvc.metadata.0.name
           }
         }
       }
