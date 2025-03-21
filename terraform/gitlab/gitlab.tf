@@ -53,7 +53,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
       }
       spec {
         container {
-          image = "gitlab/gitlab-ce:17.8.1-ce.0"
+          image = "gitlab/gitlab-ce:17.8.5-ce.0"
           name  = "gitlab"
           resources {
             requests = {
