@@ -12,7 +12,6 @@ module "oidc" {
   domain    = var.domain
   redirect_uri = [
     "https://${local.prefix}.${var.domain}/keycloak/auth/callback",
-    "https://${local.prefix}.${var.domain}/authservice_callback",
   ]
   post_logout_redirect_uris = [
     "*",
