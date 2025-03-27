@@ -33,6 +33,10 @@ module "rook-storgeclass" {
   depends_on  = [module.rook]
 }
 
+module "pihole" {
+  source = "./pihole"
+}
+
 # module "nfs" {
 #   source   = "./nfs"
 #   nfs_ip   = var.nfs_ip
