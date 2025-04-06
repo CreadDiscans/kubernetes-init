@@ -11,8 +11,12 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
@@ -25,7 +29,7 @@ variable "keycloak" {
 
 output "creds" {
   value = {
-    url = "https://${local.prefix}-api.${var.domain}"
+    url = "https://${local.prefix}-api.${var.route.domain}"
     username = local.username
     password = local.password
   }

@@ -2,8 +2,13 @@ locals {
   prefix    = "argocd"
   client_id = "argocd"
 }
-variable "domain" {
-  type = string
+
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {

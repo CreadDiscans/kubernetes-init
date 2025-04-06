@@ -1,15 +1,19 @@
 locals {
-  prefix        = "spark"
-  client_id     = "spark"
+  prefix    = "spark"
+  client_id = "spark"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })

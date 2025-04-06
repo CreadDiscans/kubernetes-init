@@ -1,9 +1,9 @@
-locals {
-  clusterissuer = "letsencrypt-prod"
-}
-
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "prefix" {

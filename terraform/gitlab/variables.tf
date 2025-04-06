@@ -18,8 +18,12 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
@@ -31,5 +35,5 @@ variable "keycloak" {
 }
 
 output "gitlab_url" {
-  value = "https://${local.prefix.gitlab}.${var.domain}"
+  value = "https://${local.prefix.gitlab}.${var.route.domain}"
 }

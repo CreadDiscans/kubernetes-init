@@ -14,7 +14,7 @@ resource "kubernetes_config_map" "config" {
     }
   }
   data = {
-    url           = "https://${local.prefix}.${var.domain}"
+    url           = "https://${local.prefix}.${var.route.domain}"
     "oidc.config" = <<EOF
 name: Keycloak
 issuer: ${var.keycloak.url}/realms/${module.oidc.auth.realm}
@@ -67,7 +67,7 @@ module "install" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
@@ -86,8 +86,8 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix
-  domain    = var.domain
+  domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix}.${var.domain}/auth/callback"
+    "https://${local.prefix}.${var.route.domain}/auth/callback"
   ]
 }

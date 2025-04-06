@@ -35,7 +35,7 @@ resource "kubernetes_ingress_v1" "web_ingress" {
     name      = "minio-ingress"
     namespace = kubernetes_namespace.ns_tenant.metadata.0.name
     annotations = {
-      "cert-manager.io/cluster-issuer"                     = "letsencrypt-prod"
+      "cert-manager.io/cluster-issuer"                     = var.route.issuer
       "kubernetes.io/ingress.class"                        = "nginx"
       "nginx.ingress.kubernetes.io/proxy-ssl-verify"       = "off"
       "nginx.ingress.kubernetes.io/backend-protocol"       = "HTTPS"
@@ -52,11 +52,11 @@ resource "kubernetes_ingress_v1" "web_ingress" {
   spec {
     ingress_class_name = "nginx"
     tls {
-      hosts       = ["${local.prefix}.${var.domain}"]
+      hosts       = ["${local.prefix}.${var.route.domain}"]
       secret_name = "${local.prefix}-cert"
     }
     rule {
-      host = "${local.prefix}.${var.domain}"
+      host = "${local.prefix}.${var.route.domain}"
       http {
         path {
           path      = "/"
@@ -81,7 +81,7 @@ resource "kubernetes_ingress_v1" "api_ingress" {
     name      = "minio-api-ingress"
     namespace = kubernetes_namespace.ns_tenant.metadata.0.name
     annotations = {
-      "cert-manager.io/cluster-issuer"               = "letsencrypt-prod"
+      "cert-manager.io/cluster-issuer"               = var.route.issuer
       "kubernetes.io/ingress.class"                  = "nginx"
       "nginx.ingress.kubernetes.io/proxy-ssl-verify" = "off"
       "nginx.ingress.kubernetes.io/backend-protocol" = "HTTPS"
@@ -92,11 +92,11 @@ resource "kubernetes_ingress_v1" "api_ingress" {
   spec {
     ingress_class_name = "nginx"
     tls {
-      hosts       = ["${local.prefix}-api.${var.domain}"]
+      hosts       = ["${local.prefix}-api.${var.route.domain}"]
       secret_name = "${local.prefix}-api-cert"
     }
     rule {
-      host = "${local.prefix}-api.${var.domain}"
+      host = "${local.prefix}-api.${var.route.domain}"
       http {
         path {
           path      = "/"
@@ -120,7 +120,7 @@ module "oidc" {
   keycloak     = var.keycloak
   client_id    = local.client_id
   prefix       = local.prefix
-  domain       = var.domain
+  domain       = var.route.domain
   policy       = "consoleAdmin"
-  redirect_uri = ["https://${local.prefix}.${var.domain}/oauth_callback"]
+  redirect_uri = ["https://${local.prefix}.${var.route.domain}/oauth_callback"]
 }

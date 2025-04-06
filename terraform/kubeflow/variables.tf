@@ -3,12 +3,12 @@ locals {
   client_id = "kubeflow"
 }
 
-variable "domain" {
-  type = string
-}
-
-variable "email" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
@@ -24,5 +24,5 @@ output "auth" {
 }
 
 output "url" {
-  value = "https://${local.prefix}.${var.domain}"
+  value = "https://${local.prefix}.${var.route.domain}"
 }

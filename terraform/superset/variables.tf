@@ -5,12 +5,16 @@ locals {
 }
 
 resource "random_password" "password" {
-  length = 16
+  length  = 16
   special = false
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {

@@ -50,7 +50,7 @@ resource "kubernetes_config_map" "runner_config" {
         [[runners]]
         tls-ca-file = "/etc/gitlab-runner/certs/tls.crt"
         name = "kubernetes-runner"
-        url = "https://${local.prefix.gitlab}.${var.domain}"
+        url = "https://${local.prefix.gitlab}.${var.route.domain}"
         token = "$TOKEN"
         executor = "kubernetes"
         [runners.kubernetes]
@@ -98,7 +98,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 
-host = "https://${local.prefix.gitlab}.${var.domain}"
+host = "https://${local.prefix.gitlab}.${var.route.domain}"
 username = "root"
 password = "${local.password}"
 source = "/etc/gitlab-runner/config.toml"

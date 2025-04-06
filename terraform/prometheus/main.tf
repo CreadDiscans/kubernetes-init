@@ -35,7 +35,7 @@ resource "kubernetes_secret" "config" {
 [date_formats]
 default_timezone = UTC
 [server]
-root_url = https://${local.prefix}.${var.domain}
+root_url = https://${local.prefix}.${var.route.domain}
 [auth]
 signout_redirect_url = ${var.keycloak.url}/realms/${module.oidc.auth.realm}/protocol/openid-connect/logout
 disable_login_form = true
@@ -66,7 +66,7 @@ module "manifests" {
 
 module "grafana" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 3000
@@ -87,6 +87,6 @@ module "oidc" {
   keycloak     = var.keycloak
   client_id    = local.client_id
   prefix       = local.prefix
-  domain       = var.domain
-  redirect_uri = ["https://${local.prefix}.${var.domain}/login/generic_oauth"]
+  domain       = var.route.domain
+  redirect_uri = ["https://${local.prefix}.${var.route.domain}/login/generic_oauth"]
 }

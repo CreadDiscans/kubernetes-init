@@ -9,10 +9,6 @@ variable "osd" {
   }))
 }
 
-variable "domain" {
-  type = string
-}
-
 variable "single_node" {
   type = bool
 }

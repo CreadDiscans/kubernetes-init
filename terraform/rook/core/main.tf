@@ -50,20 +50,3 @@ module "toolbox" {
   yaml       = "${path.module}/yaml/toolbox.yaml"
   depends_on = [null_resource.wait]
 }
-
-module "service" {
-  source    = "../../utils/service"
-  namespace = kubernetes_namespace.ns.metadata.0.name
-  prefix    = local.prefix
-  domain    = var.domain
-  port      = 7000
-  selector = {
-    app          = "rook-ceph-mgr"
-    mgr_role     = "active"
-    rook_cluster = "rook-ceph"
-  }
-  annotations = {
-    "sysflow/favicon" = "/favicon.ico"
-    "sysflow/doc"     = "https://rook.io/docs/rook/latest-release/Getting-Started/intro/"
-  }
-}

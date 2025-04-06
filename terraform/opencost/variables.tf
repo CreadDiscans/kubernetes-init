@@ -1,15 +1,19 @@
 locals {
-  prefix = "opencost"
+  prefix    = "opencost"
   client_id = "opencost"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })

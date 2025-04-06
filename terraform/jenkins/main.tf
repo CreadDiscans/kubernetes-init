@@ -9,8 +9,8 @@ module "oidc" {
   keycloak     = var.keycloak
   client_id    = local.prefix
   prefix       = local.prefix
-  domain       = var.domain
-  redirect_uri = ["https://${local.prefix}.${var.domain}/securityRealm/finishLogin"]
+  domain       = var.route.domain
+  redirect_uri = ["https://${local.prefix}.${var.route.domain}/securityRealm/finishLogin"]
 }
 
 module "jenkins" {
@@ -18,7 +18,7 @@ module "jenkins" {
   yaml   = "${path.module}/yaml/jenkins.yaml"
   args = {
     prefix                = local.prefix
-    domain                = var.domain
+    domain                = var.route.domain
     securityRealm         = <<EOF
 oic:
           allowedTokenExpirationClockSkewSeconds: 0
@@ -55,7 +55,7 @@ EOF
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080

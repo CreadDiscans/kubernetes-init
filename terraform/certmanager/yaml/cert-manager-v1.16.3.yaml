@@ -13028,6 +13028,8 @@ spec:
           - --cluster-resource-namespace=$(POD_NAMESPACE)
           - --leader-election-namespace=kube-system
           - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.16.3
+          - --dns01-recursive-nameservers-only
+          - --dns01-recursive-nameservers=kube-dns.kube-system.svc.cluster.local:53
           - --max-concurrent-challenges=60
           ports:
           - containerPort: 9402

@@ -12,7 +12,7 @@ module "presto" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
@@ -34,5 +34,5 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix
-  domain    = var.domain
+  domain    = var.route.domain
 }

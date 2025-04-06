@@ -79,7 +79,7 @@ resource "kubernetes_deployment" "attu_deploy" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   port      = 3000
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
@@ -99,5 +99,5 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix
-  domain    = var.domain
+  domain    = var.route.domain
 }

@@ -13,3 +13,8 @@
 # coredns가 pihole 보도록 설정
 
 - kube-system에 coredns configmap 수정 > forward . PIHOLE_IP:53
+
+# host가 pihole 보도록 설정
+
+- /etc/netplan/50-cloud-init.yaml 에 nameservers에 PIHOLE_IP 추가
+- sudo netplan apply

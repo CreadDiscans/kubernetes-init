@@ -45,7 +45,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
           ]
           env {
             name  = "KC_HOSTNAME"
-            value = "https://${local.prefix}.${var.domain}"
+            value = "https://${local.prefix}.${var.route.domain}"
           }
           env {
             name  = "KC_HTTP_ENABLED"
@@ -102,7 +102,7 @@ resource "kubernetes_deployment" "keycloak_deploy" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080

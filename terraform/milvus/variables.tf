@@ -3,17 +3,13 @@ locals {
   client_id = "milvus"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
-
-# variable "minio_creds" {
-#   type = object({
-#     url = string
-#     username = string
-#     password = string
-#   })
-# }
 
 variable "keycloak" {
   type = object({

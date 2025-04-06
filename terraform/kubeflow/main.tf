@@ -94,7 +94,7 @@ module "centraldashboard" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8082
@@ -172,7 +172,7 @@ module "user" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/user.yaml"
   args = {
-    email = var.email
+    email = var.route.email
   }
   depends_on = [module.training_operator]
 }
@@ -221,9 +221,9 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix
-  domain    = var.domain
+  domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix}.${var.domain}/oauth/callback",
-    "https://${local.prefix}.${var.domain}/authservice_callback"
+    "https://${local.prefix}.${var.route.domain}/oauth/callback",
+    "https://${local.prefix}.${var.route.domain}/authservice_callback"
   ]
 }

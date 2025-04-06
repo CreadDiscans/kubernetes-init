@@ -9,9 +9,9 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix
-  domain    = var.domain
+  domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix}.${var.domain}/keycloak/auth/callback",
+    "https://${local.prefix}.${var.route.domain}/keycloak/auth/callback",
   ]
   post_logout_redirect_uris = [
     "*",
@@ -39,7 +39,7 @@ resource "kubernetes_secret" "secret" {
   }
   data = {
     SECRET_KEY             = random_password.secret_key.result
-    HOST_URL               = "https://${local.prefix}.${var.domain}"
+    HOST_URL               = "https://${local.prefix}.${var.route.domain}"
     KUBEFLOW_URL           = var.kubeflow_url
     GRAFANA_URL            = var.grafana.url
     GRAFANA_PATH           = var.grafana.path
@@ -207,7 +207,7 @@ module "service" {
   source    = "../utils/service"
   namespace = kubernetes_namespace.ns.metadata.0.name
   prefix    = local.prefix
-  domain    = var.domain
+  route     = var.route
   port      = 80
   selector  = kubernetes_deployment.deploy.metadata.0.labels
 }

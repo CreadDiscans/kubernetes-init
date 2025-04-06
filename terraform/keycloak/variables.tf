@@ -3,8 +3,8 @@ locals {
   username = "admin"
   password = random_password.password.result
   db = {
-    name = "keycloak"
-    user = "keycloak"
+    name     = "keycloak"
+    user     = "keycloak"
     password = random_password.password.result
   }
 }
@@ -15,13 +15,17 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 output "info" {
   value = {
-    url      = "https://${local.prefix}.${var.domain}"
+    url      = "https://${local.prefix}.${var.route.domain}"
     username = local.username
     password = local.password
   }

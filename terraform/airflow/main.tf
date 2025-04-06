@@ -26,8 +26,8 @@ module "oidc" {
   keycloak     = var.keycloak
   client_id    = local.client_id
   prefix       = local.prefix
-  domain       = var.domain
-  redirect_uri = ["https://${local.prefix}.${var.domain}/oauth-authorized/keycloak"]
+  domain       = var.route.domain
+  redirect_uri = ["https://${local.prefix}.${var.route.domain}/oauth-authorized/keycloak"]
 }
 
 module "airflow" {
@@ -52,7 +52,7 @@ module "role" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080

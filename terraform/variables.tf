@@ -4,9 +4,28 @@ variable "external_ips" {
   default = "x.x.x.x-x.x.x.x"
 }
 
-variable "email" {
-  type    = string
-  default = "user@example.com"
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
+  default = {
+    domain = "example.com"
+    issuer = "letsencrypt-staging"
+    email  = "user@example.com"
+  }
+}
+
+variable "aws_key" {
+  type = object({
+    aws_access_key_id     = string
+    aws_secret_access_key = string
+  })
+  default = {
+    aws_access_key_id     = ""
+    aws_secret_access_key = ""
+  }
 }
 
 variable "osd" {
@@ -27,19 +46,15 @@ variable "single_node" {
   default = true
 }
 
-variable "nfs_ip" {
-  type    = string
-  default = "x.x.x.x"
-}
-
-variable "nfs_path" {
-  type    = string
-  default = "/nfs"
-}
-
-variable "domain" {
-  type    = string
-  default = "example.com"
+variable "nfs_info" {
+  type = object({
+    ip   = string
+    path = string
+  })
+  default = {
+    ip   = "x.x.x.x"
+    path = "/nfs"
+  }
 }
 
 variable "airflow_repo" {

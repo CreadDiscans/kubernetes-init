@@ -89,8 +89,8 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
           env {
             name  = "GITLAB_OMNIBUS_CONFIG"
             value = <<-EOF
-            external_url 'https://${local.prefix.gitlab}.${var.domain}'
-            registry_external_url 'https://${local.prefix.registry}.${var.domain}'
+            external_url 'https://${local.prefix.gitlab}.${var.route.domain}'
+            registry_external_url 'https://${local.prefix.registry}.${var.route.domain}'
             nginx['listen_port'] = 80
             nginx['listen_https'] = false
             registry['enable'] = true
@@ -121,7 +121,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
                   client_options: {
                     identifier: "${module.oidc.auth.client_id}",
                     secret: "${module.oidc.auth.client_secret}",
-                    redirect_uri: "https://${local.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
+                    redirect_uri: "https://${local.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
                   }
                 }
               }
@@ -159,7 +159,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
 
 module "service" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix.gitlab
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
@@ -188,7 +188,7 @@ resource "kubernetes_service" "service_ssh" {
 
 module "service_registry" {
   source    = "../utils/service"
-  domain    = var.domain
+  route     = var.route
   prefix    = local.prefix.registry
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 5005
@@ -200,8 +200,8 @@ module "oidc" {
   keycloak  = var.keycloak
   client_id = local.client_id
   prefix    = local.prefix.gitlab
-  domain    = var.domain
+  domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix.gitlab}.${var.domain}/users/auth/openid_connect/callback"
+    "https://${local.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
   ]
 }

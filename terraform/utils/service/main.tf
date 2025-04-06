@@ -26,7 +26,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       "ingress.kubernetes.io/ssl-redirect"            = "true"
       "kubernetes.io/ingress.class"                   = "nginx"
       "kubernetes.io/tls-acme"                        = "true"
-      "cert-manager.io/cluster-issuer"                = local.clusterissuer
+      "cert-manager.io/cluster-issuer"                = var.route.issuer
       "nginx.ingress.kubernetes.io/proxy-buffer-size" = "128k"
     }, var.annotations)
     namespace = var.gateway != "" ? "istio-system" : var.namespace
@@ -34,11 +34,11 @@ resource "kubernetes_ingress_v1" "ingress" {
   spec {
     ingress_class_name = "nginx"
     tls {
-      hosts       = ["${var.prefix}.${var.domain}"]
+      hosts       = ["${var.prefix}.${var.route.domain}"]
       secret_name = "${var.prefix}-cert"
     }
     rule {
-      host = "${var.prefix}.${var.domain}"
+      host = "${var.prefix}.${var.route.domain}"
 
       http {
         path {
@@ -69,7 +69,7 @@ data "template_file" "gateway" {
     gateway   = var.gateway
     name      = var.prefix
     namespace = var.namespace
-    hostname  = "${var.prefix}.${var.domain}"
+    hostname  = "${var.prefix}.${var.route.domain}"
   }
   depends_on = [time_sleep.wait]
 }
@@ -98,7 +98,7 @@ data "template_file" "vertual_service" {
     gateway   = var.gateway
     name      = var.prefix
     namespace = var.namespace
-    hostname  = "${var.prefix}.${var.domain}"
+    hostname  = "${var.prefix}.${var.route.domain}"
   }
   depends_on = [time_sleep.wait]
 }

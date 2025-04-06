@@ -12,8 +12,12 @@ resource "random_password" "db_password" {
   special = false
 }
 
-variable "domain" {
-  type = string
+variable "route" {
+  type = object({
+    domain = string
+    issuer = string
+    email  = string
+  })
 }
 
 variable "keycloak" {
