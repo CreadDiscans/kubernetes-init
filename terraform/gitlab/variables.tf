@@ -5,11 +5,6 @@ locals {
   }
   client_id = "gitlab"
   password  = random_password.password.result
-  db = {
-    dbname   = "gitlab"
-    user     = "gitlab"
-    password = random_password.password.result
-  }
 }
 
 resource "random_password" "password" {

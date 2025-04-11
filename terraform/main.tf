@@ -147,3 +147,9 @@ module "cnpg" {
 module "vitess" {
   source = "./vitess"
 }
+
+module "langfuse" {
+  source   = "./langfuse"
+  route    = var.route
+  keycloak = module.keycloak.info
+}

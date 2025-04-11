@@ -1,9 +1,19 @@
+locals {
+  password = var.password == "" ? random_password.password.result : var.password
+}
+
+resource "random_password" "password" {
+  special = false
+  length  = 16
+}
+
 variable "user" {
   type = string
 }
 
 variable "password" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "name" {
@@ -25,4 +35,20 @@ output "host" {
 
 output "port" {
   value = 5432
+}
+
+output "user" {
+  value = var.user
+}
+
+output "name" {
+  value = var.name
+}
+
+output "password" {
+  value = local.password
+}
+
+output "connection" {
+  value = "postgresql://${var.user}:${local.password}@${kubernetes_service.postgresql_service.metadata.0.name}:5432/${var.name}"
 }

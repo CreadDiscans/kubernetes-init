@@ -42,34 +42,35 @@ resource "kubernetes_stateful_set" "postgresql" {
       spec {
         container {
           name  = "postgres"
-          image = "postgres:15"
-          
+          image = "postgres:17"
           port {
             container_port = 5432
           }
-
           env {
             name  = "POSTGRES_USER"
             value = var.user
           }
-
           env {
             name  = "POSTGRES_PASSWORD"
-            value = var.password
+            value = local.password
           }
-
           env {
             name  = "POSTGRES_DB"
             value = var.name
           }
-
+          startup_probe {
+            tcp_socket {
+              port = 5432
+            }
+            failure_threshold = 1000
+            period_seconds    = 10
+          }
           volume_mount {
             name       = "postgres-data"
             mount_path = "/var/lib/postgresql/data"
             sub_path   = "postgresql"
           }
         }
-
         volume {
           name = "postgres-data"
           persistent_volume_claim {

@@ -7,7 +7,7 @@ resource "kubernetes_persistent_volume_claim" "redis_pvc" {
     access_modes = ["ReadWriteMany"]
     resources {
       requests = {
-        storage = "10Gi"
+        storage = var.storage
       }
     }
   }
@@ -43,9 +43,22 @@ resource "kubernetes_deployment" "redis_deploy" {
         container {
           image = "redis:7.4.2"
           name  = "redis"
-          env {
-            name  = "REDIS_PASSWORD"
-            value = random_password.password.result
+          dynamic "env" {
+            for_each = var.password ? [1] : []
+            content {
+              name  = "REDIS_PASSWORD"
+              value = random_password.password.result
+            }
+          }
+          port {
+            container_port = 6379
+          }
+          startup_probe {
+            tcp_socket {
+              port = 6379
+            }
+            failure_threshold = 10000
+            period_seconds    = 10
           }
           volume_mount {
             name       = "data"

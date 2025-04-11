@@ -39,9 +39,9 @@ resource "kubernetes_config_map" "langfuse_cm" {
     AUTH_KEYCLOAK_ISSUER                       = "${module.oidc.auth.keycloak.url}/realms/master"
     SALT                                       = "mysalt"
     DATABASE_HOST                              = module.db.host
-    DATABASE_USERNAME                          = "langfuse"
-    DATABASE_PASSWORD                          = "langfuse"
-    DATABASE_NAME                              = "langfuse"
+    DATABASE_USERNAME                          = module.db.user
+    DATABASE_PASSWORD                          = module.db.password
+    DATABASE_NAME                              = module.db.name
     CLICKHOUSE_URL                             = "http://clickhouse-service.langfuse:8123"
     CLICKHOUSE_MIGRATION_URL                   = "clickhouse://clickhouse-service.langfuse:9000"
     CLICKHOUSE_USER                            = "default"

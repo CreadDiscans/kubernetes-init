@@ -30,6 +30,23 @@ module "oidc" {
   redirect_uri = ["https://${local.prefix}.${var.route.domain}/oauth-authorized/keycloak"]
 }
 
+module "db" {
+  source    = "../utils/postgres"
+  name      = "airflow"
+  user      = "airflow"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+}
+
+resource "kubernetes_secret" "postgres_secret" {
+  metadata {
+    name      = "postgres-secret"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+  }
+  data = {
+    connection = module.db.connection
+  }
+}
+
 module "airflow" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/airflow.yaml"
@@ -41,7 +58,7 @@ module "airflow" {
     keycloak_url  = module.oidc.auth.keycloak.url
     realm         = module.oidc.auth.realm
   }
-  depends_on = [kubernetes_deployment.postgres]
+  depends_on = [kubernetes_secret.postgres_secret]
 }
 
 module "role" {

@@ -4,6 +4,19 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
+module "postgres" {
+  source    = "../utils/postgres"
+  user      = "gitlab"
+  name      = "gitlab"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+}
+
+module "redis" {
+  source    = "../utils/redis"
+  namespace = kubernetes_namespace.ns.metadata.0.name
+  password  = false
+}
+
 resource "kubernetes_persistent_volume_claim" "deploy_pvc" {
   metadata {
     name      = "gitlab-pvc"
@@ -99,11 +112,11 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
             registry_nginx['ssl_verify_client'] = "off"
             prometheus_monitoring['enable'] = false
             postgresql['enable'] = false
-            gitlab_rails['db_database'] = "${local.db.dbname}"
-            gitlab_rails['db_username'] = "${local.db.user}"
-            gitlab_rails['db_password'] = "${local.db.password}"
-            gitlab_rails['db_host'] = "${kubernetes_service.postgresql_service.metadata.0.name}"
-            gitlab_rails['db_port'] = 5432
+            gitlab_rails['db_database'] = "${module.postgres.name}"
+            gitlab_rails['db_username'] = "${module.postgres.user}"
+            gitlab_rails['db_password'] = "${module.postgres.password}"
+            gitlab_rails['db_host'] = "${module.postgres.host}"
+            gitlab_rails['db_port'] = ${module.postgres.port}
             gitlab_rails['omniauth_block_auto_created_users'] = false
             gitlab_rails['omniauth_providers'] = [
               {
@@ -127,8 +140,8 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
               }
             ]
             redis['enable'] = false
-            gitlab_rails['redis_host'] = '${kubernetes_service.redis_service.metadata.0.name}'
-            gitlab_rails['redis_port'] = 6379
+            gitlab_rails['redis_host'] = '${module.redis.host}'
+            gitlab_rails['redis_port'] = ${module.redis.port}
             EOF
           }
           volume_mount {
