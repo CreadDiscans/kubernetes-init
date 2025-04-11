@@ -20,9 +20,8 @@ module "oidc" {
 
 module "postgres" {
   source    = "../utils/postgres"
-  name      = local.db_name
-  user      = local.db_user
-  password  = local.db_password
+  name      = "sysflow"
+  user      = "sysflow"
   namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
@@ -53,9 +52,9 @@ resource "kubernetes_secret" "secret" {
     DEFAULT_QUOTA_MEMORY   = "8Gi"
     DEFAULT_QUOTA_GPU      = "0"
     DEFAULT_QUOTA_STORAGE  = "100Gi"
-    DB_NAME                = local.db_name
-    DB_USER                = local.db_user
-    DB_PASSWORD            = local.db_password
+    DB_NAME                = module.postgres.name
+    DB_USER                = module.postgres.user
+    DB_PASSWORD            = module.postgres.password
     DB_HOST                = module.postgres.host
     DB_PORT                = module.postgres.port
   }
@@ -149,6 +148,9 @@ resource "kubernetes_deployment" "deploy" {
     namespace = kubernetes_namespace.ns.metadata.0.name
     labels = {
       app = "sysflow"
+    }
+    annotations = {
+      "reloader.stakater.com/auto" : "true"
     }
   }
   spec {

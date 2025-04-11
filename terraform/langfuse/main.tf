@@ -8,7 +8,6 @@ module "db" {
   source    = "../utils/postgres"
   user      = "langfuse"
   name      = "langfuse"
-  password  = "langfuse"
   namespace = kubernetes_namespace.ns.metadata.0.name
 }
 
@@ -117,4 +116,47 @@ module "service" {
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 3000
   selector  = kubernetes_deployment.deploy.metadata.0.labels
+  annotations = {
+    "sysflow/favicon" = "/favicon.ico"
+    "sysflow/doc"     = "https://langfuse.com/docs"
+  }
+}
+
+resource "kubernetes_deployment" "worker" {
+  metadata {
+    name      = "langfuse-worker"
+    namespace = kubernetes_namespace.ns.metadata.0.name
+    labels = {
+      app = "langfuse-worker"
+    }
+    annotations = {
+      "reloader.stakater.com/auto" : "true"
+    }
+  }
+  spec {
+    selector {
+      match_labels = {
+        app = "langfuse-worker"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "langfuse-worker"
+        }
+      }
+      spec {
+        container {
+          name  = "langfuse-worker"
+          image = "langfuse/langfuse-worker:latest"
+          env_from {
+            config_map_ref {
+              name = kubernetes_config_map.langfuse_cm.metadata.0.name
+            }
+          }
+        }
+      }
+    }
+  }
+  depends_on = [kubernetes_deployment.deploy]
 }
