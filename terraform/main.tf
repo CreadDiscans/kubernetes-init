@@ -39,7 +39,8 @@ module "rook-storgeclass" {
 # }
 
 module "pihole" {
-  source = "./pihole"
+  source      = "./pihole"
+  dns_records = var.dns_records
 }
 
 module "keycloak" {
@@ -149,7 +150,8 @@ module "vitess" {
 }
 
 # module "langfuse" {
-#   source   = "./langfuse"
-#   route    = var.route
-#   keycloak = module.keycloak.info
+#   source      = "./langfuse"
+#   route       = var.route
+#   keycloak    = module.keycloak.info
+#   minio_creds = module.minio.creds
 # }

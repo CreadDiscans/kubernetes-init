@@ -35,8 +35,7 @@ resource "kubernetes_config_map" "cm" {
 addn-hosts=/etc/addn-hosts
 except-interface=nonexisting
 EOF
-    "addn-hosts"                  = <<EOF
-EOF
+    "addn-hosts"                  = var.dns_records
     "05-pihole-custom-cname.conf" = ""
   }
 }

@@ -61,3 +61,8 @@ variable "airflow_repo" {
   type    = string
   default = "/system/airflow.git"
 }
+
+variable "dns_records" {
+  type    = string
+  default = ""
+}
