@@ -47,7 +47,7 @@ resource "kubernetes_persistent_volume_claim" "pvc" {
     namespace = kubernetes_namespace.ns.metadata.0.name
   }
   spec {
-    access_modes = ["ReadWriteOnce"]
+    access_modes = ["ReadWriteMany"]
     resources {
       requests = {
         storage = "1Gi"
