@@ -148,8 +148,8 @@ module "vitess" {
   source = "./vitess"
 }
 
-module "langfuse" {
-  source   = "./langfuse"
-  route    = var.route
-  keycloak = module.keycloak.info
-}
+# module "langfuse" {
+#   source   = "./langfuse"
+#   route    = var.route
+#   keycloak = module.keycloak.info
+# }

@@ -36,7 +36,7 @@ resources:
            secret: <KEY>
      - identity: {}
 
-3. vim /etc/kubernetes/manifest/kube-apiserver.yaml
+3. vim /etc/kubernetes/manifests/kube-apiserver.yaml
 
 spec:
   containers:
