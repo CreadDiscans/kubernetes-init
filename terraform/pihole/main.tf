@@ -35,7 +35,8 @@ resource "kubernetes_config_map" "cm" {
 addn-hosts=/etc/addn-hosts
 except-interface=nonexisting
 EOF
-    "addn-hosts"                  = ""
+    "addn-hosts"                  = <<EOF
+EOF
     "05-pihole-custom-cname.conf" = ""
   }
 }
@@ -132,7 +133,12 @@ resource "kubernetes_deployment" "deploy" {
           }
           volume_mount {
             mount_path = "/etc/dnsmasq.d/02-custom.conf"
-            sub_path = "02-custom.conf"
+            sub_path   = "02-custom.conf"
+            name       = "custom"
+          }
+          volume_mount {
+            mount_path = "/etc/addn-hosts"
+            sub_path   = "addn-hosts"
             name       = "custom"
           }
         }
