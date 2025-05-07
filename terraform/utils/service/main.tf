@@ -35,7 +35,7 @@ resource "kubernetes_ingress_v1" "ingress" {
   spec {
     ingress_class_name = "nginx"
     dynamic "tls" {
-      for_each = var.route.issuer == "" ? 0 : 1
+      for_each = var.route.issuer == "" ? [] : [1]
       content {
         hosts       = ["${var.prefix}.${var.route.domain}"]
         secret_name = "${var.prefix}-cert"
