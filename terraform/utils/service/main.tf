@@ -23,19 +23,23 @@ resource "kubernetes_ingress_v1" "ingress" {
   metadata {
     name = "${var.prefix}-ingress"
     annotations = merge({
-      "ingress.kubernetes.io/ssl-redirect"            = "true"
       "kubernetes.io/ingress.class"                   = "nginx"
-      "kubernetes.io/tls-acme"                        = "true"
-      "cert-manager.io/cluster-issuer"                = var.route.issuer
       "nginx.ingress.kubernetes.io/proxy-buffer-size" = "128k"
+      }, var.route.issuer == "" ? {} : {
+      "cert-manager.io/cluster-issuer"     = var.route.issuer
+      "kubernetes.io/tls-acme"             = "true"
+      "ingress.kubernetes.io/ssl-redirect" = "true"
     }, var.annotations)
     namespace = var.gateway != "" ? "istio-system" : var.namespace
   }
   spec {
     ingress_class_name = "nginx"
-    tls {
-      hosts       = ["${var.prefix}.${var.route.domain}"]
-      secret_name = "${var.prefix}-cert"
+    dynamic "tls" {
+      for_each = var.route.issuer == "" ? 0 : 1
+      content {
+        hosts       = ["${var.prefix}.${var.route.domain}"]
+        secret_name = "${var.prefix}-cert"
+      }
     }
     rule {
       host = "${var.prefix}.${var.route.domain}"
