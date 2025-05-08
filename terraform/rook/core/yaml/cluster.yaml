@@ -53,12 +53,12 @@ spec:
     count: 3
     # The mons should be on unique nodes. For production, at least 3 nodes are recommended for this reason.
     # Mons should only be allowed on the same node for test environments where data loss is acceptable.
-    allowMultiplePerNode: false
+    allowMultiplePerNode: ${allowMultiplePerNode}
   mgr:
     # When higher availability of the mgr is needed, increase the count to 2.
     # In that case, one mgr will be active and one in standby. When Ceph updates which
     # mgr is active, Rook will update the mgr services to match the active mgr.
-    count: 2
+    count: 1
     allowMultiplePerNode: false
     modules:
       # List of modules to optionally enable or disable.
@@ -73,7 +73,7 @@ spec:
     # serve the dashboard at the given port.
     # port: 8443
     # serve the dashboard using SSL
-    ssl: true
+    ssl: false
     # The url of the Prometheus instance
     # prometheusEndpoint: <protocol>://<prometheus-host>:<port>
     # Whether SSL should be verified if the Prometheus server is using https
@@ -334,9 +334,9 @@ spec:
     # cephfs driver specific settings.
     cephfs:
       # Set CephFS Kernel mount options to use https://docs.ceph.com/en/latest/man/8/mount.ceph/#options.
-      # kernelMountOptions: ""
+      kernelMountOptions: ""
       # Set CephFS Fuse mount options to use https://docs.ceph.com/en/latest/man/8/ceph-fuse/#options.
-      # fuseMountOptions: ""
+      fuseMountOptions: ""
 
   # healthChecks
   # Valid values for daemons are 'mon', 'osd', 'status'
