@@ -52,7 +52,7 @@ module "airflow" {
   yaml   = "${path.module}/yaml/airflow.yaml"
   args = {
     git_repo      = "https://root:${urlencode(data.kubernetes_secret.gitlab_secret.data.GITLAB_ROOT_PASSWORD)}@${replace(var.airflow_repo, "https://", "")}"
-    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"host\":\"${var.minio_creds.url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
+    connection    = "{\"conn_type\":\"aws\",\"extra\":{\"endpoint_url\":\"${var.minio_creds.url}\",\"aws_access_key_id\":\"${var.minio_creds.username}\",\"aws_secret_access_key\":\"${var.minio_creds.password}\"}}"
     client_id     = module.oidc.auth.client_id
     client_secret = module.oidc.auth.client_secret
     keycloak_url  = module.oidc.auth.keycloak.url
