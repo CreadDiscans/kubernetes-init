@@ -85,7 +85,7 @@ module "kubeflow" {
 module "sysflow" {
   source       = "./sysflow"
   route        = var.route
-  grafana      = module.prometheus.info
+  grafana      = module.grafana.info
   kubeflow_url = module.kubeflow.url
   keycloak     = module.keycloak.info
 }
