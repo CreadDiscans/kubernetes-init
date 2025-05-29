@@ -30,15 +30,10 @@ variable "aws_key" {
 
 variable "osd" {
   type = list(object({
-    device        = string
-    osdsPerDevice = string
+    node    = string
+    devices = list(string)
   }))
-  default = [
-    {
-      device        = "/dev/ubuntu-vg/ceph-lv",
-      osdsPerDevice = "1"
-    }
-  ]
+  default = []
 }
 
 variable "single_node" {

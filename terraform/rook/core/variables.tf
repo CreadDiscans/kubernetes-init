@@ -4,9 +4,10 @@ locals {
 
 variable "osd" {
   type = list(object({
-    device        = string
-    osdsPerDevice = string
+    node    = string
+    devices = list(string)
   }))
+  default = []
 }
 
 variable "single_node" {
