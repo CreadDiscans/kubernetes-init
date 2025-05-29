@@ -290,9 +290,9 @@ spec:
 %{ for item in osd_info }
       - name: ${item.node}
         devices:
-  %{ for device in item.devices }
+%{ for device in item.devices ~}
           - name: ${device}
-  %{ endfor } 
+%{ endfor ~} 
 %{ endfor }
     # nodes:
     #   - name: "172.17.4.201"
