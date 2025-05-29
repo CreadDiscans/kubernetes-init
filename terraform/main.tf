@@ -21,6 +21,10 @@ module "reloader" {
   source = "./reloader"
 }
 
+module "prometheus" {
+  source = "./prometheus"
+}
+
 module "rook" {
   source      = "./rook/core"
   osd         = var.osd
@@ -48,8 +52,8 @@ module "keycloak" {
   route  = var.route
 }
 
-module "prometheus" {
-  source   = "./prometheus"
+module "grafana" {
+  source   = "./grafana"
   route    = var.route
   keycloak = module.keycloak.info
 }

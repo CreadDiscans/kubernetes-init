@@ -1,6 +1,7 @@
 locals {
   prefix    = "grafana"
   client_id = "grafana"
+  namespace = "monitoring"
 }
 
 variable "route" {
