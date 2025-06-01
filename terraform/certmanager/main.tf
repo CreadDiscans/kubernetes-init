@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "ns_cert_manager" {
 
 module "cert_manager" {
   source     = "../utils/apply"
-  yaml       = "${path.module}/yaml/cert-manager-v1.16.3.yaml"
+  yaml       = "${path.module}/yaml/cert-manager-v1.17.2.yaml"
   depends_on = [kubernetes_namespace.ns_cert_manager]
 }
 
@@ -18,13 +18,11 @@ resource "time_sleep" "wait_cert_manager" {
 module "cert_cluster_issuer" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/cluster-issuer.yaml"
-  args = {
-    email = var.email
-  }
   depends_on = [time_sleep.wait_cert_manager]
 }
 
 resource "kubernetes_secret" "aws_secret" {
+  count = var.aws_key.aws_access_key_id == "" ? 0 : 1
   metadata {
     name      = "route53-credentials-secret"
     namespace = kubernetes_namespace.ns_cert_manager.metadata.0.name
@@ -36,11 +34,9 @@ resource "kubernetes_secret" "aws_secret" {
 }
 
 module "dns_cluster_issuer" {
+  count  = var.aws_key.aws_access_key_id == "" ? 0 : 1
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/cluster-issuer-dns.yaml"
-  args = {
-    email = var.email
-  }
   depends_on = [kubernetes_secret.aws_secret]
 }
 

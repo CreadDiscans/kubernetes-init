@@ -1,6 +1,3 @@
-variable "email" {
-  type = string
-}
 
 variable "aws_key" {
   type = object({

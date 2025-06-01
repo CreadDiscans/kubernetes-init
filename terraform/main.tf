@@ -9,7 +9,6 @@ module "nginx" {
 
 module "certmanager" {
   source  = "./certmanager"
-  email   = var.route.email
   aws_key = var.aws_key
 }
 
