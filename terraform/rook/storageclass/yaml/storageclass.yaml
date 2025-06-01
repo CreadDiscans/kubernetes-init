@@ -6,10 +6,10 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 1
+    size: ${size}
     # Disallow setting pool with replica 1, this could lead to data loss without recovery.
     # Make sure you're *ABSOLUTELY CERTAIN* that is what you want
-    requireSafeReplicaSize: false
+    requireSafeReplicaSize: ${requireSafeReplicaSize}
     # gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity of a given pool
     # for more info: https://docs.ceph.com/docs/master/rados/operations/placement-groups/#specifying-expected-pool-size
     #targetSizeRatio: .5
@@ -18,6 +18,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: rook-ceph-block
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: rook-ceph.rbd.csi.ceph.com # csi-provisioner-name
 parameters:
   # clusterID is the namespace where the rook cluster is running

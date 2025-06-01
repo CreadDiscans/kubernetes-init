@@ -32,7 +32,7 @@ module "cluster" {
   source = "../../utils/apply"
   yaml   = "${path.module}/yaml/cluster.yaml"
   args = {
-    nodes             = var.osd
+    nodes                = var.osd
     allowMultiplePerNode = var.single_node ? true : false
   }
   depends_on = [module.operator]

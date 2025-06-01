@@ -1,9 +1,18 @@
 module "filesystem" {
-  source     = "../../utils/apply"
-  yaml       = "${path.module}/yaml/filesystem.yaml"
+  source = "../../utils/apply"
+  yaml   = "${path.module}/yaml/filesystem.yaml"
   args = {
-    size = var.single_node ? 1 : 3
+    size                   = var.single_node ? 1 : 2
     requireSafeReplicaSize = var.single_node ? false : true
-    podAntiAffinity = var.single_node ? false : true
+    podAntiAffinity        = var.single_node ? false : true
+  }
+}
+
+module "blockpool" {
+  source = "../../utils/apply"
+  yaml   = "${path.module}/yaml/storageclass.yaml"
+  args = {
+    size                   = var.single_node ? 1 : 2
+    requireSafeReplicaSize = var.single_node ? false : true
   }
 }
