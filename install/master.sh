@@ -22,7 +22,7 @@ kubectl create secret generic node-ssh \
 kubectl create -f nvidia-device-plugin-daemonset.yaml
 
 # k9s
-wget https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_Linux_amd64.tar.gz
+wget https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_amd64.tar.gz
 tar -zxvf k9s_Linux_amd64.tar.gz 
 sudo mv k9s /usr/bin/k9s
 rm k9s_Linux_amd64.tar.gz
