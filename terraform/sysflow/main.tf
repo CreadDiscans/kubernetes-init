@@ -170,7 +170,7 @@ resource "kubernetes_deployment" "deploy" {
         service_account_name = kubernetes_service_account.sa.metadata.0.name
         container {
           name  = "sysflow"
-          image = "creaddiscans/sysflow:1.2.3"
+          image = "creaddiscans/sysflow:1.3.4"
           port {
             container_port = 80
           }
@@ -186,7 +186,7 @@ resource "kubernetes_deployment" "deploy" {
         }
         container {
           name    = "operator"
-          image   = "creaddiscans/sysflow:1.2.3"
+          image   = "creaddiscans/sysflow:1.3.4"
           command = ["bash", "-c", "python3 manage.py operator --settings=config.prod.settings"]
           env_from {
             secret_ref {

@@ -24,7 +24,7 @@
 - presto                            0.3.0       [https://prestodb.github.io/presto-helm-charts]
 - superset                          0.14.0      [https://github.com/apache/superset]
 - opencost                          1.43.2      [https://github.com/opencost/opencost-helm-chart]
-- sysflow                           1.0.13      
+- sysflow                           1.3.4      
 
 # kubernetes 설치
 
