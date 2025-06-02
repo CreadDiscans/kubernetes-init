@@ -8,12 +8,10 @@ variable "route" {
   type = object({
     domain = string
     issuer = string
-    email  = string
   })
   default = {
     domain = "example.com"
     issuer = "letsencrypt-staging"
-    email  = "user@example.com"
   }
 }
 
@@ -60,4 +58,9 @@ variable "airflow_repo" {
 variable "dns_records" {
   type    = string
   default = ""
+}
+
+variable "email" {
+  type    = string
+  default = "user@example.com"
 }

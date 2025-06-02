@@ -172,7 +172,7 @@ module "user" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/user.yaml"
   args = {
-    email = var.route.email
+    email = var.email
   }
   depends_on = [module.training_operator]
 }

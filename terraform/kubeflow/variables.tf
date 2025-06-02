@@ -7,7 +7,6 @@ variable "route" {
   type = object({
     domain = string
     issuer = string
-    email  = string
   })
 }
 
@@ -17,6 +16,10 @@ variable "keycloak" {
     username = string
     password = string
   })
+}
+
+variable "email" {
+  type = string
 }
 
 output "auth" {

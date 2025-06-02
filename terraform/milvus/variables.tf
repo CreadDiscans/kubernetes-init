@@ -7,7 +7,6 @@ variable "route" {
   type = object({
     domain = string
     issuer = string
-    email  = string
   })
 }
 
