@@ -52,3 +52,16 @@ spec:
 5. 기존 시크릿 데이터 암호화하여 etcd에 저장
 
 kubectl get secrets -A -o json | kubectl replace -f -
+
+## 네트워크 인터페이스 커스커마이징
+
+- ifconfig에서 interface확인
+- installation에서 수정
+nodeAddressAutodetectionV4:
+  Interface: INTERFACE
+
+## MTU 설정
+
+- ip a 로 mtu 확인
+- mtu - 50으로 설정
+- kubectl patch installation.operator.tigera.io default --type merge -p '{"spec":{"calicoNetwork":{"mtu":1450}}}'

@@ -30,7 +30,7 @@ module "rook" {
   single_node = var.single_node
 }
 
-module "rook-storgeclass" {
+module "rook-storageclass" {
   source      = "./rook/storageclass"
   single_node = var.single_node
   depends_on  = [module.rook]
