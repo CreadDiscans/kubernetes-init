@@ -126,6 +126,7 @@ module "milvus" {
 module "spark" {
   source   = "./spark"
   route    = var.route
+  prefix   = var.prefix.spark
   keycloak = module.keycloak.info
 }
 

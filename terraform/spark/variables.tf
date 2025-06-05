@@ -1,5 +1,4 @@
 locals {
-  prefix    = "spark"
   client_id = "spark"
 }
 
@@ -8,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "spark"
 }
 
 variable "keycloak" {
