@@ -2095,7 +2095,7 @@ metadata:
 apiVersion: v1
 data:
   DEFAULTPIPELINERUNNERSERVICEACCOUNT: default-editor
-  MULTIUSER: "false"
+  MULTIUSER: "true"
   VISUALIZATIONSERVICE_NAME: ml-pipeline-visualizationserver
   VISUALIZATIONSERVICE_PORT: "8888"
 kind: ConfigMap
@@ -3136,6 +3136,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: DISABLE_GKE_METADATA 
+          value: "true"
         image: gcr.io/ml-pipeline/frontend:2.3.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
