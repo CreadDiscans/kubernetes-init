@@ -69,3 +69,12 @@ variable "cloudflared_token" {
   type    = string
   default = ""
 }
+
+variable "prefix" {
+  type = object({
+    keycloak = string
+  })
+  default = {
+    keycloak = "keycloak"
+  }
+}

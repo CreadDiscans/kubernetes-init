@@ -54,6 +54,7 @@ module "pihole" {
 module "keycloak" {
   source = "./keycloak"
   route  = var.route
+  prefix = var.prefix.keycloak
 }
 
 module "grafana" {

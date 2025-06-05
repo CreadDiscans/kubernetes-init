@@ -1,5 +1,4 @@
 locals {
-  prefix   = "keycloak"
   username = "admin"
   password = random_password.password.result
   db = {
@@ -15,6 +14,11 @@ resource "random_password" "password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+variable "prefix" {
+  type    = string
+  default = "keycloak"
+}
+
 variable "route" {
   type = object({
     domain = string
@@ -24,7 +28,7 @@ variable "route" {
 
 output "info" {
   value = {
-    url      = "https://${local.prefix}.${var.route.domain}"
+    url      = "https://${var.prefix}.${var.route.domain}"
     username = local.username
     password = local.password
   }
