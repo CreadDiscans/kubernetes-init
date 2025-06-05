@@ -72,9 +72,11 @@ variable "cloudflared_token" {
 
 variable "prefix" {
   type = object({
-    keycloak = string
-    grafana  = string
-    argocd   = string
+    keycloak  = string
+    grafana   = string
+    argocd    = string
+    minio     = string
+    minio_api = string
   })
   default = {
     keycloak  = "keycloak"
