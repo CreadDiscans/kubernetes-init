@@ -85,6 +85,8 @@ variable "prefix" {
     spark     = string
     jenkins   = string
     presto    = string
+    opencost  = string
+    superset  = string
   })
   default = {
     keycloak  = "keycloak"
@@ -100,5 +102,7 @@ variable "prefix" {
     spark     = "spark"
     jenkins   = "jenkins"
     presto    = "presto"
+    opencost  = "opencost"
+    superset  = "superset"
   }
 }

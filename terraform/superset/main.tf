@@ -13,7 +13,7 @@ module "superset" {
     keycloak_url  = var.keycloak.url
     client_id     = local.client_id
     client_secret = module.oidc.auth.client_secret
-    prefix        = local.prefix
+    prefix        = var.prefix
     domain        = var.route.domain
   }
   depends_on = [kubernetes_namespace.ns]
@@ -22,7 +22,7 @@ module "superset" {
 module "service" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8088
   selector = {
@@ -40,9 +40,9 @@ module "oidc" {
   source    = "../utils/oidc"
   keycloak  = var.keycloak
   client_id = local.client_id
-  prefix    = local.prefix
+  prefix    = var.prefix
   domain    = var.route.domain
   redirect_uri = [
-    "http://${local.prefix}.${var.route.domain}/authorize"
+    "http://${var.prefix}.${var.route.domain}/authorize"
   ]
 }

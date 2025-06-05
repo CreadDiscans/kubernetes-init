@@ -147,12 +147,14 @@ module "presto" {
 module "opencost" {
   source   = "./opencost"
   route    = var.route
+  prefix   = var.prefix.opencost
   keycloak = module.keycloak.info
 }
 
 module "superset" {
   source   = "./superset"
   route    = var.route
+  prefix   = var.prefix.superset
   keycloak = module.keycloak.info
 }
 

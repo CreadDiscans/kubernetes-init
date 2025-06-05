@@ -1,5 +1,4 @@
 locals {
-  prefix    = "superset"
   client_id = "superset"
   secretkey = random_password.password.result
 }
@@ -14,6 +13,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "superset"
 }
 
 variable "keycloak" {

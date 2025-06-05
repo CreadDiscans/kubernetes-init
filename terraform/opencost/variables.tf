@@ -1,5 +1,4 @@
 locals {
-  prefix    = "opencost"
   client_id = "opencost"
 }
 
@@ -8,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "opencost"
 }
 
 variable "keycloak" {
