@@ -64,3 +64,8 @@ variable "email" {
   type    = string
   default = "user@example.com"
 }
+
+variable "cloudflared_token" {
+  type    = string
+  default = ""
+}
