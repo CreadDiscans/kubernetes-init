@@ -72,8 +72,12 @@ module "argocd" {
 }
 
 module "minio" {
-  source   = "./minio"
-  route    = var.route
+  source = "./minio"
+  route  = var.route
+  prefix = {
+    console = var.prefix.minio
+    api     = var.prefix.minio_api
+  }
   keycloak = module.keycloak.info
 }
 

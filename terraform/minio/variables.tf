@@ -1,7 +1,6 @@
 locals {
-  username = "minioadmin"
-  password = random_password.password.result
-  prefix = "minio"
+  username  = "minioadmin"
+  password  = random_password.password.result
   client_id = "minio"
 }
 
@@ -18,9 +17,16 @@ variable "route" {
   })
 }
 
+variable "prefix" {
+  type = object({
+    console = string
+    api     = string
+  })
+}
+
 variable "keycloak" {
   type = object({
-    url = string
+    url      = string
     username = string
     password = string
   })
@@ -28,7 +34,7 @@ variable "keycloak" {
 
 output "creds" {
   value = {
-    url = "https://${local.prefix}-api.${var.route.domain}"
+    url      = module.service_api.internal_url
     username = local.username
     password = local.password
   }

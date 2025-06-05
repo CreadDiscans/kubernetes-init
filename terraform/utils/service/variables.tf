@@ -30,3 +30,7 @@ variable "annotations" {
   type    = map(string)
   default = {}
 }
+
+output "internal_url" {
+  value = "http://${var.prefix}-service.${var.namespace}"
+}

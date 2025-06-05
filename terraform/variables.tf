@@ -77,8 +77,10 @@ variable "prefix" {
     argocd   = string
   })
   default = {
-    keycloak = "keycloak"
-    grafana  = "grafana"
-    argocd   = "argocd"
+    keycloak  = "keycloak"
+    grafana   = "grafana"
+    argocd    = "argocd"
+    minio     = "minio"
+    minio_api = "minio-api"
   }
 }
