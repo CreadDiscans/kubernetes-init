@@ -1,7 +1,5 @@
 locals {
-  realm     = "master"
   client_id = "presto"
-  prefix    = "presto"
 }
 
 variable "route" {
@@ -9,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "presto"
 }
 
 variable "keycloak" {

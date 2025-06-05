@@ -7,7 +7,7 @@ resource "kubernetes_namespace" "ns" {
 module "oidc" {
   source       = "../utils/oidc"
   keycloak     = var.keycloak
-  client_id    = var.prefix
+  client_id    = local.client_id
   prefix       = var.prefix
   domain       = var.route.domain
   redirect_uri = ["https://${var.prefix}.${var.route.domain}/securityRealm/finishLogin"]

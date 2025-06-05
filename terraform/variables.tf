@@ -84,6 +84,7 @@ variable "prefix" {
     milvus    = string
     spark     = string
     jenkins   = string
+    presto    = string
   })
   default = {
     keycloak  = "keycloak"
@@ -98,5 +99,6 @@ variable "prefix" {
     milvus    = "milvus"
     spark     = "spark"
     jenkins   = "jenkins"
+    presto    = "presto"
   }
 }

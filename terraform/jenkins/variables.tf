@@ -1,3 +1,7 @@
+locals {
+  client_id = "jenkins"
+}
+
 variable "route" {
   type = object({
     domain = string
