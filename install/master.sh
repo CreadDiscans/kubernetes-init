@@ -1,4 +1,4 @@
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/12
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -7,7 +7,7 @@ kubectl create secret generic kubeconfig --from-file=$HOME/.kube/config -n kube-
 
 # calico cni
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
+kubectl create -f custom-resources.yaml
 
 # node ssh key
 mkdir -p $HOME/.ssh
