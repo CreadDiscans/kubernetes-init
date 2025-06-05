@@ -7,17 +7,17 @@ resource "kubernetes_namespace" "ns" {
 module "oidc" {
   source       = "../utils/oidc"
   keycloak     = var.keycloak
-  client_id    = local.prefix
-  prefix       = local.prefix
+  client_id    = var.prefix
+  prefix       = var.prefix
   domain       = var.route.domain
-  redirect_uri = ["https://${local.prefix}.${var.route.domain}/securityRealm/finishLogin"]
+  redirect_uri = ["https://${var.prefix}.${var.route.domain}/securityRealm/finishLogin"]
 }
 
 module "jenkins" {
   source = "../utils/apply"
   yaml   = "${path.module}/yaml/jenkins.yaml"
   args = {
-    prefix                = local.prefix
+    prefix                = var.prefix
     domain                = var.route.domain
     securityRealm         = <<EOF
 oic:
@@ -56,7 +56,7 @@ EOF
 module "service" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {

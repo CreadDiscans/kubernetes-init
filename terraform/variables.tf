@@ -83,6 +83,7 @@ variable "prefix" {
     airflow   = string
     milvus    = string
     spark     = string
+    jenkins   = string
   })
   default = {
     keycloak  = "keycloak"
@@ -96,5 +97,6 @@ variable "prefix" {
     airflow   = "airflow"
     milvus    = "milvus"
     spark     = "spark"
+    jenkins   = "jenkins"
   }
 }

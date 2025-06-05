@@ -130,11 +130,11 @@ module "spark" {
   keycloak = module.keycloak.info
 }
 
-module "jenkins" {
-  source   = "./jenkins"
-  route    = var.route
-  keycloak = module.keycloak.info
-}
+# module "jenkins" {
+#   source   = "./jenkins"
+#   route    = var.route
+#   keycloak = module.keycloak.info
+# }
 
 module "presto" {
   source   = "./presto"

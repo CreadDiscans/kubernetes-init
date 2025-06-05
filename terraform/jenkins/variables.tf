@@ -1,12 +1,13 @@
-locals {
-  prefix = "jenkins"
-}
-
 variable "route" {
   type = object({
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "jenkins"
 }
 
 variable "keycloak" {
