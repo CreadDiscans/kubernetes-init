@@ -71,11 +71,11 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
           resources {
             requests = {
               cpu    = "100m"
-              memory = "4Gi"
+              memory = "8Gi"
             }
             limits = {
               cpu    = 2
-              memory = "8Gi"
+              memory = "16Gi"
             }
           }
           startup_probe {
