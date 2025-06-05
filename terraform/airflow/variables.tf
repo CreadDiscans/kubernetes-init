@@ -1,6 +1,5 @@
 locals {
   password  = random_password.password.result
-  prefix    = "airflow"
   client_id = "airflow"
 }
 
@@ -14,6 +13,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "airflow"
 }
 
 variable "minio_creds" {

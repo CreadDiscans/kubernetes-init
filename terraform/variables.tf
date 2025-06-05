@@ -80,6 +80,7 @@ variable "prefix" {
     gitlab    = string
     registry  = string
     kubeflow  = string
+    airflow   = string
   })
   default = {
     keycloak  = "keycloak"
@@ -90,5 +91,6 @@ variable "prefix" {
     gitlab    = "gitlab"
     registry  = "registry"
     kubeflow  = "kubeflow"
+    airflow   = "airflow"
   }
 }

@@ -25,9 +25,9 @@ module "oidc" {
   source       = "../utils/oidc"
   keycloak     = var.keycloak
   client_id    = local.client_id
-  prefix       = local.prefix
+  prefix       = var.prefix
   domain       = var.route.domain
-  redirect_uri = ["https://${local.prefix}.${var.route.domain}/oauth-authorized/keycloak"]
+  redirect_uri = ["https://${var.prefix}.${var.route.domain}/oauth-authorized/keycloak"]
 }
 
 module "db" {
@@ -70,7 +70,7 @@ module "role" {
 module "service" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8080
   selector = {

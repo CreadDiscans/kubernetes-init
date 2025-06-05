@@ -572,7 +572,7 @@ data:
           me = json.loads(base64.b64decode(payload.encode() + b'='*(-len(payload) % 4)).decode('utf-8'))
     
           groups = me.get('groups') # unsafe
-          if '/airflow' in groups:
+          if '/${client_id}' in groups:
             groups = ["airflow_admin"]
           else:
             groups = ["airflow_public"]

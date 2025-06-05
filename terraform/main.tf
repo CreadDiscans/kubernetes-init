@@ -110,6 +110,7 @@ module "sysflow" {
 module "airflow" {
   source       = "./airflow"
   route        = var.route
+  prefix       = var.prefix.airflow
   minio_creds  = module.minio.creds
   keycloak     = module.keycloak.info
   airflow_repo = "${module.gitlab.gitlab_url}${var.airflow_repo}"
