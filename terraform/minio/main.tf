@@ -39,6 +39,10 @@ module "service_console" {
   selector = {
     "v1.min.io/tenant" = "myminio"
   }
+  annotations = {
+    "sysflow/favicon" = "/favicon-32x32.png"
+    "sysflow/doc"     = "https://min.io/docs/minio/kubernetes/upstream/administration/minio-console.html"
+  }
   depends_on = [module.tenant]
 }
 
@@ -55,12 +59,12 @@ module "service_api" {
 }
 
 module "oidc" {
-  source       = "../utils/oidc"
-  keycloak     = var.keycloak
-  client_id    = local.client_id
-  prefix       = var.prefix.console
-  domain       = var.route.domain
-  policy       = "consoleAdmin"
+  source    = "../utils/oidc"
+  keycloak  = var.keycloak
+  client_id = local.client_id
+  prefix    = var.prefix.console
+  domain    = var.route.domain
+  policy    = "consoleAdmin"
   redirect_uri = [
     "https://${var.prefix.console}.${var.route.domain}/oauth_callback",
     "http://${var.prefix.console}.${var.route.domain}/oauth_callback",
