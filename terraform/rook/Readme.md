@@ -16,3 +16,14 @@
 - fs 삭제 : ceph fs ls / rm NAME --yes-i-really-mean-it
 - pool 삭제 : ceph osd pool ls / delete NAME NAME --yes-i-really-really-mean-it
 - crush  rule 삭제 : ceph osd crush rule ls / rm NAME
+
+# troubleshoot
+
+- mon이 한개씩 계속 down 되는 현상상
+
+$ sudo vi /usr/lib/systemd/system/containerd.service
+ 
+LimitNOFILE=1048576 # 수정
+ 
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart containerd
