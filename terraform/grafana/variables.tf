@@ -1,5 +1,4 @@
 locals {
-  prefix    = "grafana"
   client_id = "grafana"
   namespace = "monitoring"
 }
@@ -9,6 +8,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "grafana"
 }
 
 variable "keycloak" {
@@ -21,7 +25,7 @@ variable "keycloak" {
 
 output "info" {
   value = {
-    url  = "https://${local.prefix}.${var.route.domain}"
+    url  = "https://${var.prefix}.${var.route.domain}"
     path = "/d/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods"
   }
 }

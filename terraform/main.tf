@@ -60,6 +60,7 @@ module "keycloak" {
 module "grafana" {
   source   = "./grafana"
   route    = var.route
+  prefix   = var.prefix.grafana
   keycloak = module.keycloak.info
 }
 
