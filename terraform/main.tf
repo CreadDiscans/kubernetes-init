@@ -67,6 +67,7 @@ module "grafana" {
 module "argocd" {
   source   = "./argocd"
   route    = var.route
+  prefix   = var.prefix.argocd
   keycloak = module.keycloak.info
 }
 

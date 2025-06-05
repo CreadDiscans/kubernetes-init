@@ -1,5 +1,4 @@
 locals {
-  prefix    = "argocd"
   client_id = "argocd"
 }
 
@@ -8,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "argocd"
 }
 
 variable "keycloak" {

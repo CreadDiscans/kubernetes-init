@@ -74,9 +74,11 @@ variable "prefix" {
   type = object({
     keycloak = string
     grafana  = string
+    argocd   = string
   })
   default = {
     keycloak = "keycloak"
     grafana  = "grafana"
+    argocd   = "argocd"
   }
 }
