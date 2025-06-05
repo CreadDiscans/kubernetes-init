@@ -81,7 +81,7 @@ module "service" {
   source    = "../utils/service"
   route     = var.route
   port      = 3000
-  prefix    = local.prefix
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   gateway   = "milvus-gateway"
   selector = {
@@ -98,6 +98,6 @@ module "oidc" {
   source    = "../utils/oidc"
   keycloak  = var.keycloak
   client_id = local.client_id
-  prefix    = local.prefix
+  prefix    = var.prefix
   domain    = var.route.domain
 }

@@ -81,6 +81,7 @@ variable "prefix" {
     registry  = string
     kubeflow  = string
     airflow   = string
+    milvus    = string
   })
   default = {
     keycloak  = "keycloak"
@@ -92,5 +93,6 @@ variable "prefix" {
     registry  = "registry"
     kubeflow  = "kubeflow"
     airflow   = "airflow"
+    milvus    = "milvus"
   }
 }

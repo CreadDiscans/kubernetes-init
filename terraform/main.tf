@@ -119,6 +119,7 @@ module "airflow" {
 module "milvus" {
   source   = "./milvus"
   route    = var.route
+  prefix   = var.prefix.milvus
   keycloak = module.keycloak.info
 }
 

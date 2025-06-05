@@ -1,5 +1,4 @@
 locals {
-  prefix = "milvus"
   client_id = "milvus"
 }
 
@@ -8,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "milvus"
 }
 
 variable "keycloak" {
