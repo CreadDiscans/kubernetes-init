@@ -55,6 +55,7 @@ kubectl get secrets -A -o json | kubectl replace -f -
 
 ## 네트워크 인터페이스 커스커마이징
 
+- 각 노드에서 /etc/sysconfig/kubelet 파일에 KUBELET_EXTRA_ARGS=--node-ip=<NODE_IP> 추가후 kubelet restart
 - ifconfig에서 interface확인
 - installation에서 수정
 nodeAddressAutodetectionV4:

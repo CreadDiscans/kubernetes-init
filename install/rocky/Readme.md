@@ -7,3 +7,4 @@
     /home 폴더 복구
     sudo lvremove /dev/mapper/rl-home
     sudo lvextend -l +100%FREE /dev/mapper/rl-root
+    sudo xfs_growfs  /
