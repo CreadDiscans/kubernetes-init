@@ -18,9 +18,13 @@ variable "route" {
 
 variable "prefix" {
   type = object({
+    gitlab   = string
+    registry = string
+  })
+  default = {
     gitlab   = "gitlab"
     registry = "registry"
-  })
+  }
 }
 
 variable "keycloak" {
