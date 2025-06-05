@@ -61,5 +61,5 @@ module "oidc" {
   prefix       = var.prefix.console
   domain       = var.route.domain
   policy       = "consoleAdmin"
-  redirect_uri = ["https://${var.prefix.console}.${var.route.domain}/oauth_callback"]
+  redirect_uri = ["http://${var.prefix.console}.${var.route.domain}/oauth_callback"]
 }
