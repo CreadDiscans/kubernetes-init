@@ -47,6 +47,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       http {
         path {
           path = "/"
+          path_type = "Prefix"
           backend {
             service {
               name = var.gateway != "" ? "istio-ingressgateway" : kubernetes_service.service.metadata.0.name
