@@ -7,6 +7,11 @@ module "nginx" {
   source = "./nginx"
 }
 
+module "cloudflare" {
+  source = "./cloudflare"
+  token  = var.cloudflared_token
+}
+
 module "certmanager" {
   source  = "./certmanager"
   aws_key = var.aws_key
