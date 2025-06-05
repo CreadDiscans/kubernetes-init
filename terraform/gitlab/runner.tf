@@ -190,9 +190,6 @@ resource "kubernetes_deployment" "runner" {
       }
       spec {
         service_account_name = kubernetes_service_account.runner_sa.metadata.0.name
-        node_selector = {
-          "kubernetes.io/hostname": "master"
-        }
         init_container {
           name  = "gitlab-runner-token-getter"
           image = "creaddiscans/selenium_script:0.1"
