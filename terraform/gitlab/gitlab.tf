@@ -154,11 +154,22 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
             name       = "gitlab-volume"
             sub_path   = "gitlab/data"
           }
+          volume_mount {
+            mount_path = "/dev/shm"
+            name       = "dshm"
+          }
         }
         volume {
           name = "gitlab-volume"
           persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim.deploy_pvc.metadata.0.name
+          }
+        }
+        volume {
+          name = "dshm"
+          empty_dir {
+            medium     = "Memory"
+            size_limit = "512Mi"
           }
         }
       }
