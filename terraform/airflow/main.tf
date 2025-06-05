@@ -27,7 +27,10 @@ module "oidc" {
   client_id    = local.client_id
   prefix       = var.prefix
   domain       = var.route.domain
-  redirect_uri = ["https://${var.prefix}.${var.route.domain}/oauth-authorized/keycloak"]
+  redirect_uri = [
+    "https://${var.prefix}.${var.route.domain}/oauth-authorized/keycloak",
+    "http://${var.prefix}.${var.route.domain}/oauth-authorized/keycloak",
+  ]
 }
 
 module "db" {
