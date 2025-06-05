@@ -36,5 +36,5 @@ variable "keycloak" {
 }
 
 output "gitlab_url" {
-  value = "https://${local.prefix.gitlab}.${var.route.domain}"
+  value = module.service.internal_url
 }
