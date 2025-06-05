@@ -1,6 +1,5 @@
 locals {
-  prefix    = "sysflow"
-  client_id = "sysflow"
+  client_id = "dashboard"
 }
 
 variable "route" {
@@ -8,6 +7,11 @@ variable "route" {
     domain = string
     issuer = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "dashboard"
 }
 
 variable "keycloak" {

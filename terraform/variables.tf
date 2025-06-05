@@ -87,6 +87,7 @@ variable "prefix" {
     presto    = string
     opencost  = string
     superset  = string
+    dashboard = string
   })
   default = {
     keycloak  = "keycloak"
@@ -104,5 +105,6 @@ variable "prefix" {
     presto    = "presto"
     opencost  = "opencost"
     superset  = "superset"
+    dashboard = "dashboard"
   }
 }

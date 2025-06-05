@@ -102,6 +102,7 @@ module "kubeflow" {
 module "sysflow" {
   source       = "./sysflow"
   route        = var.route
+  prefix       = var.prefix.dashboard
   grafana      = module.grafana.info
   kubeflow_url = module.kubeflow.url
   keycloak     = module.keycloak.info
