@@ -88,6 +88,7 @@ variable "prefix" {
     opencost  = string
     superset  = string
     dashboard = string
+    kubeai    = string
   })
   default = {
     keycloak  = "keycloak"
@@ -106,5 +107,6 @@ variable "prefix" {
     opencost  = "opencost"
     superset  = "superset"
     dashboard = "dashboard"
+    kubeai    = "kubeai"
   }
 }

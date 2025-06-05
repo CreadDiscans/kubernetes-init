@@ -178,9 +178,9 @@ module "vitess" {
   source = "./vitess"
 }
 
-# module "langfuse" {
-#   source      = "./langfuse"
-#   route       = var.route
-#   keycloak    = module.keycloak.info
-#   minio_creds = module.minio.creds
-# }
+module "kubeai" {
+  source   = "./kubeai"
+  route    = var.route
+  prefix   = var.prefix.kubeai
+  keycloak = module.keycloak.info
+}

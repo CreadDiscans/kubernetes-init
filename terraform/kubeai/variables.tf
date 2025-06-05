@@ -1,14 +1,17 @@
 locals {
-  prefix    = "langfuse"
-  client_id = "langfuse"
+  client_id = "kubeai"
 }
 
 variable "route" {
   type = object({
     domain = string
     issuer = string
-    email  = string
   })
+}
+
+variable "prefix" {
+  type    = string
+  default = "kubeai"
 }
 
 variable "keycloak" {
@@ -19,10 +22,6 @@ variable "keycloak" {
   })
 }
 
-variable "minio_creds" {
-  type = object({
-    url      = string
-    username = string
-    password = string
-  })
+output "auth" {
+  value = module.oidc.auth
 }
