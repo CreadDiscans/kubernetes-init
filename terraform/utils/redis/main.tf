@@ -4,7 +4,7 @@ resource "kubernetes_persistent_volume_claim" "redis_pvc" {
     namespace = var.namespace
   }
   spec {
-    access_modes = ["ReadWriteMany"]
+    access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
         storage = var.storage
