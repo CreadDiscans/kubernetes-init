@@ -193,6 +193,9 @@ resource "kubernetes_deployment" "runner" {
         init_container {
           name  = "gitlab-runner-token-getter"
           image = "creaddiscans/selenium_script:0.1"
+          security_context {
+            run_as_user = 0
+          }
           env {
             name = "PYTHONUNBUFFERED"
             value = 1
