@@ -77,6 +77,8 @@ variable "prefix" {
     argocd    = string
     minio     = string
     minio_api = string
+    gitlab    = string
+    registry  = string
   })
   default = {
     keycloak  = "keycloak"
@@ -84,5 +86,7 @@ variable "prefix" {
     argocd    = "argocd"
     minio     = "minio"
     minio_api = "minio-api"
+    gitlab    = "gitlab"
+    registry  = "registry"
   }
 }

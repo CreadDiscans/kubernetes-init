@@ -82,8 +82,12 @@ module "minio" {
 }
 
 module "gitlab" {
-  source   = "./gitlab"
-  route    = var.route
+  source = "./gitlab"
+  route  = var.route
+  prefix = {
+    gitlab   = var.prefix.gitlab
+    registry = var.prefix.registry
+  }
   keycloak = module.keycloak.info
 }
 

@@ -50,7 +50,7 @@ resource "kubernetes_config_map" "runner_config" {
         [[runners]]
         tls-ca-file = "/etc/gitlab-runner/certs/tls.crt"
         name = "kubernetes-runner"
-        url = "https://${local.prefix.gitlab}.${var.route.domain}"
+        url = "https://${var.prefix.gitlab}.${var.route.domain}"
         token = "$TOKEN"
         executor = "kubernetes"
         [runners.kubernetes]
@@ -98,7 +98,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 
-host = "https://${local.prefix.gitlab}.${var.route.domain}"
+host = "https://${var.prefix.gitlab}.${var.route.domain}"
 username = "root"
 password = "${local.password}"
 source = "/etc/gitlab-runner/config.toml"
@@ -235,11 +235,11 @@ resource "kubernetes_deployment" "runner" {
             read_only  = true
             sub_path   = "config.toml"
           }
-          volume_mount {
-            name       = "gitlab-cert"
-            mount_path = "/etc/gitlab-runner/certs"
-            read_only  = true
-          }
+          # volume_mount {
+          #   name       = "gitlab-cert"
+          #   mount_path = "/etc/gitlab-runner/certs"
+          #   read_only  = true
+          # }
         }
         volume {
           name = "script"
@@ -259,12 +259,12 @@ resource "kubernetes_deployment" "runner" {
             claim_name = kubernetes_persistent_volume_claim.pvc.metadata.0.name
           }
         }
-        volume {
-          name = "gitlab-cert"
-          secret {
-            secret_name = "${local.prefix.gitlab}-cert"
-          }
-        }
+        # volume {
+        #   name = "gitlab-cert"
+        #   secret {
+        #     secret_name = "${var.prefix.gitlab}-cert"
+        #   }
+        # }
         restart_policy = "Always"
       }
     }

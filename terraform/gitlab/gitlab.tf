@@ -102,8 +102,8 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
           env {
             name  = "GITLAB_OMNIBUS_CONFIG"
             value = <<-EOF
-            external_url 'https://${local.prefix.gitlab}.${var.route.domain}'
-            registry_external_url 'https://${local.prefix.registry}.${var.route.domain}'
+            external_url 'https://${var.prefix.gitlab}.${var.route.domain}'
+            registry_external_url 'https://${var.prefix.registry}.${var.route.domain}'
             nginx['listen_port'] = 80
             nginx['listen_https'] = false
             registry['enable'] = true
@@ -134,7 +134,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
                   client_options: {
                     identifier: "${module.oidc.auth.client_id}",
                     secret: "${module.oidc.auth.client_secret}",
-                    redirect_uri: "https://${local.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
+                    redirect_uri: "https://${var.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
                   }
                 }
               }
@@ -173,7 +173,7 @@ resource "kubernetes_stateful_set" "gitlab_deploy" {
 module "service" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix.gitlab
+  prefix    = var.prefix.gitlab
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 80
   selector  = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
@@ -202,7 +202,7 @@ resource "kubernetes_service" "service_ssh" {
 module "service_registry" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix.registry
+  prefix    = var.prefix.registry
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 5005
   selector  = kubernetes_stateful_set.gitlab_deploy.metadata.0.labels
@@ -212,9 +212,9 @@ module "oidc" {
   source    = "../utils/oidc"
   keycloak  = var.keycloak
   client_id = local.client_id
-  prefix    = local.prefix.gitlab
+  prefix    = var.prefix.gitlab
   domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
+    "https://${var.prefix.gitlab}.${var.route.domain}/users/auth/openid_connect/callback"
   ]
 }

@@ -1,8 +1,4 @@
 locals {
-  prefix = {
-    gitlab   = "gitlab"
-    registry = "registry"
-  }
   client_id = "gitlab"
   password  = random_password.password.result
 }
@@ -17,6 +13,13 @@ variable "route" {
   type = object({
     domain = string
     issuer = string
+  })
+}
+
+variable "prefix" {
+  type = object({
+    gitlab   = "gitlab"
+    registry = "registry"
   })
 }
 
