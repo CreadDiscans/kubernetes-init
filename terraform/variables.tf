@@ -79,6 +79,7 @@ variable "prefix" {
     minio_api = string
     gitlab    = string
     registry  = string
+    kubeflow  = string
   })
   default = {
     keycloak  = "keycloak"
@@ -88,5 +89,6 @@ variable "prefix" {
     minio_api = "minio-api"
     gitlab    = "gitlab"
     registry  = "registry"
+    kubeflow  = "kubeflow"
   }
 }

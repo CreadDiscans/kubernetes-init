@@ -94,6 +94,7 @@ module "gitlab" {
 module "kubeflow" {
   source   = "./kubeflow"
   route    = var.route
+  prefix   = var.prefix.kubeflow
   email    = var.email
   keycloak = module.keycloak.info
 }

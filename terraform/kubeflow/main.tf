@@ -95,7 +95,7 @@ module "centraldashboard" {
 module "service" {
   source    = "../utils/service"
   route     = var.route
-  prefix    = local.prefix
+  prefix    = var.prefix
   namespace = kubernetes_namespace.ns.metadata.0.name
   port      = 8082
   gateway   = "kubeflow-gateway"
@@ -220,10 +220,10 @@ module "oidc" {
   source    = "../utils/oidc"
   keycloak  = var.keycloak
   client_id = local.client_id
-  prefix    = local.prefix
+  prefix    = var.prefix
   domain    = var.route.domain
   redirect_uri = [
-    "https://${local.prefix}.${var.route.domain}/oauth/callback",
-    "https://${local.prefix}.${var.route.domain}/authservice_callback"
+    "https://${var.prefix}.${var.route.domain}/oauth/callback",
+    "https://${var.prefix}.${var.route.domain}/authservice_callback"
   ]
 }
