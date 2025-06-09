@@ -26,6 +26,7 @@
 - opencost                          1.43.2      [https://github.com/opencost/opencost-helm-chart]
 - sysflow                           1.3.4      
 - kubeai                            0.20.0      [https://github.com/substratusai/kubeai]
+- dify                              1.2.0       [https://github.com/langgenius/dify]
 
 # kubernetes 설치
 
