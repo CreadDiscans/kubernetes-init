@@ -184,3 +184,13 @@ module "kubeai" {
   prefix   = var.prefix.kubeai
   keycloak = module.keycloak.info
 }
+
+module "dify" {
+  source = "./dify"
+  route  = var.route
+  prefix = {
+    console = var.prefix.dify
+    api     = var.prefix.dify_api
+  }
+  minio_creds = module.minio.creds
+}

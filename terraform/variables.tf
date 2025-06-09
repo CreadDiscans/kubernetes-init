@@ -89,6 +89,8 @@ variable "prefix" {
     superset  = string
     dashboard = string
     kubeai    = string
+    dify      = string
+    dify_api  = string
   })
   default = {
     keycloak  = "keycloak"
@@ -108,5 +110,7 @@ variable "prefix" {
     superset  = "superset"
     dashboard = "dashboard"
     kubeai    = "kubeai"
+    dify      = "dify"
+    dify_api  = "dify_api"
   }
 }
