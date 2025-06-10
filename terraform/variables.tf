@@ -57,7 +57,7 @@ variable "airflow_repo" {
 
 variable "dns_records" {
   type    = string
-  default = ""
+  default = "" # x.x.x.x example.com
 }
 
 variable "email" {
