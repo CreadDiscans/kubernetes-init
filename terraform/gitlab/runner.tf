@@ -50,7 +50,7 @@ resource "kubernetes_config_map" "runner_config" {
         [[runners]]
         tls-ca-file = "/etc/gitlab-runner/certs/tls.crt"
         name = "kubernetes-runner"
-        url = "https://${var.prefix.gitlab}.${var.route.domain}"
+        url = "${module.service.internal_url}"
         token = "$TOKEN"
         executor = "kubernetes"
         [runners.kubernetes]
