@@ -9,6 +9,9 @@ module "postgres" {
   user      = "gitlab"
   name      = "gitlab"
   namespace = kubernetes_namespace.ns.metadata.0.name
+  config = {
+    "max_connections" = "200"
+  }
 }
 
 module "redis" {

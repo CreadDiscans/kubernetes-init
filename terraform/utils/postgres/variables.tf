@@ -29,6 +29,11 @@ variable "namespace" {
   type = string
 }
 
+variable "config" {
+  type    = map(string)
+  default = {}
+}
+
 output "host" {
   value = "${kubernetes_service.postgresql_service.metadata.0.name}.${var.namespace}"
 }
