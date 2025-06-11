@@ -69,6 +69,9 @@ resource "kubernetes_deployment" "deploy" {
   }
   spec {
     replicas = 1
+    strategy {
+      type = "Recreate"
+    }
     selector {
       match_labels = {
         app = "pihole"

@@ -18,3 +18,9 @@
 
 - /etc/netplan/50-cloud-init.yaml 에 nameservers에 PIHOLE_IP 추가
 - sudo netplan apply
+
+# CLI
+
+- pihole status
+- pihole disable
+- pihole enable
