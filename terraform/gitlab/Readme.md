@@ -16,6 +16,7 @@
 
 # Container Registry 내부 처리
 
+- /etc/hosts에 registry 주소 추가
 - [docker]
 - 노드에서 /etc/docker/daemon.json에 {"insecure-registries": ["REGISTRY 주소"]} 추가
 - sudo systemctl restart docker
