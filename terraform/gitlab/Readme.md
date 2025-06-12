@@ -18,11 +18,12 @@
 
 - /etc/hosts에 registry 주소 추가
 - [docker]
-- 노드에서 /etc/docker/daemon.json에 {"insecure-registries": ["REGISTRY 주소"]} 추가
+- sudo vi /etc/docker/daemon.json
+- {"insecure-registries": ["REGISTRY 주소"]} # 추가
 - sudo systemctl restart docker
 - docker info로 확인
 - [containerd]
-- 노드에서 /etc/containerd/config.toml 편집
+- sudo vi /etc/containerd/config.toml
 - [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
 -   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."REGISTRY주소"] # 추가
 -     endpoint = ["http://REGISTRY주소"] # 추가
