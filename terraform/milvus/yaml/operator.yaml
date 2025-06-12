@@ -7253,15 +7253,16 @@ metadata:
   name: milvuses.milvus.io
 spec:
   conversion:
-    strategy: Webhook
-    webhook:
-      clientConfig:
-        service:
-          name: 'milvus-operator-webhook-service'
-          namespace: milvus-operator
-          path: /convert
-      conversionReviewVersions:
-      - v1
+    strategy: None
+    # strategy: Webhook
+    # webhook:
+    #   clientConfig:
+    #     service:
+    #       name: 'milvus-operator-webhook-service'
+    #       namespace: milvus-operator
+    #       path: /convert
+    #   conversionReviewVersions:
+    #   - v1
   group: milvus.io
   names:
     kind: Milvus
