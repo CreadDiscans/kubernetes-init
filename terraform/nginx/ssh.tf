@@ -15,11 +15,6 @@ resource "kubernetes_secret" "ssh_key_secret" {
   }
 }
 
-resource "local_file" "ssh_key" {
-  filename = "test.pem"
-  content  = tls_private_key.ssh_key_pair.private_key_pem
-}
-
 resource "kubernetes_deployment" "ssh_remote_forward" {
   for_each = toset(var.ssh_client.ports)
   metadata {
