@@ -301,7 +301,7 @@ spec:
       containers:
       - env:
         - name: LOGOUT_URL
-          value: /oauth2/sign_out
+          value: /authservice_logout
         - name: USERID_HEADER
           value: kubeflow-userid
         - name: USERID_PREFIX
