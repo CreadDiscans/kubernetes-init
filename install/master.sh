@@ -10,13 +10,13 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1
 kubectl create -f custom-resources.yaml
 
 # node ssh key
-mkdir -p $HOME/.ssh
-ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N ""
-kubectl create secret generic node-ssh \
-    --from-file=$HOME/.ssh/id_rsa \
-    --from-file=$HOME/.ssh/id_rsa.pub \
-    --from-literal=username=$USER \
-    -n kube-system
+# mkdir -p $HOME/.ssh
+# ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N ""
+# kubectl create secret generic node-ssh \
+#     --from-file=$HOME/.ssh/id_rsa \
+#     --from-file=$HOME/.ssh/id_rsa.pub \
+#     --from-literal=username=$USER \
+#     -n kube-system
 
 # nvidia plugin
 kubectl create -f nvidia-device-plugin-daemonset.yaml
