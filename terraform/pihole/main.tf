@@ -104,6 +104,10 @@ resource "kubernetes_deployment" "deploy" {
             name  = "FTLCONF_misc_etc_dnsmasq_d"
             value = "true"
           }
+          env {
+            name = "DNSMASQ_USER"
+            value = "root"
+          }
           port {
             container_port = 80
             name           = "http"

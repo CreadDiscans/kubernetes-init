@@ -14,17 +14,6 @@ resource "kubernetes_persistent_volume_claim" "postgresql_pvc" {
   }
 }
 
-resource "kubernetes_config_map" "config" {
-  metadata {
-    name      = "postgres-config"
-    namespace = var.namespace
-  }
-  data = {
-    "postgresql.auto.conf" = join("\n", [
-      for key, value in var.config : "${key} = ${value}"
-    ])
-  }
-}
 
 resource "kubernetes_stateful_set" "postgresql" {
   metadata {
@@ -56,18 +45,16 @@ resource "kubernetes_stateful_set" "postgresql" {
       }
       spec {
         init_container {
-          name    = "override-config"
-          image   = "busybox:latest"
-          command = ["sh", "-c", "cp /tmp/postgresql.auto.conf /var/lib/postgresql/data/postgresql.auto.conf"]
+          name    = "fix-permissions"
+          image   = "busybox"
+          command = [
+            "sh", "-c",
+            "chmod 0700 /var/lib/postgresql/data && chown -R 999:999 /var/lib/postgresql/data && ls -al /var/lib/postgresql/data"
+          ]
           volume_mount {
             name       = "postgres-data"
             mount_path = "/var/lib/postgresql/data"
             sub_path   = "postgresql"
-          }
-          volume_mount {
-            name       = "config"
-            mount_path = "/tmp/postgresql.auto.conf"
-            sub_path   = "postgresql.auto.conf"
           }
         }
         container {
@@ -100,17 +87,15 @@ resource "kubernetes_stateful_set" "postgresql" {
             mount_path = "/var/lib/postgresql/data"
             sub_path   = "postgresql"
           }
+          security_context {
+            run_as_user = 999
+            run_as_group = 999
+          }
         }
         volume {
           name = "postgres-data"
           persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim.postgresql_pvc.metadata.0.name
-          }
-        }
-        volume {
-          name = "config"
-          config_map {
-            name = kubernetes_config_map.config.metadata.0.name
           }
         }
       }
